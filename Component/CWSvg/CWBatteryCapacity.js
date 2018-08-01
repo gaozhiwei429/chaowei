@@ -86,7 +86,6 @@ export default class CWBatteryCapacity extends Component {
             },(error)=>{
                 console.log(error);
             });
-
             const batteryCapacity1 = () => {
                 //查询
                 db.transaction((tx)=>{
