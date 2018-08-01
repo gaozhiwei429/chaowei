@@ -76,7 +76,6 @@ export default class CWBatteryCapacity extends Component {
                     var len = results.rows.length;
                     for(let i=0; i<len; i++){
                         var u = results.rows.item(i);
-
                         battery1capacityData.push(parseInt(u.capacity));
                         this.setState({
                             battery1:battery1capacityData,
