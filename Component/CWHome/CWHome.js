@@ -51,7 +51,7 @@ function bindSingle(){
     var equipmentList = Identifier.concat(Reserved,Reserved,others[otherIndex],batteryArray[currentIndex]);
     bleBroadcast.start(commandList ,equipmentList);// 蓝牙广播开始
     var con=commandList.concat(equipmentList);//广播的数据
-    console.log(con);//广播的数据
+    // console.log(con);//广播的数据
     otherIndex = otherIndex + 1;// otherIndex 自增
 }
 

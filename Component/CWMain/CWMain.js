@@ -52,7 +52,7 @@ Tabs.navigationOptions = ({ navigation }) => {
 
     // here's an example, but you can dynamically define title
     // however you like given `routes` & `index`
-    console.log(routes);
+
     if (routes[index].routeName === 'Home') {
         navigationOptions.title = '首页';
             navigationOptions.headerStyle={

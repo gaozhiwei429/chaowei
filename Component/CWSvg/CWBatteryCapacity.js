@@ -242,7 +242,7 @@ export default class CWBatteryCapacity extends Component {
             setTimeout(batteryCapacity4, 10000);
         });
     }
-
+    // 查询历史数据
     historyTime(){
         battery1capacityData = [];
         battery2capacityData=[];
@@ -258,10 +258,11 @@ export default class CWBatteryCapacity extends Component {
 
         //查询电池1
         db.transaction((tx)=>{
-            tx.executeSql("select id,battery_id,my_timestamp,capacity from battery where battery_id='"+promiseValues[0][0]+"' order by my_timestamp  limit 18", [],(tx,results)=>{
+            tx.executeSql("select id,battery_id,my_timestamp,capacity from battery where battery_id='"+promiseValues[0][0]+"' order by my_timestamp desc limit 18", [],(tx,results)=>{
                 var len = results.rows.length;
                 for(let i=0; i<len; i++){
                     var u = results.rows.item(i);
+                    console.log(u,1);
                     battery1capacityData.push(parseInt(u.capacity));
                     this.setState({
                         battery1:battery1capacityData,
@@ -274,10 +275,11 @@ export default class CWBatteryCapacity extends Component {
 
         //查询电池2
         db.transaction((tx)=>{
-            tx.executeSql("select id,battery_id,my_timestamp,capacity from battery where battery_id='"+promiseValues[0][1]+"' order by my_timestamp  limit 18", [],(tx,results)=>{
+            tx.executeSql("select id,battery_id,my_timestamp,capacity from battery where battery_id='"+promiseValues[0][1]+"' order by my_timestamp desc limit 18", [],(tx,results)=>{
                 var len = results.rows.length;
                 for(let i=0; i<len; i++){
                     var u = results.rows.item(i);
+                    console.log(u,2);
                     battery2capacityData.push(parseInt(u.capacity));
                     this.setState({
                         battery2:battery2capacityData,
@@ -290,10 +292,11 @@ export default class CWBatteryCapacity extends Component {
 
         //查询电池3
         db.transaction((tx)=>{
-            tx.executeSql("select id,battery_id,my_timestamp,capacity from battery where battery_id='"+promiseValues[0][2]+"' order by my_timestamp  limit 18", [],(tx,results)=>{
+            tx.executeSql("select id,battery_id,my_timestamp,capacity from battery where battery_id='"+promiseValues[0][2]+"' order by my_timestamp desc limit 18", [],(tx,results)=>{
                 var len = results.rows.length;
                 for(let i=0; i<len; i++){
                     var u = results.rows.item(i);
+                    console.log(u,3);
                     battery3capacityData.push(parseInt(u.capacity));
                     this.setState({
                         battery3:battery3capacityData,
@@ -306,10 +309,11 @@ export default class CWBatteryCapacity extends Component {
 
         //查询电池4
         db.transaction((tx)=>{
-            tx.executeSql("select id,battery_id,my_timestamp,capacity from battery where battery_id='"+promiseValues[0][3]+"' order by my_timestamp  limit 18", [],(tx,results)=>{
+            tx.executeSql("select id,battery_id,my_timestamp,capacity from battery where battery_id='"+promiseValues[0][3]+"' order by my_timestamp desc limit 18", [],(tx,results)=>{
                 var len = results.rows.length;
                 for(let i=0; i<len; i++){
                     var u = results.rows.item(i);
+                    console.log(u,4);
                     battery4capacityData.push(parseInt(u.capacity));
                     this.setState({
                         battery4:battery4capacityData,

@@ -257,7 +257,7 @@ export default class CWBatteryTemperature extends Component {
         //查询电池1
         db.transaction((tx)=>{
             // console.log(values[0][1]);
-            tx.executeSql("select id,battery_id,my_timestamp,temperature from battery where battery_id='"+promiseValues[0][0]+"' order by my_timestamp  limit 18", [],(tx,results)=>{
+            tx.executeSql("select id,battery_id,my_timestamp,temperature from battery where battery_id='"+promiseValues[0][0]+"' order by my_timestamp desc  limit 18", [],(tx,results)=>{
                 var len = results.rows.length;
                 for(let i=0; i<len; i++){
                     var u = results.rows.item(i);
@@ -273,7 +273,7 @@ export default class CWBatteryTemperature extends Component {
 
         //查询电池2
         db.transaction((tx)=>{
-            tx.executeSql("select id,battery_id,my_timestamp,temperature from battery where battery_id='"+promiseValues[0][1]+"' order by my_timestamp  limit 18", [],(tx,results)=>{
+            tx.executeSql("select id,battery_id,my_timestamp,temperature from battery where battery_id='"+promiseValues[0][1]+"' order by my_timestamp desc  limit 18", [],(tx,results)=>{
                 var len = results.rows.length;
                 for(let i=0; i<len; i++){
                     var u = results.rows.item(i);
@@ -289,7 +289,7 @@ export default class CWBatteryTemperature extends Component {
 
         //查询电池3
         db.transaction((tx)=>{
-            tx.executeSql("select id,battery_id,my_timestamp,temperature from battery where battery_id='"+promiseValues[0][2]+"' order by my_timestamp  limit 18", [],(tx,results)=>{
+            tx.executeSql("select id,battery_id,my_timestamp,temperature from battery where battery_id='"+promiseValues[0][2]+"' order by my_timestamp desc  limit 18", [],(tx,results)=>{
                 var len = results.rows.length;
                 for(let i=0; i<len; i++){
                     var u = results.rows.item(i);
@@ -305,7 +305,7 @@ export default class CWBatteryTemperature extends Component {
 
         //查询电池4
         db.transaction((tx)=>{
-            tx.executeSql("select id,battery_id,my_timestamp,temperature from battery where battery_id='"+promiseValues[0][3]+"' order by my_timestamp  limit 18", [],(tx,results)=>{
+            tx.executeSql("select id,battery_id,my_timestamp,temperature from battery where battery_id='"+promiseValues[0][3]+"' order by my_timestamp desc limit 18", [],(tx,results)=>{
                 var len = results.rows.length;
                 for(let i=0; i<len; i++){
                     var u = results.rows.item(i);
