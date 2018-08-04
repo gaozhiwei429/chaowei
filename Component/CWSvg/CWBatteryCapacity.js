@@ -262,7 +262,6 @@ export default class CWBatteryCapacity extends Component {
                 var len = results.rows.length;
                 for(let i=0; i<len; i++){
                     var u = results.rows.item(i);
-                    console.log(u,1);
                     battery1capacityData.push(parseInt(u.capacity));
                     this.setState({
                         battery1:battery1capacityData,
@@ -279,7 +278,6 @@ export default class CWBatteryCapacity extends Component {
                 var len = results.rows.length;
                 for(let i=0; i<len; i++){
                     var u = results.rows.item(i);
-                    console.log(u,2);
                     battery2capacityData.push(parseInt(u.capacity));
                     this.setState({
                         battery2:battery2capacityData,
@@ -296,7 +294,6 @@ export default class CWBatteryCapacity extends Component {
                 var len = results.rows.length;
                 for(let i=0; i<len; i++){
                     var u = results.rows.item(i);
-                    console.log(u,3);
                     battery3capacityData.push(parseInt(u.capacity));
                     this.setState({
                         battery3:battery3capacityData,
@@ -313,7 +310,6 @@ export default class CWBatteryCapacity extends Component {
                 var len = results.rows.length;
                 for(let i=0; i<len; i++){
                     var u = results.rows.item(i);
-                    console.log(u,4);
                     battery4capacityData.push(parseInt(u.capacity));
                     this.setState({
                         battery4:battery4capacityData,
