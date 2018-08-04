@@ -22,8 +22,11 @@ import SQLite from '../SQLite/sqlite';
 // var reactMixin = require('react-mixin');
 import ToastSuccessAndError from '../Alert/ToastSuccessAndError';
 import Confirm from '../Alert/Confirm';
+import ProgressDialogAlert from '../Alert/ProgressDialogAlert';
 var sqLite = new SQLite();
 var db;
+
+const {width,height}=Dimensions.get('window');
 
 function padding(num, length) {
     for(var len = (num + "").length; len < length; len = num.length) {
@@ -155,8 +158,6 @@ export default class CWHome extends Component {
     }
 
     componentDidMount() {
-        // 蓝牙搜索开始
-
         /** 充电器*/
         let promise1=new Promise(function (resolve, reject) {
             return storage.get(CHARGER_BIND_STORAGE_KEY, (error, result) => {
@@ -330,7 +331,6 @@ export default class CWHome extends Component {
                                 for (var r=0;r<batteryArray.length;r++){
                                     var batteryIdentifier = searchBle.slice(4, 16);//搜索到的电池识别码与ID
                                     if(batteryIdentifier === Identifier && batteryArray[r] === batteryID){//判断电池识别码与ID
-                                        console.log(searchBle);
                                         // 电池数据
                                         var batteryData = [];
                                         var battery = {};
@@ -475,13 +475,14 @@ export default class CWHome extends Component {
         return(
             <View style={styles.container}>
                 <ToastSuccessAndError ref='toast_su' successMsg='绑定完成' errorMsg='系统出错'/>
-                <Confirm ref='confirm' leftFunc={() => {this.goQRCodeBattery()}} rightFunc={() => {}} btnLeftText='去扫码' btnRightText='取消' title='提示' msg='您还未扫码！'>
-                </Confirm>
+                <Confirm ref='confirm' leftFunc={() => {this.goQRCodeBattery()}} rightFunc={() => {}} btnLeftText='去扫码' btnRightText='取消' title='提示' msg='您还未扫码！'/>
+                {/*进度条*/}
+                <ProgressDialogAlert ref='alert' title='提示信息' btnText='确定' msg={10+'%'}  progress={0.7} width={200} color='red'/>
+
                 <View style={{width:Dimensions.get('window').width,height:40,alignItems:'center',flexDirection:'row',borderBottomColor:'#ff0',justifyContent:'space-between',backgroundColor:'#fff'}}>
                     <View style={{marginLeft:20}}>
                         <Text style={{fontSize:20,color:'#000'}}>首页</Text>
                     </View>
-
                     <TouchableOpacity style={{marginRight:20}} onPress={()=>this.props.navigation.navigate('CWQRCode')}>
                         <Image style={{width:20,height:20 }} source={require('../../img/saomiao01.png')}/>
                     </TouchableOpacity>
@@ -567,6 +568,10 @@ export default class CWHome extends Component {
                         </TouchableOpacity>
                     </View>
                 </View>
+                {/*绑定按钮*/}
+                <TouchableOpacity style={{position:'absolute',bottom:20,left:20}} onPress={()=>this.refs.toast_su.success()}>
+                    <Image style={{width:width/8,height:width/8 }} source={require('../../img/bind.png')}/>
+                </TouchableOpacity>
             </View>
         )
     }
@@ -574,7 +579,6 @@ export default class CWHome extends Component {
 
 const styles = StyleSheet.create({
     container:{
-        // height:50,
         flex:1
     },
     mileageText:{
@@ -593,8 +597,8 @@ const styles = StyleSheet.create({
     viewRightImage:{
     },
     ImagesStyle:{
-        width:Dimensions.get('window').width/7 ,
-        height:Dimensions.get('window').height/7
+        width:width/7 ,
+        height:height/7
     }
 });
 

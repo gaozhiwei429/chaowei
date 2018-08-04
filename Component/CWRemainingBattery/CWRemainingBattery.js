@@ -4,12 +4,13 @@ import {
     Text,
     StyleSheet,
     Image,
-    TouchableOpacity
+    TouchableOpacity,
+    Dimensions
 } from 'react-native'
-
+const {width,height}=Dimensions.get('window');
 export default class CWRemainingBattery extends Component {
     static navigationOptions = {
-        headerTitle: '充电总量',
+        headerTitle: '目前电量',
         headerStyle: {
             height:40,
             // backgroundColor: 'red',
@@ -21,9 +22,10 @@ export default class CWRemainingBattery extends Component {
             <View style={{flex:1}}>
                 <View style={{flex:1}}>
                     <View style={styles.ElectricityStyle}>
+                        <Image style={{width:width,height:height}} source={require('../../img/background.jpg')}/>
                         <Text style={styles.ElectricityTop}>目前电量</Text>
-                        <Image source={require('../../img/Electricity.png')}/>
-                        <Text style={styles.ElectricityBootomTextStyle} >70%</Text>
+                        {/*<Image style={{position:'absolute'}} source={require('../../img/Electricity.png')}/>*/}
+                        <Text style={styles.ElectricityBootomTextStyle}>70%</Text>
                     </View>
                 </View>
             </View>
@@ -33,12 +35,12 @@ export default class CWRemainingBattery extends Component {
 
 const styles = StyleSheet.create({
     ElectricityStyle:{
-        flex:5,
+        flex:1,
         justifyContent:'center',
         alignItems:'center',
     },
     ElectricityTop:{
-        fontSize:20,
+        fontSize:25,
         marginBottom:30,
         justifyContent:'center',
         alignItems:'center',
@@ -48,6 +50,6 @@ const styles = StyleSheet.create({
     ElectricityBootomTextStyle:{
         fontSize:50,
         position:'absolute',
-        color:'#fff'
+        // color:'#fff',
     }
 });

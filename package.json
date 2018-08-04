@@ -19,6 +19,7 @@
     "react-native-deprecated-custom-components": "^0.1.2",
     "react-native-device-info": "^0.21.5",
     "react-native-popup-dialog": "^0.14.52",
+    "react-native-progress": "^3.5.0",
     "react-native-qrcode-scanner": "^1.0.1",
     "react-native-sqlite-storage": "^3.3.6",
     "react-native-svg": "^6.3.1",
