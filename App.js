@@ -25,6 +25,8 @@ import CWBatteryTemperature from './Component/CWSvg/CWBatteryTemperature';//温�
 import CWBatteryVoltage from './Component/CWSvg/CWBatteryVoltage';//电压折线图
 import CWBatteryElectricCurrent from './Component/CWSvg/CWBatteryElectricCurrent';//电流折线图
 import CWBatteryCapacity from './Component/CWSvg/CWBatteryCapacity';//容量
+import ChargerData from './Component/ChargerLater/ChargerData';//充电器net
+import ChargerSvg from './Component/ChargerLater/ChargerSvg';//充电器折线图
 
 //测试
 import ListView from './Component/ListView/ListView'
@@ -60,6 +62,8 @@ const RootStack = createStackNavigator({
         CWBatteryVoltage:{screen:CWBatteryVoltage},//电压
         CWBatteryElectricCurrent:{screen:CWBatteryElectricCurrent},//电流
         CWBatteryCapacity:{screen:CWBatteryCapacity},//容量
+        ChargerData:{screen:ChargerData},//充电器第二页
+        ChargerSvg:{screen:ChargerSvg},
 
         //测试
         CWSvgBatteryone:{screen:CWSvgBatteryone},

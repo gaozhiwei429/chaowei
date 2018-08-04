@@ -14,6 +14,7 @@ import {
 import CWQRCode from '../CWQRCode/CWQRCode';
 import bleBroadcast from '../CWBleBroadcast/CWBleBroadcast';//蓝牙广播模块
 import CWScanning from '../CWScanning/CWScanning';//绑定页面
+import ChargerData from '../ChargerLater/ChargerData';
 import * as storage from '../../storage';
 // import _ from 'lodash';
 import { BATTERY_BIND_STORAGE_KEY,CHARGER_BIND_STORAGE_KEY,PHONE_BIND_STORAGE_KEY } from '../../config';
@@ -518,10 +519,10 @@ export default class CWHome extends Component {
                 <ProgressBarAndroid  styleAttr="Horizontal" color="red" indeterminate={false} progress={0.7} />
                 {/*电源、电池按钮*/}
                 <View style={styles.BtnView}>
-                    {/*电源按钮*/}
+                    {/*充电器按钮*/}
                     <TouchableOpacity
-                        onPress={() => this.props.navigation.navigate('CWScanning',{
-                            chargerImg:0
+                        onPress={() => this.props.navigation.navigate('ChargerData',{
+                            // chargerImg:0
                         })
                         }
                     >
