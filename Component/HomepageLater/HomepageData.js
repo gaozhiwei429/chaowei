@@ -32,11 +32,24 @@ export default class BatteryData extends Component {
 
     render() {
         const { params } = this.props.navigation.state;
-        const { index } = params;
+        const { index,chargerImg } = params;
         return (
             <View style={styles.Binding}>
                 {
-                    index==0 ?
+                    chargerImg==0?
+                        <View style={styles.Binding}>
+                            <TouchableOpacity style={styles.Btn} onPress={() => this.props.navigation.navigate('CWScanning',{ chargerImg:0})}>
+                                <Text style={styles.BtnText}>绑定</Text>
+                                <Image style={styles.BtnImg} source={require('../../img/next.png')}/>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity style={styles.Btn} onPress={() => this.props.navigation.navigate('ChargerSvg')
+                            }>
+                                <Text style={styles.BtnText}>充电器数据曲线</Text>
+                                <Image style={styles.BtnImg} source={require('../../img/next.png')}/>
+                            </TouchableOpacity>
+                        </View>
+                        :index==0 ?
                         <View>
                             <TouchableOpacity style={styles.Btn} onPress={() => this.props.navigation.navigate('CWScanning',{ index: 0 })
                             }>
@@ -100,6 +113,7 @@ const styles = StyleSheet.create({
         // flex: 1,
         // justifyContent: 'center',
         // alignItems: 'center',
+        backgroundColor:'#fff'
     },
     BtnImg:{
         width:20,
@@ -108,16 +122,16 @@ const styles = StyleSheet.create({
         right:20,
     },
     Btn:{
-        borderBottomColor:'#4f4f4f',
+        borderBottomColor:'#f5f5f5',
         borderBottomWidth:1,
         justifyContent: 'center',
         // alignItems: 'center',
-        marginLeft:15,
+        // marginLeft:15,
     },
     BtnText:{
         fontSize:19,
         paddingTop:10,
         paddingBottom:10,
-
+        marginLeft:15,
     }
 });
