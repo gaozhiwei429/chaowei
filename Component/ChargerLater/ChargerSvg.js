@@ -143,7 +143,7 @@ export default class ChargerSvg extends Component {
 
         //查询
         db.transaction((tx)=>{
-            tx.executeSql("select * from charger where charger_id='"+promiseValues[0]+"' order by my_timestamp desc limit 8,16", [],(tx,results)=>{
+            tx.executeSql("select * from charger where charger_id='"+promiseValues[0]+"' order by my_timestamp desc limit 16,34", [],(tx,results)=>{
                 var len = results.rows.length;
                 console.log(promiseValues);
                 for(var i=0; i<len; i++){

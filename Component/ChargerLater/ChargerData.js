@@ -34,10 +34,7 @@ export default class ChargerData extends Component {
     render() {
         return (
             <View style={styles.Binding}>
-                <TouchableOpacity style={styles.Btn} onPress={() => this.props.navigation.navigate('CWScanning',{
-                    chargerImg:0
-                })
-                }>
+                <TouchableOpacity style={styles.Btn} onPress={() => this.props.navigation.navigate('CWScanning',{ chargerImg:0})}>
                     <Text style={styles.BtnText}>绑定</Text>
                     <Image style={styles.BtnImg} source={require('../../img/next.png')}/>
                 </TouchableOpacity>

@@ -25,8 +25,9 @@ import CWBatteryTemperature from './Component/CWSvg/CWBatteryTemperature';//温�
 import CWBatteryVoltage from './Component/CWSvg/CWBatteryVoltage';//电压折线图
 import CWBatteryElectricCurrent from './Component/CWSvg/CWBatteryElectricCurrent';//电流折线图
 import CWBatteryCapacity from './Component/CWSvg/CWBatteryCapacity';//容量
-import ChargerData from './Component/ChargerLater/ChargerData';//充电器net
+import ChargerData from './Component/ChargerLater/ChargerData';//充电器next
 import ChargerSvg from './Component/ChargerLater/ChargerSvg';//充电器折线图
+import BatteryData from './Component/BatteryLater/BatteryData';//蓄电池Next
 
 //测试
 import ListView from './Component/ListView/ListView'
@@ -64,13 +65,13 @@ const RootStack = createStackNavigator({
         CWBatteryCapacity:{screen:CWBatteryCapacity},//容量
         ChargerData:{screen:ChargerData},//充电器第二页
         ChargerSvg:{screen:ChargerSvg},
+        BatteryData:{screen:BatteryData},
 
         //测试
         CWSvgBatteryone:{screen:CWSvgBatteryone},
         CWSvgBatterTwo:{screen:CWSvgBatterTwo},
         CWSvgBatteryThree:{screen:CWSvgBatteryThree},
         CWSvgBatteryFour:{screen:CWSvgBatteryFour},
-
         ListView:{screen:ListView},
         SQLiteDemo:{screen:SQLiteDemo},//
         SQLiteTextDemo:{screen:SQLiteTextDemo},
@@ -81,11 +82,11 @@ const RootStack = createStackNavigator({
     },
     {
         initialRouteName: 'CWGLaunchlmage',
-        headerMode: 'screen',
-        mode: 'modal',
-        navigationOptions: {
-            gesturesEnabled: true,
-        },
+        // headerMode: 'screen',
+        // mode: 'modal',
+        // navigationOptions: {
+        //     gesturesEnabled: true,
+        // },
         
     }
 );

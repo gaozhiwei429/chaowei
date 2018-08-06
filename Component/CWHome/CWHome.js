@@ -13,19 +13,20 @@ import {
 
 import CWQRCode from '../CWQRCode/CWQRCode';
 import bleBroadcast from '../CWBleBroadcast/CWBleBroadcast';//蓝牙广播模块
-import CWScanning from '../CWScanning/CWScanning';//绑定页面
-import ChargerData from '../ChargerLater/ChargerData';
+import ChargerData from '../ChargerLater/ChargerData';//充电器next
+import BatteryData from '../BatteryLater/BatteryData';//蓄电池Next
 import * as storage from '../../storage';
-// import _ from 'lodash';
 import { BATTERY_BIND_STORAGE_KEY,CHARGER_BIND_STORAGE_KEY,PHONE_BIND_STORAGE_KEY } from '../../config';
 import SQLite from '../SQLite/sqlite';
-// import TimerMixin from 'react-timer-mixin';
-// var reactMixin = require('react-mixin');
 import ToastSuccessAndError from '../Alert/ToastSuccessAndError';
 import Confirm from '../Alert/Confirm';
 import ProgressDialogAlert from '../Alert/ProgressDialogAlert';
 var sqLite = new SQLite();
 var db;
+// import CWScanning from '../CWScanning/CWScanning';//绑定页面
+// import TimerMixin from 'react-timer-mixin';
+// var reactMixin = require('react-mixin');
+// import _ from 'lodash';
 
 const {width,height}=Dimensions.get('window');
 
@@ -250,12 +251,10 @@ export default class CWHome extends Component {
                                                         }
                                                     });
                                                 });
-
                                                 // BluetoothManager.stopScan();
                                                 // bleBroadcast.stop();
                                                 // Alert.alert('提示','绑定完成',[{text:"确定"}]);
                                                 // break;
-
                                             }
                                             // 绑定下一块
                                             currentIndex = currentIndex + 1;
@@ -478,7 +477,7 @@ export default class CWHome extends Component {
                 <ToastSuccessAndError ref='toast_su' successMsg='绑定完成' errorMsg='系统出错'/>
                 <Confirm ref='confirm' leftFunc={() => {this.goQRCodeBattery()}} rightFunc={() => {}} btnLeftText='去扫码' btnRightText='取消' title='提示' msg='您还未扫码！'/>
                 {/*进度条*/}
-                <ProgressDialogAlert ref='alert' title='提示信息' btnText='确定' msg={10+'%'}  progress={0.7} width={200} color='red'/>
+                <ProgressDialogAlert ref='pmgressbar' title='提示信息' btnText='确定' msg={10+'%'}  progress={0.7} width={200} color='red'/>
 
                 <View style={{width:Dimensions.get('window').width,height:40,alignItems:'center',flexDirection:'row',borderBottomColor:'#ff0',justifyContent:'space-between',backgroundColor:'#fff'}}>
                     <View style={{marginLeft:20}}>
@@ -521,10 +520,7 @@ export default class CWHome extends Component {
                 <View style={styles.BtnView}>
                     {/*充电器按钮*/}
                     <TouchableOpacity
-                        onPress={() => this.props.navigation.navigate('ChargerData',{
-                            // chargerImg:0
-                        })
-                        }
+                        onPress={() => this.props.navigation.navigate('ChargerData',{chargerImg: 0}) }
                     >
                         <Image style={{width:Dimensions.get('window').width/3,height:Dimensions.get('window').width/2}} source={require('../../img/charger.png')}/>
                     </TouchableOpacity>
@@ -532,7 +528,7 @@ export default class CWHome extends Component {
                     <View style={styles.viewRightImage} >
                         <TouchableOpacity
                             activeOpacity={0.5}
-                            onPress={() => this.props.navigation.navigate('CWScanning', { index: 0 })}
+                            onPress={() => this.props.navigation.navigate('BatteryData', { index: 0 })}
                             style={{justifyContent:'center'}}
                         >
                             <Image
@@ -542,7 +538,7 @@ export default class CWHome extends Component {
                         </TouchableOpacity>
                         <TouchableOpacity
                             activeOpacity={0.5}
-                            onPress={() => this.props.navigation.navigate('CWScanning', { index: 1 })}
+                            onPress={() => this.props.navigation.navigate('BatteryData', { index: 1 })}
                         >
                             <Image
                                 style={styles.ImagesStyle}
@@ -551,7 +547,7 @@ export default class CWHome extends Component {
                         </TouchableOpacity>
                         <TouchableOpacity
                             activeOpacity={0.5}
-                            onPress={() => this.props.navigation.navigate('CWScanning', { index: 2 })}
+                            onPress={() => this.props.navigation.navigate('BatteryData', { index: 2 })}
                         >
                             <Image
                                 style={styles.ImagesStyle}
@@ -560,7 +556,7 @@ export default class CWHome extends Component {
                         </TouchableOpacity>
                         <TouchableOpacity
                             activeOpacity={0.5}
-                            onPress={() => this.props.navigation.navigate('CWScanning', { index: 3 })}
+                            onPress={() => this.props.navigation.navigate('BatteryData', { index: 3 })}
                         >
                             <Image
                                 style={styles.ImagesStyle}
@@ -570,7 +566,7 @@ export default class CWHome extends Component {
                     </View>
                 </View>
                 {/*绑定按钮*/}
-                <TouchableOpacity style={{position:'absolute',bottom:20,left:20}} onPress={()=>this.refs.toast_su.success()}>
+                <TouchableOpacity style={{position:'absolute',bottom:20,left:20}} onPress={()=>{}}>
                     <Image style={{width:width/8,height:width/8 }} source={require('../../img/bind.png')}/>
                 </TouchableOpacity>
             </View>
