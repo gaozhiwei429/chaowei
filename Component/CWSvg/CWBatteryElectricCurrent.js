@@ -247,10 +247,10 @@ export default class CWBatteryElectricCurrent extends Component {
         battery2electric_currentData=[];
         battery3electric_currentData=[];
         battery4electric_currentData=[];
-        clearInterval(battery1Time);
-        clearInterval(battery2Time);
-        clearInterval(battery3Time);
-        clearInterval(battery4Time);
+        clearTimeout(battery1Time);
+        clearTimeout(battery2Time);
+        clearTimeout(battery3Time);
+        clearTimeout(battery4Time);
         this.setState({
             isLiked: !this.state.isLiked
         });
@@ -427,9 +427,9 @@ export default class CWBatteryElectricCurrent extends Component {
                 />
                 <View style={styles.switching}>
                     {this.state.isLiked?
-                        <TouchableOpacity style={styles.selected}>
+                        <Text style={styles.selected}>
                             <Text>实时数据</Text>
-                        </TouchableOpacity>:
+                        </Text>:
                         <TouchableOpacity style={styles.unselected} onPress={()=>this.componentDidMount()}>
                             <Text>实时数据</Text>
                         </TouchableOpacity>
@@ -438,9 +438,9 @@ export default class CWBatteryElectricCurrent extends Component {
                         <TouchableOpacity style={styles.unselected}  onPress={()=>this.historyTime()}>
                             <Text>历史数据</Text>
                         </TouchableOpacity>:
-                        <TouchableOpacity style={styles.selected}>
+                        <Text style={styles.selected}>
                             <Text>历史数据</Text>
-                        </TouchableOpacity>
+                        </Text>
                     }
                 </View>
             </View>

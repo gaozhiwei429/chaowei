@@ -7,7 +7,7 @@ import {
     Image
 } from 'react-native';
 import CWScanning from '../CWScanning/CWScanning';
-import ChargerSvgs from './ChargerSvgs';
+import ChargerSvg from './ChargerSvg';
 
 export default class ChargerData extends Component {
     //构造函数
@@ -42,7 +42,7 @@ export default class ChargerData extends Component {
                     <Image style={styles.BtnImg} source={require('../../img/next.png')}/>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.Btn} onPress={() => this.props.navigation.navigate('ChargerSvgs')
+                <TouchableOpacity style={styles.Btn} onPress={() => this.props.navigation.navigate('ChargerSvg')
                 }>
                     <Text style={styles.BtnText}>充电器数据曲线</Text>
                     <Image style={styles.BtnImg} source={require('../../img/next.png')}/>

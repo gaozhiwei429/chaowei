@@ -26,7 +26,7 @@ import CWBatteryVoltage from './Component/CWSvg/CWBatteryVoltage';//电压折线
 import CWBatteryElectricCurrent from './Component/CWSvg/CWBatteryElectricCurrent';//电流折线图
 import CWBatteryCapacity from './Component/CWSvg/CWBatteryCapacity';//容量
 import ChargerData from './Component/ChargerLater/ChargerData';//充电器net
-import ChargerSvgs from './Component/ChargerLater/ChargerSvgs';//充电器折线图
+import ChargerSvg from './Component/ChargerLater/ChargerSvg';//充电器折线图
 
 //测试
 import ListView from './Component/ListView/ListView'
@@ -63,7 +63,7 @@ const RootStack = createStackNavigator({
         CWBatteryElectricCurrent:{screen:CWBatteryElectricCurrent},//电流
         CWBatteryCapacity:{screen:CWBatteryCapacity},//容量
         ChargerData:{screen:ChargerData},//充电器第二页
-        ChargerSvg:{screen:ChargerSvgs},
+        ChargerSvg:{screen:ChargerSvg},
 
         //测试
         CWSvgBatteryone:{screen:CWSvgBatteryone},
@@ -81,6 +81,12 @@ const RootStack = createStackNavigator({
     },
     {
         initialRouteName: 'CWGLaunchlmage',
+        headerMode: 'screen',
+        mode: 'modal',
+        navigationOptions: {
+            gesturesEnabled: true,
+        },
+        
     }
 );
 

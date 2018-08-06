@@ -8,7 +8,7 @@ import {
     TouchableOpacity,
     Alert,
 } from 'react-native';
-import Main from '../CWMain/CWMain'
+// import Main from '../CWMain/CWMain'
 
 import * as storage from '../../storage';
 
@@ -21,7 +21,7 @@ export default class CWScanning extends Component {
         this.state = {
             dataBattery: '',
             dataCharger:'',
-            dataBatteryArray:[],
+            // dataBatteryArray:[],
         }
     }
 
@@ -31,7 +31,7 @@ export default class CWScanning extends Component {
     }
 
     componentWillMount() {
-        this.setState({dataBattery: '',dataCharger:'',dataBatteryArray:''});
+        this.setState({dataBattery: '',dataCharger:'',});
 
         const { params } = this.props.navigation.state;
         const { index,chargerImg } = params;
@@ -55,7 +55,7 @@ export default class CWScanning extends Component {
                     return;
                 }
                 const value = result[index];
-                this.setState({ dataBatteryArray:result });
+                // this.setState({ dataBatteryArray:result });
                 this.setState({ dataBattery: value });
             });
         }

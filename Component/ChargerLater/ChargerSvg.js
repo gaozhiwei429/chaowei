@@ -13,16 +13,16 @@ import SQLiteText from '../SQLite/sqlite';
 import * as storage from '../../storage';
 // import _ from 'lodash';
 import { BATTERY_BIND_STORAGE_KEY,CHARGER_BIND_STORAGE_KEY } from '../../config';
-let sqLite = new SQLiteText();
-let db;
+var sqLite = new SQLiteText();
+var db;
 
 
-let chargerVoltageData = [];
-let chargerElectricCurrentData=[];
-let chargerTemperatureData=[];
-let chargerCapacityData=[];
-let promiseValues;
-let chargerTime;
+var chargerVoltageData = [];
+var chargerElectricCurrentData=[];
+var chargerTemperatureData=[];
+var chargerCapacityData=[];
+var promiseValues;
+var chargerTime;
 export default class ChargerSvg extends Component {
     constructor(props) {
         super(props);
@@ -55,23 +55,18 @@ export default class ChargerSvg extends Component {
         // sqLite.deleteData();
 
         /** 电池*/
-        let promise=new Promise(function (resolve,reject) {
-            return storage.get(CHARGER_BIND_STORAGE_KEY, (error, result) => {
-                if (error) {
-                    reject(error);
-                    return;
-                }
-                resolve(result);
-            })}
-        );
-        Promise.all([promise]).then((values) => {
-            promiseValues=values;
+        storage.get(CHARGER_BIND_STORAGE_KEY, (error, result) => {
+            if (error) {
+                reject(error);
+                return;
+            }
+            promiseValues=result;
             //查询
             db.transaction((tx)=>{
-                tx.executeSql("select * from charger where charger_id='"+values[0][0]+"' order by my_timestamp desc limit 18", [],(tx,results)=>{
+                tx.executeSql("select charger_id,my_timestamp,voltage,electric_current,temperature,capacity from charger where charger_id='"+result[0]+"' order by my_timestamp desc limit 18", [],(tx,results)=>{
                     var len = results.rows.length;
-                    for(let i=0; i<len; i++){
-                        let u = results.rows.item(i);
+                    for(var i=0; i<len; i++){
+                        var u = results.rows.item(i);
                         chargerVoltageData.push(parseInt(u.voltage));
                         chargerElectricCurrentData.push(parseInt(u.electric_current));
                         chargerTemperatureData.push(parseInt(u.temperature));
@@ -88,13 +83,13 @@ export default class ChargerSvg extends Component {
                 console.log(error);
             });
 
-            const charger = () => {
+            const chargerFeedback = () => {
                 //查询
                 db.transaction((tx)=>{
-                    tx.executeSql("select * from charger where charger_id= '"+values[0][0]+"' order by my_timestamp desc limit 1", [],(tx,results)=>{
-                        let len = results.rows.length;
-                        for(let i=0; i<len; i++){
-                            let u = results.rows.item(i);
+                    tx.executeSql("select * from charger where charger_id= '"+result[0]+"' order by my_timestamp desc limit 1", [],(tx,results)=>{
+                        var len = results.rows.length;
+                        for(var i=0; i<len; i++){
+                            var u = results.rows.item(i);
                             chargerVoltageData.push(parseInt(u.voltage));
                             chargerElectricCurrentData.push(parseInt(u.electric_current));
                             chargerTemperatureData.push(parseInt(u.temperature));
@@ -119,22 +114,24 @@ export default class ChargerSvg extends Component {
                                 });
                             }
                         }
-                        chargerTime=setTimeout(charger, 1000);
+                        console.log(1);
+                        chargerTime=setTimeout(chargerFeedback, 1000);
                     });
                 },(error)=>{
                     console.log(error);
                 });
             };
-            setTimeout(charger, 1000);
+            setTimeout(chargerFeedback, 1000);
         });
     }
 
     async historyTime(){
         chargerVoltageData = [];
+        console.log(chargerVoltageData);
         chargerElectricCurrentData=[];
         chargerTemperatureData=[];
         chargerCapacityData=[];
-        clearInterval(chargerTime);
+        clearTimeout(chargerTime);
         this.setState({
             isLiked: !this.state.isLiked
         });
@@ -146,10 +143,11 @@ export default class ChargerSvg extends Component {
 
         //查询
         db.transaction((tx)=>{
-            tx.executeSql("select * from charger where charger_id='"+values[0][0]+"' order by my_timestamp desc limit 18", [],(tx,results)=>{
+            tx.executeSql("select * from charger where charger_id='"+promiseValues[0]+"' order by my_timestamp desc limit 8,16", [],(tx,results)=>{
                 var len = results.rows.length;
-                for(let i=0; i<len; i++){
-                    let u = results.rows.item(i);
+                console.log(promiseValues);
+                for(var i=0; i<len; i++){
+                    var u = results.rows.item(i);
                     chargerVoltageData.push(parseInt(u.voltage));
                     chargerElectricCurrentData.push(parseInt(u.electric_current));
                     chargerTemperatureData.push(parseInt(u.temperature));
