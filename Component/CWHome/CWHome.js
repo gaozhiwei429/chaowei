@@ -13,14 +13,14 @@ import {
 
 import CWQRCode from '../CWQRCode/CWQRCode';
 import bleBroadcast from '../CWBleBroadcast/CWBleBroadcast';//蓝牙广播模块
-import ChargerData from '../ChargerLater/ChargerData';//充电器next
-import BatteryData from '../BatteryLater/BatteryData';//蓄电池Next
+import HomepageData from '../HomepageLater/HomepageData';//蓄电池Next
 import * as storage from '../../storage';
 import { BATTERY_BIND_STORAGE_KEY,CHARGER_BIND_STORAGE_KEY,PHONE_BIND_STORAGE_KEY } from '../../config';
 import SQLite from '../SQLite/sqlite';
 import ToastSuccessAndError from '../Alert/ToastSuccessAndError';
 import Confirm from '../Alert/Confirm';
 import ProgressDialogAlert from '../Alert/ProgressDialogAlert';
+import AlertS from '../Alert/Alert';
 var sqLite = new SQLite();
 var db;
 // import CWScanning from '../CWScanning/CWScanning';//绑定页面
@@ -54,7 +54,7 @@ function bindSingle(){
     var commandList = commandArr[otherIndex];
     // 向 batteryArray[currentIndex] 发送 commandArr[otherIndex] + others[otherIndex] 的值
     var equipmentList = Identifier.concat(Reserved,Reserved,others[otherIndex],batteryArray[currentIndex]);
-    bleBroadcast.start(commandList ,equipmentList);// 蓝牙广播开始
+    // bleBroadcast.start(commandList ,equipmentList);// 蓝牙广播开始
     var con=commandList.concat(equipmentList);//广播的数据
     // console.log(con);//广播的数据
     otherIndex = otherIndex + 1;// otherIndex 自增
@@ -185,31 +185,31 @@ export default class CWHome extends Component {
         /** 电池充电器数据广播*/
         Promise.all([promise1,promise2]).then((values) => {
             batteryArray=[].concat.apply([],values);//绑定电池与充电器合并后的数组
-            if(batteryArray.length >= 5 ){
-                storage.get(PHONE_BIND_STORAGE_KEY, (error, result) => {
-                    if(result !== '123'){
-                        bindSingle();
-                    }
-                    // console.log(result);
-                });
-                // bindSingle();
+            // if(batteryArray.length >= 5 ){
+            storage.get(PHONE_BIND_STORAGE_KEY, (error, result) => {
+                if(result !== '123'){
+                    bindSingle();
+                }
+                // console.log(result);
+            });
+            // bindSingle();
 
-                /**蓝牙扫描绑定*/
-                this.deviceMap.clear();
-                BluetoothManager.manager.startDeviceScan(null, null, (error, device) => {
-                    if (error) {
-                        if(error.code == 102){
-                            alert('请打开手机蓝牙后再搜索');
-                        }
-                        console.log(error);
-                    }else{
-                        this.deviceMap.set(device.id,device); //使用Map类型保存搜索到的蓝牙设备，确保列表不显示重复的设备
-                        // this.setState({data:[...this.deviceMap.values()]},()=>{
-                        BleScan = [...this.deviceMap.values()];
+            /**蓝牙扫描绑定*/
+            this.deviceMap.clear();
+            BluetoothManager.manager.startDeviceScan(null, null, (error, device) => {
+                if (error) {
+                    // if(error.code == 102){
+                    //     alert('请打开手机蓝牙后再搜索');
+                    // }
+                    this.refs.bleScan.open();
+                }else{
+                    this.deviceMap.set(device.id,device); //使用Map类型保存搜索到的蓝牙设备，确保列表不显示重复的设备
+                    // this.setState({data:[...this.deviceMap.values()]},()=>{
+                    BleScan = [...this.deviceMap.values()];
 
+                    if(batteryArray.length >= 5 ){
                         //var BroadcastJudgment = Identifier.concat(others[otherIndex-1]);//广播判断数据.toString(16)
                         var BroadcastJudgment1 = Identifier.concat(batteryArray[currentIndex]);
-
                         if(BleScan !== undefined){
                             for (let z = 0;z<BleScan.length;z++) {
                                 let BleDataArray=CharToHex(base64decode(BleScan[z].manufacturerData)).replace(/\\x/g,'').replace(/\s+/g,'');
@@ -235,7 +235,7 @@ export default class CWHome extends Component {
                                             // 蓝牙广播返回绑定手机设备个数
                                             var command='20';
                                             var equipmentQuantity = Identifier.concat(Reserved,Reserved,pad(otherIndex,2),batteryArray[currentIndex].toString(16));
-                                             bleBroadcast.start(command ,equipmentQuantity);
+                                            bleBroadcast.start(command ,equipmentQuantity);
 
                                             // 已经全部绑定成功，返回
                                             if (currentIndex === batteryArray.length -1) {
@@ -265,22 +265,32 @@ export default class CWHome extends Component {
                                 }
                             }
                         }
+                    }else {
+                        this.refs.confirm.open();
+                        // Alert.alert('提示','您还未扫码',
+                        //     [
+                        //         {text:"取消",},
+                        //         {text:"去扫码",onPress:()=>{this.goQRCodeBattery()}},
+                        //     ]
+                        // );
                     }
-                });
+                }
+            });
 
-            }else {
-                this.refs.confirm.open();
-                // Alert.alert('提示','您还未扫码',
-                //     [
-                //         {text:"取消",},
-                //         {text:"去扫码",onPress:()=>{this.goQRCodeBattery()}},
-                //     ]
-                // );
-            }
+            // }else {
+            //     this.refs.confirm.open();
+            //     // Alert.alert('提示','您还未扫码',
+            //     //     [
+            //     //         {text:"取消",},
+            //     //         {text:"去扫码",onPress:()=>{this.goQRCodeBattery()}},
+            //     //     ]
+            //     // );
+            // }
             //向数据库写数据
             this.writeDatabase();
         });
     }
+
 
     /**向数据库写数据*/
     async writeDatabase(){
@@ -469,15 +479,16 @@ export default class CWHome extends Component {
 
     _removeText = ()=>{
         AsyncStorage.removeItem(PHONE_BIND_STORAGE_KEY);
-        alert('1')
+        // alert('1')
     };
     render(){
         return(
             <View style={styles.container}>
-                <ToastSuccessAndError ref='toast_su' successMsg='绑定完成' errorMsg='系统出错'/>
+                <ToastSuccessAndError ref='toast_su' successMsg='绑定完成' errorMsg='请打开蓝牙'/>
                 <Confirm ref='confirm' leftFunc={() => {this.goQRCodeBattery()}} rightFunc={() => {}} btnLeftText='去扫码' btnRightText='取消' title='提示' msg='您还未扫码！'/>
                 {/*进度条*/}
-                <ProgressDialogAlert ref='pmgressbar' title='提示信息' btnText='确定' msg={10+'%'}  progress={0.7} width={200} color='red'/>
+                <ProgressDialogAlert ref='pmgressbar' title='提示信息' btnText='确定' msg={10}  progress={0.7} width={200} color='red'/>
+                <AlertS ref='bleScan' title='提示' btnText='确定' msg='请先打开蓝牙开关！' />
 
                 <View style={{width:Dimensions.get('window').width,height:40,alignItems:'center',flexDirection:'row',borderBottomColor:'#ff0',justifyContent:'space-between',backgroundColor:'#fff'}}>
                     <View style={{marginLeft:20}}>
@@ -520,7 +531,7 @@ export default class CWHome extends Component {
                 <View style={styles.BtnView}>
                     {/*充电器按钮*/}
                     <TouchableOpacity
-                        onPress={() => this.props.navigation.navigate('ChargerData',{chargerImg: 0}) }
+                        onPress={() => this.props.navigation.navigate('HomepageData',{chargerImg: 0}) }
                     >
                         <Image style={{width:Dimensions.get('window').width/3,height:Dimensions.get('window').width/2}} source={require('../../img/charger.png')}/>
                     </TouchableOpacity>
@@ -528,7 +539,7 @@ export default class CWHome extends Component {
                     <View style={styles.viewRightImage} >
                         <TouchableOpacity
                             activeOpacity={0.5}
-                            onPress={() => this.props.navigation.navigate('BatteryData', { index: 0 })}
+                            onPress={() => this.props.navigation.navigate('HomepageData', { index: 0 })}
                             style={{justifyContent:'center'}}
                         >
                             <Image
@@ -538,7 +549,7 @@ export default class CWHome extends Component {
                         </TouchableOpacity>
                         <TouchableOpacity
                             activeOpacity={0.5}
-                            onPress={() => this.props.navigation.navigate('BatteryData', { index: 1 })}
+                            onPress={() => this.props.navigation.navigate('HomepageData', { index: 1 })}
                         >
                             <Image
                                 style={styles.ImagesStyle}
@@ -547,7 +558,7 @@ export default class CWHome extends Component {
                         </TouchableOpacity>
                         <TouchableOpacity
                             activeOpacity={0.5}
-                            onPress={() => this.props.navigation.navigate('BatteryData', { index: 2 })}
+                            onPress={() => this.props.navigation.navigate('HomepageData', { index: 2 })}
                         >
                             <Image
                                 style={styles.ImagesStyle}
@@ -556,7 +567,7 @@ export default class CWHome extends Component {
                         </TouchableOpacity>
                         <TouchableOpacity
                             activeOpacity={0.5}
-                            onPress={() => this.props.navigation.navigate('BatteryData', { index: 3 })}
+                            onPress={() => this.props.navigation.navigate('HomepageData', { index: 3 })}
                         >
                             <Image
                                 style={styles.ImagesStyle}
@@ -566,7 +577,7 @@ export default class CWHome extends Component {
                     </View>
                 </View>
                 {/*绑定按钮*/}
-                <TouchableOpacity style={{position:'absolute',bottom:20,left:20}} onPress={()=>{}}>
+                <TouchableOpacity style={{position:'absolute',bottom:20,left:20}} onPress={()=>{this.componentDidMount()}}>
                     <Image style={{width:width/8,height:width/8 }} source={require('../../img/bind.png')}/>
                 </TouchableOpacity>
             </View>

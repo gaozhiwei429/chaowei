@@ -4,7 +4,6 @@
 import React, {
     Component,
 } from 'react';
-import PropTypes from 'prop-types';
 import {
     StyleSheet,
     View,
@@ -14,6 +13,7 @@ import {
     TouchableHighlight,
     TouchableOpacity
 } from 'react-native';
+import PropTypes from 'prop-types';
 import * as Progress from 'react-native-progress';
 export default class Alert extends Component {
     constructor(props) {
@@ -32,7 +32,7 @@ export default class Alert extends Component {
         color:'red',
     };
     static propTypes = {
-        msg: PropTypes.number.any, //提示信息
+        msg: PropTypes.number, //提示信息
         title: PropTypes.string,
         callback: PropTypes.func,
         btnText: PropTypes.string,

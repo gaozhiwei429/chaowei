@@ -145,7 +145,6 @@ export default class ChargerSvg extends Component {
         db.transaction((tx)=>{
             tx.executeSql("select * from charger where charger_id='"+promiseValues[0]+"' order by my_timestamp desc limit 16,34", [],(tx,results)=>{
                 var len = results.rows.length;
-                console.log(promiseValues);
                 for(var i=0; i<len; i++){
                     var u = results.rows.item(i);
                     chargerVoltageData.push(parseInt(u.voltage));

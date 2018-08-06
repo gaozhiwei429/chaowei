@@ -57,7 +57,7 @@ public class BleBroadcast extends ReactContextBaseJavaModule {
         }
 
         if (!bluetoothAdapter.isEnabled()) {
-            toast("请打开蓝牙开关");
+//            toast("请打开蓝牙开关");
             return;
         }
         if (!bluetoothAdapter.isMultipleAdvertisementSupported()) {
