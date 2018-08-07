@@ -27,14 +27,13 @@ import CWBatteryElectricCurrent from './Component/CWSvg/CWBatteryElectricCurrent
 import CWBatteryCapacity from './Component/CWSvg/CWBatteryCapacity';//容量
 import ChargerSvg from './Component/HomepageLater/ChargerSvg';//充电器折线图
 import HomepageData from './Component/HomepageLater/HomepageData';//蓄电池Next
-
+import Calibration from './Component/HomepageLater/Calibration';//校准
 //测试
 import ListView from './Component/ListView/ListView'
 import CWSvgBatteryone from './Component/CWSvg/CWSvgBatteryOne';
 import CWSvgBatterTwo from './Component/CWSvg/CWSvgBatteryTwo';
 import CWSvgBatteryThree from './Component/CWSvg/CWSvgBatteryThree';
 import CWSvgBatteryFour from './Component/CWSvg/CWSvgBatteryFour';
-
 import SQLiteDemo from './Component/SQLite/SQLiteDemo';
 import SQLiteTextDemo from './Component/SQLiteText/SQLiteTextDemo';//测试
 import cha from './Component/SQLite/cha'
@@ -64,6 +63,7 @@ const RootStack = createStackNavigator({
         CWBatteryCapacity:{screen:CWBatteryCapacity},//容量
         ChargerSvg:{screen:ChargerSvg},
         HomepageData:{screen:HomepageData},
+        Calibration:{screen:Calibration},
 
         //测试
         CWSvgBatteryone:{screen:CWSvgBatteryone},

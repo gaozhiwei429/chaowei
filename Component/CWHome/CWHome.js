@@ -587,7 +587,8 @@ export default class CWHome extends Component {
 
 const styles = StyleSheet.create({
     container:{
-        flex:1
+        flex:1,
+        backgroundColor:'#fff'
     },
     mileageText:{
         fontSize:20,

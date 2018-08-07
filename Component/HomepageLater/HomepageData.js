@@ -6,7 +6,6 @@ import {
     TouchableOpacity,
     Image
 } from 'react-native';
-import CWScanning from '../CWScanning/CWScanning';
 
 export default class BatteryData extends Component {
     //构造函数
@@ -25,8 +24,8 @@ export default class BatteryData extends Component {
         title: '蓄电池',
         headerStyle: {
             height: 40,
-            // backgroundColor: 'red',
-            // elevation: null
+            // backgroundColor: '#FFF',
+            // elevation: null,
         },
     };
 
@@ -36,7 +35,7 @@ export default class BatteryData extends Component {
         return (
             <View style={styles.Binding}>
                 {
-                    chargerImg==0?
+                    chargerImg===0?
                         <View style={styles.Binding}>
                             <TouchableOpacity style={styles.Btn} onPress={() => this.props.navigation.navigate('CWScanning',{ chargerImg:0})}>
                                 <Text style={styles.BtnText}>绑定</Text>
@@ -48,8 +47,14 @@ export default class BatteryData extends Component {
                                 <Text style={styles.BtnText}>充电器数据曲线</Text>
                                 <Image style={styles.BtnImg} source={require('../../img/next.png')}/>
                             </TouchableOpacity>
+
+                            <TouchableOpacity style={styles.Btn} onPress={() => this.props.navigation.navigate('Calibration',{chargerImg:0})
+                            }>
+                                <Text style={styles.BtnText}>校准</Text>
+                                <Image style={styles.BtnImg} source={require('../../img/next.png')}/>
+                            </TouchableOpacity>
                         </View>
-                        :index==0 ?
+                        :index===0 ?
                         <View>
                             <TouchableOpacity style={styles.Btn} onPress={() => this.props.navigation.navigate('CWScanning',{ index: 0 })
                             }>
@@ -57,13 +62,19 @@ export default class BatteryData extends Component {
                                 <Image style={styles.BtnImg} source={require('../../img/next.png')}/>
                             </TouchableOpacity>
 
-                            <TouchableOpacity style={styles.Btn} onPress={() => {}
+                            {/*<TouchableOpacity style={styles.Btn} onPress={() => {}*/}
+                            {/*}>*/}
+                                {/*<Text style={styles.BtnText}>蓄电池{index+1}数据曲线</Text>*/}
+                                {/*<Image style={styles.BtnImg} source={require('../../img/next.png')}/>*/}
+                            {/*</TouchableOpacity>*/}
+
+                            <TouchableOpacity style={styles.Btn} onPress={() => this.props.navigation.navigate('Calibration',{index:0})
                             }>
-                                <Text style={styles.BtnText}>蓄电池{index+1}数据曲线</Text>
+                                <Text style={styles.BtnText}>校准</Text>
                                 <Image style={styles.BtnImg} source={require('../../img/next.png')}/>
                             </TouchableOpacity>
                         </View>
-                    :index==1?
+                    :index===1?
                         <View>
                             <TouchableOpacity style={styles.Btn} onPress={() => this.props.navigation.navigate('CWScanning',{ index: 1 })
                             }>
@@ -71,22 +82,34 @@ export default class BatteryData extends Component {
                                 <Image style={styles.BtnImg} source={require('../../img/next.png')}/>
                             </TouchableOpacity>
 
-                            <TouchableOpacity style={styles.Btn} onPress={() => {}
+                            {/*<TouchableOpacity style={styles.Btn} onPress={() => {}*/}
+                            {/*}>*/}
+                                {/*<Text style={styles.BtnText}>蓄电池{index+1}数据曲线</Text>*/}
+                                {/*<Image style={styles.BtnImg} source={require('../../img/next.png')}/>*/}
+                            {/*</TouchableOpacity>*/}
+
+                            <TouchableOpacity style={styles.Btn} onPress={() => this.props.navigation.navigate('Calibration',{index:1})
                             }>
-                                <Text style={styles.BtnText}>蓄电池{index+1}数据曲线</Text>
+                                <Text style={styles.BtnText}>校准</Text>
                                 <Image style={styles.BtnImg} source={require('../../img/next.png')}/>
                             </TouchableOpacity>
                         </View>
-                        :index==2?
+                        :index===2?
                             <View>
                                 <TouchableOpacity style={styles.Btn} onPress={() => this.props.navigation.navigate('CWScanning',{index: 2 })}>
                                     <Text style={styles.BtnText}>绑定</Text>
                                     <Image style={styles.BtnImg} source={require('../../img/next.png')}/>
                                 </TouchableOpacity>
 
-                                <TouchableOpacity style={styles.Btn} onPress={() => {}
+                                {/*<TouchableOpacity style={styles.Btn} onPress={() => {}*/}
+                                {/*}>*/}
+                                    {/*<Text style={styles.BtnText}>蓄电池{index+1}数据曲线</Text>*/}
+                                    {/*<Image style={styles.BtnImg} source={require('../../img/next.png')}/>*/}
+                                {/*</TouchableOpacity>*/}
+
+                                <TouchableOpacity style={styles.Btn} onPress={() => this.props.navigation.navigate('Calibration',{index:2})
                                 }>
-                                    <Text style={styles.BtnText}>蓄电池{index+1}数据曲线</Text>
+                                    <Text style={styles.BtnText}>校准</Text>
                                     <Image style={styles.BtnImg} source={require('../../img/next.png')}/>
                                 </TouchableOpacity>
                             </View>
@@ -96,9 +119,14 @@ export default class BatteryData extends Component {
                                     <Image style={styles.BtnImg} source={require('../../img/next.png')}/>
                                 </TouchableOpacity>
 
-                                <TouchableOpacity style={styles.Btn} onPress={() => {}
-                                }>
-                                    <Text style={styles.BtnText}>蓄电池{index+1}数据曲线</Text>
+                                {/*<TouchableOpacity style={styles.Btn} onPress={() => {} }>*/}
+                                    {/*<Text style={styles.BtnText}>蓄电池{index+1}数据曲线</Text>*/}
+                                    {/*<Image style={styles.BtnImg} source={require('../../img/next.png')}/>*/}
+                                {/*</TouchableOpacity>*/}
+
+                                <TouchableOpacity style={styles.Btn} onPress={() => this.props.navigation.navigate('Calibration',{index:3})
+                                    }>
+                                    <Text style={styles.BtnText}>校准</Text>
                                     <Image style={styles.BtnImg} source={require('../../img/next.png')}/>
                                 </TouchableOpacity>
                             </View>
@@ -110,7 +138,7 @@ export default class BatteryData extends Component {
 
 const styles = StyleSheet.create({
     Binding: {
-        // flex: 1,
+        flex: 1,
         // justifyContent: 'center',
         // alignItems: 'center',
         backgroundColor:'#fff'

@@ -35,8 +35,6 @@ export default class CWScanning extends Component {
 
         const { params } = this.props.navigation.state;
         const { index,chargerImg } = params;
-        console.log(index);
-        console.log(chargerImg)
 
         if(chargerImg === 0){
             // 充电器
@@ -48,7 +46,6 @@ export default class CWScanning extends Component {
                 }
                 this.setState({ dataCharger: result });
             });
-            console.log(chargerImg);
         }else {
             // 电池
             storage.get(BATTERY_BIND_STORAGE_KEY, (error, result) => {
@@ -58,12 +55,9 @@ export default class CWScanning extends Component {
                     return;
                 }
                 const value = result[index];
-                console.log(value);
-                // this.setState({ dataBatteryArray:result });
                 this.setState({ dataBattery: value });
             });
         }
-
     };
     // 解绑电池
     _removeBattery = ()=>{

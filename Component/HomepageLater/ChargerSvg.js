@@ -114,14 +114,13 @@ export default class ChargerSvg extends Component {
                                 });
                             }
                         }
-                        console.log(1);
-                        chargerTime=setTimeout(chargerFeedback, 1000);
+                        chargerTime=setTimeout(chargerFeedback, 10000);
                     });
                 },(error)=>{
                     console.log(error);
                 });
             };
-            setTimeout(chargerFeedback, 1000);
+            setTimeout(chargerFeedback, 10000);
         });
     }
 
