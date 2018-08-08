@@ -40,7 +40,7 @@ function padding(num, length) {
 
 var otherIndex = 0;	// 其余电池中正在处理的 index
 var currentIndex = 0; // 当前要绑定的电池 index
-var commandArr = ['05','06','07','08','09','0a','0b','0c'];//命令符
+var commandArr = ['0105','0106','0107','0108','0109','010a','010b','010c'];//命令符
 var Reserved = '00';//
 var batteryArray;                         //绑定电池与充电器合并后的数组
 var others;                               //其他的电池
@@ -54,9 +54,9 @@ function bindSingle(){
     var commandList = commandArr[otherIndex];
     // 向 batteryArray[currentIndex] 发送 commandArr[otherIndex] + others[otherIndex] 的值
     var equipmentList = Identifier.concat(Reserved,Reserved,others[otherIndex],batteryArray[currentIndex]);
-    // bleBroadcast.start(commandList ,equipmentList);// 蓝牙广播开始
+     bleBroadcast.start(commandList ,equipmentList);// 蓝牙广播开始
     var con=commandList.concat(equipmentList);//广播的数据
-    // console.log(con);//广播的数据
+     console.log(con);//广播的数据
     otherIndex = otherIndex + 1;// otherIndex 自增
 }
 
@@ -207,14 +207,14 @@ export default class CWHome extends Component {
                     // this.setState({data:[...this.deviceMap.values()]},()=>{
                     BleScan = [...this.deviceMap.values()];
 
-                    if(batteryArray.length >= 5 ){
+//                    if(batteryArray.length >= 5 ){
                         //var BroadcastJudgment = Identifier.concat(others[otherIndex-1]);//广播判断数据.toString(16)
                         var BroadcastJudgment1 = Identifier.concat(batteryArray[currentIndex]);
                         if(BleScan !== undefined){
                             for (let z = 0;z<BleScan.length;z++) {
-                                let BleDataArray=CharToHex(base64decode(BleScan[z].manufacturerData)).replace(/\\x/g,'').replace(/\s+/g,'');
+                                let BleDataArray=CharToHex(base64decode(BleScan[z].manufacturerData)).replace(/\\x/g,'').replace(/\s+/g,'').toLowerCase();
                                 let InterceptionA=BleDataArray.slice(4,16);
-                                let BleScanArrayId = BleScan[z].id.replace(/\:/g, "");
+                                let BleScanArrayId = BleScan[z].id.replace(/\:/g, "").toLowerCase();
                                 let BleScanId1 = BleScanArrayId.slice(0, 2);
                                 let BleScanId2 = BleScanArrayId.slice(2, 4);
                                 let BleScanId3 = BleScanArrayId.slice(4, 6);
@@ -233,7 +233,7 @@ export default class CWHome extends Component {
                                         // 绑定了一块
                                         if (otherIndex === others.length){
                                             // 蓝牙广播返回绑定手机设备个数
-                                            var command='20';
+                                            var command='0120';
                                             var equipmentQuantity = Identifier.concat(Reserved,Reserved,pad(otherIndex,2),batteryArray[currentIndex].toString(16));
                                             bleBroadcast.start(command ,equipmentQuantity);
 
@@ -265,15 +265,15 @@ export default class CWHome extends Component {
                                 }
                             }
                         }
-                    }else {
-                        this.refs.confirm.open();
-                        // Alert.alert('提示','您还未扫码',
-                        //     [
-                        //         {text:"取消",},
-                        //         {text:"去扫码",onPress:()=>{this.goQRCodeBattery()}},
-                        //     ]
-                        // );
-                    }
+//                    }else {
+//                        this.refs.confirm.open();
+//                        // Alert.alert('提示','您还未扫码',
+//                        //     [
+//                        //         {text:"取消",},
+//                        //         {text:"去扫码",onPress:()=>{this.goQRCodeBattery()}},
+//                        //     ]
+//                        // );
+//                    }
                 }
             });
 

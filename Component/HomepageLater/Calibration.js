@@ -8,7 +8,13 @@ import {
 } from 'react-native';
 import BleModule from '../CWBleSearch/BleModule';
 import * as storage from '../../storage';
-import {BATTERY_BIND_STORAGE_KEY, CALIBRATION_CHARGER_VOLTAGE_VALUE_STORAGE_KEY, CALIBRATION_CHARGER_ELECTRICITY_VALUE_STORAGE_KEY,CHARGER_BIND_STORAGE_KEY,CALIBRATION_BATTERY_VOLTAGE_VALUE_STORAGE_KEY,CALIBRATION_BATTERY_ELECTRICITY_VALUE_STORAGE_KEY} from '../../config';
+import {BATTERY_BIND_STORAGE_KEY,
+    CALIBRATION_CHARGER_VOLTAGE_VALUE_STORAGE_KEY,
+    CALIBRATION_CHARGER_ELECTRICITY_VALUE_STORAGE_KEY,
+    CHARGER_BIND_STORAGE_KEY,
+    CALIBRATION_BATTERY_VOLTAGE_VALUE_STORAGE_KEY,
+    CALIBRATION_BATTERY_ELECTRICITY_VALUE_STORAGE_KEY
+} from '../../config';
 import bleBroadcast from '../CWBleBroadcast/CWBleBroadcast';//蓝牙广播模块
 var base64DecodeChars = new Array(
     -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
@@ -101,9 +107,8 @@ export default class Calibration extends Component {
             ChargerVoltage:'',
             ChargerElectricity:'',
             BatteryVoltage:'',
-            BatteryElectricity:'',
-            voltager:'',
-            Electricity:'',
+            voltager:40,
+            Electricity:15,
         };
         this.deviceMap = new Map();
     }
@@ -139,23 +144,21 @@ export default class Calibration extends Component {
                 this.deviceMap.set(device.id,device); //使用Map类型保存搜索到的蓝牙设备，确保列表不显示重复的设备
                 let data1 = [...this.deviceMap.values()];
                 for (let i = 0;i<data1.length;i++) {
-                    let BleScan =CharToHex(base64decode(data1[i].manufacturerData)).replace(/\\x/g,'').replace(/\s+/g,'');
+                    let BleScan =CharToHex(base64decode(data1[i].manufacturerData)).replace(/\\x/g,'').replace(/\s+/g,'').toLowerCase();
                     let fixed = BleScan.slice(0,16);//截取搜索数据
-                    let ScanID = data1[i].id.replace(/\:/g, "");//搜索到的ID
+                    let ScanID = data1[i].id.replace(/\:/g, "").toLowerCase();//搜索到的ID
                     if(chargerImg === 0){
                         /**充电器*/
                         let StorageChargerID = this.state.ChargerID;   //本地存储id
-
-                        let ChargerVoltageValue = '0202382687921502';//固定值电压
-                        let ChargerElectricityValue = '0203382687921502';//固定值电流
-                        if(fixed === ChargerVoltageValue){//电压校准
-                            if(BleScan !== null && StorageChargerID === ScanID){
+                        let ChargerFixedValue = '0288382687921502';//判断固定值
+                        if(fixed === ChargerFixedValue){
+                            if(BleScan !== null && StorageChargerID === ScanID){//电压校准
                                 storage.get(CALIBRATION_CHARGER_VOLTAGE_VALUE_STORAGE_KEY,() => {
                                     this.setState({ ChargerVoltage: BleScan});
                                 });
                             }
-                        }else if(fixed ===ChargerElectricityValue){//电流校准
-                            if(BleScan !== null && StorageChargerID === ScanID){
+                        }else if(fixed ===ChargerFixedValue){
+                            if(BleScan !== null && StorageChargerID === ScanID){//电流校准
                                 storage.get(CALIBRATION_CHARGER_ELECTRICITY_VALUE_STORAGE_KEY,() => {
                                     this.setState({ ChargerElectricity: BleScan});
                                 });
@@ -164,18 +167,11 @@ export default class Calibration extends Component {
                     }else {
                         /** 电池*/
                         let StorageBatteryId = this.state.BatteryID;//本地存储id
-                        let BatteryVoltageValue = '0302382687921502';//固定值电压
-                        let BatteryElectricityValue = '0303382687921502';//固定值电流
+                        let BatteryVoltageValue = '0388382687921502';//固定值电压
                         if(fixed === BatteryVoltageValue){//电压校准
                             if(BleScan !== null && StorageBatteryId === ScanID){
                                 storage.get(CALIBRATION_BATTERY_VOLTAGE_VALUE_STORAGE_KEY,() => {
                                     this.setState({ BatteryVoltage: BleScan});
-                                });
-                            }
-                        }else if(fixed === BatteryElectricityValue){
-                            if(BleScan !== null && StorageBatteryId === ScanID){
-                                storage.get(CALIBRATION_BATTERY_ELECTRICITY_VALUE_STORAGE_KEY,() => {
-                                    this.setState({ BatteryElectricity: BleScan});
                                 });
                             }
                         }
@@ -190,24 +186,18 @@ export default class Calibration extends Component {
         const { params } = this.props.navigation.state;
         const { chargerImg } = params;
         if(chargerImg === 0){
-            bleBroadcast.start('02','02023826879215020000'+this.state.voltager+this.state.ChargerID);//电压
+            bleBroadcast.start('0002','3826879215020000'+this.state.voltager+this.state.ChargerID);//电压
         }else {
-            bleBroadcast.start('02','03023826879215020000'+this.state.voltager+this.state.BatteryID);//电压
+            bleBroadcast.start('0002','3826879215020000'+this.state.voltager+this.state.BatteryID);//电压
         }
-
-        console.log("您输入的内容为："+this.state.voltager);
     }
 
     searchElectricity(){
         const { params } = this.props.navigation.state;
         const { chargerImg } = params;
         if(chargerImg === 0){
-            bleBroadcast.start('03','02033826879215020000'+this.state.Electricity+this.state.ChargerID);//电流
-        }else {
-            bleBroadcast.start('03','03033826879215020000'+this.state.Electricity+this.state.BatteryID);//电流
+            bleBroadcast.start('0003','3826879215020000'+this.state.Electricity+this.state.ChargerID);//电流
         }
-
-        console.log("您输入的内容为："+this.state.Electricity);
     }
 
     static navigationOptions = {
@@ -223,14 +213,11 @@ export default class Calibration extends Component {
         const { params } = this.props.navigation.state;
         const { index,chargerImg } = params;
         // 充电器电压
-        var ChargerVoltage = parseInt(this.state.ChargerVoltage.slice(20,22));
+        var ChargerVoltage = parseInt(this.state.ChargerVoltage.slice(22,24).concat(this.state.ChargerVoltage.slice(20,22)));
         // 充电器电流
-        var ChargerElectricity = parseInt(this.state.ChargerElectricity.slice(20,22));
-
+        var ChargerElectricity =  parseInt(this.state.ChargerElectricity.slice(26,28).concat(this.state.ChargerElectricity.slice(24,26)));
         // 电池电压
-        var BatteryVoltager = parseInt(this.state.BatteryVoltage.slice(20,22));
-        //电池电流
-        var BatteryElectricity = parseInt(this.state.BatteryElectricity.slice(20,22));
+        var BatteryVoltager = parseInt(this.state.BatteryVoltage.slice(22,24).concat(this.state.BatteryVoltage.slice(20,22)));
         return (
             <View style={styles.Banding}>
                 {
@@ -244,6 +231,7 @@ export default class Calibration extends Component {
                                        defaultValue='40'
                                        underlineColorAndroid='transparent'
                                        keyboardType='numeric'
+                                       editable={false}
                             />
                             <View style={styles.CalibrationInstrument}>
                                 <Text style={styles.InstrumentText}>{ChargerVoltage == NaN ? ChargerVoltage:0}</Text>
@@ -254,16 +242,14 @@ export default class Calibration extends Component {
                             <TextInput style={styles.CalibrationInput}
                                        returnKeyType="search"
                                        onChangeText={(Electricity) => this.setState({Electricity})}
-                                       defaultValue='12'
+                                       defaultValue='15'
                                        underlineColorAndroid='transparent'
                                        keyboardType='numeric'
+                                       editable={false}
                             />
                             <View style={styles.CalibrationInstrument}>
                                 <Text style={styles.InstrumentText}>{ChargerElectricity == NaN ? ChargerElectricity:0}</Text>
                             </View>
-                        </View>
-                        <View style={{alignItems:'center'}}>
-                            <Text style={{color:'#c0c0c0'}}>注：输入框内容以手动输入数据为准</Text>
                         </View>
                         <View style={styles.BtnTouchable}>
                             <TouchableOpacity onPress={()=>this.searchVoltage()} style={styles.CalibrationBtn}>
@@ -284,33 +270,16 @@ export default class Calibration extends Component {
                                        defaultValue='40'
                                        underlineColorAndroid='transparent'
                                        keyboardType='numeric'
+                                       editable={false}
                             />
                             <View style={styles.CalibrationInstrument}>
                                 <Text style={styles.InstrumentText}>{BatteryVoltager == NaN ? BatteryVoltager:0}</Text>
                             </View>
                         </View>
-                        <View style={styles.CalibrationRow}>
-                            <Text style={styles.CalibrationText}>电流校准值:</Text>
-                            <TextInput style={styles.CalibrationInput}
-                                       returnKeyType="search"
-                                       onChangeText={(Electricity) => this.setState({Electricity})}
-                                       defaultValue='12'
-                                       underlineColorAndroid='transparent'
-                                       keyboardType='numeric'
-                            />
-                            <View style={styles.CalibrationInstrument}>
-                                <Text style={styles.InstrumentText}>{BatteryElectricity == NaN ? BatteryElectricity:0}</Text>
-                            </View>
-                        </View>
-                        <View style={{alignItems:'center'}}>
-                            <Text style={{color:'#c0c0c0'}}>注：输入框内容以手动输入数据为准</Text>
-                        </View>
+
                         <View style={styles.BtnTouchable}>
                             <TouchableOpacity onPress={()=>this.searchVoltage()} style={styles.CalibrationBtn}>
                                 <Text style={{fontSize:20}}>电压校准</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity onPress={()=>this.searchElectricity()} style={styles.CalibrationBtn}>
-                                <Text style={{fontSize:20}}>电流校准</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -324,33 +293,16 @@ export default class Calibration extends Component {
                                            defaultValue='40'
                                            underlineColorAndroid='transparent'
                                            keyboardType='numeric'
+                                           editable={false}
                                 />
                                 <View style={styles.CalibrationInstrument}>
                                     <Text style={styles.InstrumentText}>{BatteryVoltager == NaN ? BatteryVoltager:0}</Text>
                                 </View>
                             </View>
-                            <View style={styles.CalibrationRow}>
-                                <Text style={styles.CalibrationText}>电流校准值:</Text>
-                                <TextInput style={styles.CalibrationInput}
-                                           returnKeyType="search"
-                                           onChangeText={(Electricity) => this.setState({Electricity})}
-                                           defaultValue='12'
-                                           underlineColorAndroid='transparent'
-                                           keyboardType='numeric'
-                                />
-                                <View style={styles.CalibrationInstrument}>
-                                    <Text style={styles.InstrumentText}>{BatteryElectricity == NaN ? BatteryElectricity:0}</Text>
-                                </View>
-                            </View>
-                            <View style={{alignItems:'center'}}>
-                                <Text style={{color:'#c0c0c0'}}>注：输入框内容以手动输入数据为准</Text>
-                            </View>
+
                             <View style={styles.BtnTouchable}>
                                 <TouchableOpacity onPress={()=>this.searchVoltage()} style={styles.CalibrationBtn}>
                                     <Text style={{fontSize:20}}>电压校准</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity onPress={()=>this.searchElectricity()} style={styles.CalibrationBtn}>
-                                    <Text style={{fontSize:20}}>电流校准</Text>
                                 </TouchableOpacity>
                             </View>
                         </View>
@@ -364,33 +316,16 @@ export default class Calibration extends Component {
                                                defaultValue='40'
                                                underlineColorAndroid='transparent'
                                                keyboardType='numeric'
+                                               editable={false}
                                     />
                                     <View style={styles.CalibrationInstrument}>
                                         <Text style={styles.InstrumentText}>{BatteryVoltager == NaN ? BatteryVoltager:0}</Text>
                                     </View>
                                 </View>
-                                <View style={styles.CalibrationRow}>
-                                    <Text style={styles.CalibrationText}>电流校准值:</Text>
-                                    <TextInput style={styles.CalibrationInput}
-                                               returnKeyType="search"
-                                               onChangeText={(Electricity) => this.setState({Electricity})}
-                                               defaultValue='12'
-                                               underlineColorAndroid='transparent'
-                                               keyboardType='numeric'
-                                    />
-                                    <View style={styles.CalibrationInstrument}>
-                                        <Text style={styles.InstrumentText}>{BatteryElectricity == NaN ? BatteryElectricity:0}</Text>
-                                    </View>
-                                </View>
-                                <View style={{alignItems:'center'}}>
-                                    <Text style={{color:'#c0c0c0'}}>注：输入框内容以手动输入数据为准</Text>
-                                </View>
+
                                 <View style={styles.BtnTouchable}>
                                     <TouchableOpacity onPress={()=>this.searchVoltage()} style={styles.CalibrationBtn}>
                                         <Text style={{fontSize:20}}>电压校准</Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity onPress={()=>this.searchElectricity()} style={styles.CalibrationBtn}>
-                                        <Text style={{fontSize:20}}>电流校准</Text>
                                     </TouchableOpacity>
                                 </View>
                             </View>
@@ -404,33 +339,16 @@ export default class Calibration extends Component {
                                                defaultValue='40'
                                                underlineColorAndroid='transparent'
                                                keyboardType='numeric'
+                                               editable={false}
                                     />
                                     <View style={styles.CalibrationInstrument}>
                                         <Text style={styles.InstrumentText}>{BatteryVoltager == NaN ? BatteryVoltager:0}</Text>
                                     </View>
                                 </View>
-                                <View style={styles.CalibrationRow}>
-                                    <Text style={styles.CalibrationText}>电流校准值:</Text>
-                                    <TextInput style={styles.CalibrationInput}
-                                               returnKeyType="search"
-                                               onChangeText={(Electricity) => this.setState({Electricity})}
-                                               defaultValue='12'
-                                               underlineColorAndroid='transparent'
-                                               keyboardType='numeric'
-                                    />
-                                    <View style={styles.CalibrationInstrument}>
-                                        <Text style={styles.InstrumentText}>{BatteryElectricity == NaN ? BatteryElectricity:0}</Text>
-                                    </View>
-                                </View>
-                                <View style={{alignItems:'center'}}>
-                                    <Text style={{color:'#c0c0c0'}}>注：输入框内容以手动输入数据为准</Text>
-                                </View>
+
                                 <View style={styles.BtnTouchable}>
                                     <TouchableOpacity onPress={()=>this.searchVoltage()} style={styles.CalibrationBtn}>
                                         <Text style={{fontSize:20}}>电压校准</Text>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity onPress={()=>this.searchElectricity()} style={styles.CalibrationBtn}>
-                                        <Text style={{fontSize:20}}>电流校准</Text>
                                     </TouchableOpacity>
                                 </View>
                             </View>

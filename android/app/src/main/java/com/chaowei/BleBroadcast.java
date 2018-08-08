@@ -117,10 +117,11 @@ public class BleBroadcast extends ReactContextBaseJavaModule {
 
        // int a =data1[0];
        // int b =data1[0]<<8;
-        int h =(data1[0]<<8)+0x01;
-        //int h =a+b;
-       // mDataBuilder.addManufacturerData(data1[1], data);
-       mDataBuilder.addManufacturerData(h, data);
+//       int h =(data1[0]<<8)+0x01;
+        int h =(data1[0])+(data1[1]<<8);
+       //int h =a+b;
+       //mDataBuilder.addManufacturerData(data1[1], data);
+        mDataBuilder.addManufacturerData(h, data);
         AdvertiseData mAdvertiseData = mDataBuilder.build();
         return mAdvertiseData;
     }

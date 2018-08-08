@@ -37,7 +37,7 @@ export default class DefaultScreen extends Component {
     onBarCodeRead(e) {
         //将返回的结果转为对象
         // let id = JSON.parse(e.data);
-        let value = e.data;
+        let value = e.data.toLowerCase();
         // const { params } = this.props.navigation.state;
         // const { battery,charger } = params;
         if( this.state.isLiked === false ){//蓄电池
