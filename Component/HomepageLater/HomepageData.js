@@ -6,13 +6,15 @@ import {
     TouchableOpacity,
     Image
 } from 'react-native';
-
+// const { params } = this.props.navigation.state;
+// const { index,chargerImg } = params;
 export default class BatteryData extends Component {
     //构造函数
     constructor(props) {
         super(props);
         this.state = {
             text: '',
+            chargerImg:0,
         }
     }
 
@@ -21,12 +23,19 @@ export default class BatteryData extends Component {
     };
 
     static navigationOptions = {
-        title: '蓄电池',
+        headerTitle:(<Text style={{fontSize:20,flex: 1, textAlign: 'center'}}>充电器</Text>),
         headerStyle: {
             height: 40,
-            // backgroundColor: '#FFF',
-            // elevation: null,
+            // backgroundColor: 'red',
+            // elevation: null
         },
+        // headerLeft:(
+        //     <View style={{height: 44,width: 55,justifyContent: 'center',paddingRight:15} }/>
+        // ),
+        headerRight: (
+            <View style={{height: 44,width: 55,justifyContent: 'center',paddingRight:15} }/>
+        ),
+        headerPressColorAndroid:'blue',
     };
 
     render() {
@@ -154,12 +163,11 @@ const styles = StyleSheet.create({
         borderBottomWidth:1,
         justifyContent: 'center',
         // alignItems: 'center',
-        // marginLeft:15,
+        marginLeft:15,
     },
     BtnText:{
         fontSize:19,
         paddingTop:10,
         paddingBottom:10,
-        marginLeft:15,
     }
 });

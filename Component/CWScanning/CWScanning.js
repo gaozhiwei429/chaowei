@@ -9,9 +9,7 @@ import {
     Alert,
 } from 'react-native';
 // import Main from '../CWMain/CWMain'
-
 import * as storage from '../../storage';
-
 import { BATTERY_BIND_STORAGE_KEY,CHARGER_BIND_STORAGE_KEY,PHONE_BIND_STORAGE_KEY } from '../../config';
 import AlertS from '../Alert/Alert';
 export default class CWScanning extends Component {
@@ -79,12 +77,19 @@ export default class CWScanning extends Component {
     };
 
     static navigationOptions = {
-        title: '绑定',
+        headerTitle:(<Text style={{fontSize:20,flex: 1, textAlign: 'center'}}>绑定</Text>),
         headerStyle: {
-            height:40,
+            height: 40,
             // backgroundColor: 'red',
             // elevation: null
         },
+        // headerLeft:(
+        //     <View style={{height: 44,width: 55,justifyContent: 'center',paddingRight:15} }/>
+        // ),
+        headerRight: (
+            <View style={{height: 44,width: 55,justifyContent: 'center',paddingRight:15} }/>
+        ),
+        headerPressColorAndroid:'blue',
     };
 
     render() {

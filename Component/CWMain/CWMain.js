@@ -1,12 +1,18 @@
 import React from 'react';
 import {
-
+    StyleSheet,
+    TouchableOpacity,
+    Image,
+    Text,
+    Dimensions,
+    View
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { createBottomTabNavigator, TabBarBottom } from 'react-navigation'; // Version can be specified in package.json
 import Homescreen from '../CWHome/CWHome';
 import TABscreen from '../CWSvg/TAB';
 import Buttonscreen from '../CWButton/CWButton';
+import CWQRCode from '../CWQRCode/CWQRCode';
 
 const tabBarConfig = {
     Home: {
@@ -54,20 +60,44 @@ Tabs.navigationOptions = ({ navigation }) => {
     // however you like given `routes` & `index`
 
     if (routes[index].routeName === 'Home') {
-        navigationOptions.title = '首页';
+        navigationOptions.headerTitle=(
+            <Text style={{fontSize:20,flex:1, textAlign: 'center'}}>首页</Text>
+            );
             navigationOptions.headerStyle={
-                height:0
-            }
+                height:40
+            };
+        navigationOptions.headerLeft=(
+            <View style={{height: 44,width: 55,justifyContent: 'center',paddingRight:15} }/>
+        );
+        navigationOptions.headerRight=(
+            <TouchableOpacity style={{paddingRight:15} } onPress={()=>navigation.navigate('CWQRCode')}>
+                <Image style={{width:20,height:20,}} source={require('../../img/saomiao01.png')}/>
+            </TouchableOpacity>
+        );
+        navigationOptions.headerTitleStyle={
+            alignSelf:'center',//居中显示
+        }
     }else if(routes[index].routeName === 'More'){
-        navigationOptions.title = '更多';
-            navigationOptions.headerStyle={
-                height:40
-            }
+        navigationOptions.headerTitle=(
+            <Text style={{fontSize:20,flex:1, textAlign: 'center'}}>更多</Text>
+        );
+        navigationOptions.headerStyle={
+            height:40
+        };
+        navigationOptions.headerTitleStyle={
+            alignSelf:'center',//居中显示
+        }
     }else if(routes[index].routeName === 'Tab'){
-        navigationOptions.title = '数据';
-            navigationOptions.headerStyle={
-                height:40
-            }
+        navigationOptions.headerTitle=(
+            <Text style={{fontSize:20,flex:1, textAlign: 'center'}}>数据</Text>
+        );
+        navigationOptions.headerStyle={
+            height:40
+        };
+        navigationOptions.headerTitleStyle={
+            alignSelf:'center',//居中显示
+            color:'#00f'
+        }
     }
 
     return navigationOptions;

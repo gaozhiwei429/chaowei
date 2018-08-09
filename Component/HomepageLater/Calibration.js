@@ -201,12 +201,19 @@ export default class Calibration extends Component {
     }
 
     static navigationOptions = {
-        title: '校准',
+        headerTitle:(<Text style={{fontSize:20,flex: 1, textAlign: 'center'}}>校准</Text>),
         headerStyle: {
             height: 40,
             // backgroundColor: 'red',
             // elevation: null
         },
+        // headerLeft:(
+        //     <View style={{height: 44,width: 55,justifyContent: 'center',paddingRight:15} }/>
+        // ),
+        headerRight: (
+            <View style={{height: 44,width: 55,justifyContent: 'center',paddingRight:15} }/>
+        ),
+        headerPressColorAndroid:'blue',
     };
 
     render() {

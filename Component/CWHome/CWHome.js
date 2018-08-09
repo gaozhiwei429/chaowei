@@ -54,7 +54,7 @@ function bindSingle(){
     var commandList = commandArr[otherIndex];
     // 向 batteryArray[currentIndex] 发送 commandArr[otherIndex] + others[otherIndex] 的值
     var equipmentList = Identifier.concat(Reserved,Reserved,others[otherIndex],batteryArray[currentIndex]);
-     bleBroadcast.start(commandList ,equipmentList);// 蓝牙广播开始
+     // bleBroadcast.start(commandList ,equipmentList);// 蓝牙广播开始
     var con=commandList.concat(equipmentList);//广播的数据
      console.log(con);//广播的数据
     otherIndex = otherIndex + 1;// otherIndex 自增
@@ -490,14 +490,6 @@ export default class CWHome extends Component {
                 <ProgressDialogAlert ref='pmgressbar' title='提示信息' btnText='确定' msg={10}  progress={0.7} width={200} color='red'/>
                 <AlertS ref='bleScan' title='提示' btnText='确定' msg='请先打开蓝牙开关！' />
 
-                <View style={{width:Dimensions.get('window').width,height:40,alignItems:'center',flexDirection:'row',borderBottomColor:'#ff0',justifyContent:'space-between',backgroundColor:'#fff'}}>
-                    <View style={{marginLeft:20}}>
-                        <Text style={{fontSize:20,color:'#000'}}>首页</Text>
-                    </View>
-                    <TouchableOpacity style={{marginRight:20}} onPress={()=>this.props.navigation.navigate('CWQRCode')}>
-                        <Image style={{width:20,height:20 }} source={require('../../img/saomiao01.png')}/>
-                    </TouchableOpacity>
-                </View>
                 {/*测试*/}
                 {/*<View style={{justifyContent:'space-around',flexDirection:'row'}}>*/}
                     {/*<TouchableOpacity style={{width:40,height:40,backgroundColor:'#0fa'}} onPress={()=>this.banding1()}>*/}

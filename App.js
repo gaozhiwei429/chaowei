@@ -28,6 +28,9 @@ import CWBatteryCapacity from './Component/CWSvg/CWBatteryCapacity';//容量
 import ChargerSvg from './Component/HomepageLater/ChargerSvg';//充电器折线图
 import HomepageData from './Component/HomepageLater/HomepageData';//蓄电池Next
 import Calibration from './Component/HomepageLater/Calibration';//校准
+import RechargeRecord from './Component/RechargeRecord/RechargeRecord';//充电记录
+import Charging from './Component/Charging/Charging';//启动停止充电
+
 //测试
 import ListView from './Component/ListView/ListView'
 import CWSvgBatteryone from './Component/CWSvg/CWSvgBatteryOne';
@@ -64,6 +67,8 @@ const RootStack = createStackNavigator({
         ChargerSvg:{screen:ChargerSvg},
         HomepageData:{screen:HomepageData},
         Calibration:{screen:Calibration},
+        RechargeRecord:{screen:RechargeRecord},
+        Charging:{screen:Charging},
 
         //测试
         CWSvgBatteryone:{screen:CWSvgBatteryone},

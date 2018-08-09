@@ -165,12 +165,19 @@ export default class ChargerSvg extends Component {
     }
 
     static navigationOptions = {
-        title: '充电器数据曲线',
+        headerTitle:(<Text style={{fontSize:20,flex: 1, textAlign: 'center'}}>充电器数据曲线</Text>),
         headerStyle: {
             height: 40,
             // backgroundColor: 'red',
             // elevation: null
         },
+        // headerLeft:(
+        //     <View style={{height: 44,width: 55,justifyContent: 'center',paddingRight:15} }/>
+        // ),
+        headerRight: (
+            <View style={{height: 44,width: 55,justifyContent: 'center',paddingRight:15} }/>
+        ),
+        headerPressColorAndroid:'blue',
     };
     render() {
         const option= {

@@ -23,7 +23,7 @@ import Toast from '../Alert/Toast';
 // let FlashLight = NativeModules.FlashLight;
 // import FlashLight from '../FlashLight/FlashLight'
 
-export default class DefaultScreen extends Component {
+export default class CWQRCode extends Component {
     constructor(){
         super();
         this.state = {
@@ -109,12 +109,19 @@ export default class DefaultScreen extends Component {
     }
 
     static navigationOptions = {
-        headerTitle: '二维码扫描',
+        headerTitle:(<Text style={{fontSize:20,flex: 1, textAlign: 'center'}}>二维码扫描</Text>),
         headerStyle: {
             height:40,
             // backgroundColor: 'red',
             // elevation: null
         },
+        headerTitleStyle:{
+            alignSelf:'center',//居中显示
+        },
+        headerRight: (
+            <View style={{height: 44,width: 55,justifyContent: 'center',paddingRight:15} }/>
+        ),
+        headerPressColorAndroid:'blue',
     };
 
     render() {
