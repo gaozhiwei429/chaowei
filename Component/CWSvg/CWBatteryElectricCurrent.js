@@ -75,10 +75,10 @@ export default class CWBatteryElectricCurrent extends Component {
                     for(let i=0; i<len; i++){
                         var u = results.rows.item(i);
                         battery1electric_currentData.push(parseInt(u.electric_current));
-                        this.setState({
-                            battery1:battery1electric_currentData,
-                        })
                     }
+                    this.setState({
+                        battery1:battery1electric_currentData,
+                    })
                 });
             },(error)=>{
                 console.log(error);
@@ -92,16 +92,16 @@ export default class CWBatteryElectricCurrent extends Component {
                         for(let i=0; i<len; i++){
                             var u = results.rows.item(i);
                             battery1electric_currentData.push(parseInt(u.electric_current));
-                            if(battery1electric_currentData.length>18){
-                                battery1TemperatureData.shift();
-                                this.setState({
-                                    battery1:battery1electric_currentData,
-                                });
-                            }else {
-                                this.setState({
-                                    battery1:battery1electric_currentData,
-                                });
-                            }
+                        }
+                        if(battery1electric_currentData.length>18){
+                            battery1TemperatureData.shift();
+                            this.setState({
+                                battery1:battery1electric_currentData,
+                            });
+                        }else {
+                            this.setState({
+                                battery1:battery1electric_currentData,
+                            });
                         }
                         battery1Time=setTimeout(batteryelectric_current1, 10000);
                     });
@@ -118,10 +118,10 @@ export default class CWBatteryElectricCurrent extends Component {
                     for(let i=0; i<len; i++){
                         var u = results.rows.item(i);
                         battery2electric_currentData.push(parseInt(u.electric_current));
-                        this.setState({
-                            battery2:battery2electric_currentData,
-                        })
                     }
+                    this.setState({
+                        battery2:battery2electric_currentData,
+                    })
                 });
             },(error)=>{
                 console.log(error);
@@ -135,16 +135,16 @@ export default class CWBatteryElectricCurrent extends Component {
                         for(let i=0; i<len; i++){
                             var u = results.rows.item(i);
                             battery2electric_currentData.push(parseInt(u.electric_current));
-                            if(battery2electric_currentData.length>18){
-                                battery2electric_currentData.shift();
-                                this.setState({
-                                    battery2:battery2electric_currentData,
-                                });
-                            }else {
-                                this.setState({
-                                    battery2:battery2electric_currentData,
-                                });
-                            }
+                        }
+                        if(battery2electric_currentData.length>18){
+                            battery2electric_currentData.shift();
+                            this.setState({
+                                battery2:battery2electric_currentData,
+                            });
+                        }else {
+                            this.setState({
+                                battery2:battery2electric_currentData,
+                            });
                         }
                         battery2Time=setTimeout(batteryelectric_current2, 10000);
                     });
@@ -161,10 +161,10 @@ export default class CWBatteryElectricCurrent extends Component {
                     for(let i=0; i<len; i++){
                         var u = results.rows.item(i);
                         battery3electric_currentData.push(parseInt(u.electric_current));
-                        this.setState({
-                            battery3:battery3electric_currentData,
-                        })
                     }
+                    this.setState({
+                        battery3:battery3electric_currentData,
+                    })
                 });
             },(error)=>{
                 console.log(error);
@@ -178,16 +178,16 @@ export default class CWBatteryElectricCurrent extends Component {
                         for(let i=0; i<len; i++){
                             var u = results.rows.item(i);
                             battery3electric_currentData.push(parseInt(u.electric_current));
-                            if(battery3electric_currentData.length>18){
-                                battery3electric_currentData.shift();
-                                this.setState({
-                                    battery3:battery3electric_currentData,
-                                });
-                            }else {
-                                this.setState({
-                                    battery3:battery3electric_currentData,
-                                });
-                            }
+                        }
+                        if(battery3electric_currentData.length>18){
+                            battery3electric_currentData.shift();
+                            this.setState({
+                                battery3:battery3electric_currentData,
+                            });
+                        }else {
+                            this.setState({
+                                battery3:battery3electric_currentData,
+                            });
                         }
                         battery3Time=setTimeout(batteryelectric_current3, 10000);
                     });
@@ -204,10 +204,10 @@ export default class CWBatteryElectricCurrent extends Component {
                     for(let i=0; i<len; i++){
                         var u = results.rows.item(i);
                         battery4electric_currentData.push(parseInt(u.electric_current));
-                        this.setState({
-                            battery4:battery4electric_currentData,
-                        })
                     }
+                    this.setState({
+                        battery4:battery4electric_currentData,
+                    })
                 });
             },(error)=>{
                 console.log(error);
@@ -221,16 +221,16 @@ export default class CWBatteryElectricCurrent extends Component {
                         for(let i=0; i<len; i++){
                             var u = results.rows.item(i);
                             battery4electric_currentData.push(parseInt(u.electric_current));
-                            if(battery4electric_currentData.length>18){
-                                battery4electric_currentData.shift();
-                                this.setState({
-                                    battery4:battery4electric_currentData,
-                                });
-                            }else {
-                                this.setState({
-                                    battery4:battery4electric_currentData,
-                                });
-                            }
+                        }
+                        if(battery4electric_currentData.length>18){
+                            battery4electric_currentData.shift();
+                            this.setState({
+                                battery4:battery4electric_currentData,
+                            });
+                        }else {
+                            this.setState({
+                                battery4:battery4electric_currentData,
+                            });
                         }
                         battery4Time=setTimeout(batteryelectric_current4, 10000);
                     });
@@ -263,10 +263,10 @@ export default class CWBatteryElectricCurrent extends Component {
                 for(let i=0; i<len; i++){
                     var u = results.rows.item(i);
                     battery1electric_currentData.push(parseInt(u.electric_current));
-                    this.setState({
-                        battery1:battery1electric_currentData,
-                    })
                 }
+                this.setState({
+                    battery1:battery1electric_currentData,
+                })
             });
         },(error)=>{
             console.log(error);
@@ -279,10 +279,10 @@ export default class CWBatteryElectricCurrent extends Component {
                 for(let i=0; i<len; i++){
                     var u = results.rows.item(i);
                     battery2electric_currentData.push(parseInt(u.electric_current));
-                    this.setState({
-                        battery2:battery2electric_currentData,
-                    })
                 }
+                this.setState({
+                    battery2:battery2electric_currentData,
+                })
             });
         },(error)=>{
             console.log(error);
@@ -295,10 +295,10 @@ export default class CWBatteryElectricCurrent extends Component {
                 for(let i=0; i<len; i++){
                     var u = results.rows.item(i);
                     battery3electric_currentData.push(parseInt(u.electric_current));
-                    this.setState({
-                        battery3:battery3electric_currentData,
-                    })
                 }
+                this.setState({
+                    battery3:battery3electric_currentData,
+                })
             });
         },(error)=>{
             console.log(error);
@@ -311,10 +311,10 @@ export default class CWBatteryElectricCurrent extends Component {
                 for(let i=0; i<len; i++){
                     var u = results.rows.item(i);
                     battery4electric_currentData.push(parseInt(u.electric_current));
-                    this.setState({
-                        battery4:battery4electric_currentData,
-                    })
                 }
+                this.setState({
+                    battery4:battery4electric_currentData,
+                })
             });
         },(error)=>{
             console.log(error);
@@ -337,10 +337,20 @@ export default class CWBatteryElectricCurrent extends Component {
                 show : true,
                 showTitle:true,
                 feature : {
-                    dataView : {show: true, readOnly: false},//show是否显示表格，readOnly是否只读
+                    dataView : {
+                        show: true,
+                        readOnly: true,
+                        emphasis:{
+                            iconStyle:{
+                                shadowColor: 'rgba(0, 0, 0, 0.5)',
+                                shadowBlur: 10,
+                                borderWidth:1,
+                            }
+                        }
+                    },//show是否显示表格，readOnly是否只读
                     magicType : {
                         //折线图  柱形图    总数统计 分开平铺
-                        //type: ['line'],//'line', 'bar','stack' ,'tiled'
+                        // type: ['line', 'bar','stack' ,'tiled'],//'line', 'bar','stack' ,'tiled'
                     },
                 }
             },

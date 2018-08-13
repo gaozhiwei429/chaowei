@@ -75,10 +75,10 @@ export default class CWBatteryVoltage extends Component {
                     for(let i=0; i<len; i++){
                         var u = results.rows.item(i);
                         battery1VoltageData.push(parseInt(u.voltage));
-                        this.setState({
-                            battery1:battery1VoltageData,
-                        })
                     }
+                    this.setState({
+                        battery1:battery1VoltageData,
+                    })
                 });
             },(error)=>{
                 console.log(error);
@@ -92,16 +92,16 @@ export default class CWBatteryVoltage extends Component {
                         for(let i=0; i<len; i++){
                             var u = results.rows.item(i);
                             battery1VoltageData.push(parseInt(u.voltage));
-                            if(battery1VoltageData.length>18){
-                                battery1VoltageData.shift();
-                                this.setState({
-                                    battery1:battery1VoltageData,
-                                });
-                            }else {
-                                this.setState({
-                                    battery1:battery1VoltageData,
-                                });
-                            }
+                        }
+                        if(battery1VoltageData.length>18){
+                            battery1VoltageData.shift();
+                            this.setState({
+                                battery1:battery1VoltageData,
+                            });
+                        }else {
+                            this.setState({
+                                battery1:battery1VoltageData,
+                            });
                         }
                         battery1Time=setTimeout(batteryVoltage1, 10000);
                     });
@@ -118,10 +118,10 @@ export default class CWBatteryVoltage extends Component {
                     for(let i=0; i<len; i++){
                         var u = results.rows.item(i);
                         battery2VoltageData.push(parseInt(u.voltage));
-                        this.setState({
-                            battery2:battery2VoltageData,
-                        })
                     }
+                    this.setState({
+                        battery2:battery2VoltageData,
+                    })
                 });
             },(error)=>{
                 console.log(error);
@@ -135,16 +135,16 @@ export default class CWBatteryVoltage extends Component {
                         for(let i=0; i<len; i++){
                             var u = results.rows.item(i);
                             battery2VoltageData.push(parseInt(u.voltage));
-                            if(battery2VoltageData.length>18){
-                                battery2VoltageData.shift();
-                                this.setState({
-                                    battery2:battery2VoltageData,
-                                });
-                            }else {
-                                this.setState({
-                                    battery2:battery2VoltageData,
-                                });
-                            }
+                        }
+                        if(battery2VoltageData.length>18){
+                            battery2VoltageData.shift();
+                            this.setState({
+                                battery2:battery2VoltageData,
+                            });
+                        }else {
+                            this.setState({
+                                battery2:battery2VoltageData,
+                            });
                         }
                         battery2Time=setTimeout(batteryVoltage2, 10000);
                     });
@@ -161,10 +161,10 @@ export default class CWBatteryVoltage extends Component {
                     for(let i=0; i<len; i++){
                         var u = results.rows.item(i);
                         battery3VoltageData.push(parseInt(u.voltage));
-                        this.setState({
-                            battery3:battery3VoltageData,
-                        })
                     }
+                    this.setState({
+                        battery3:battery3VoltageData,
+                    })
                 });
             },(error)=>{
                 console.log(error);
@@ -178,16 +178,16 @@ export default class CWBatteryVoltage extends Component {
                         for(let i=0; i<len; i++){
                             var u = results.rows.item(i);
                             battery3VoltageData.push(parseInt(u.voltage));
-                            if(battery3VoltageData.length>18){
-                                battery3VoltageData.shift();
-                                this.setState({
-                                    battery3:battery3VoltageData,
-                                });
-                            }else {
-                                this.setState({
-                                    battery3:battery3VoltageData,
-                                });
-                            }
+                        }
+                        if(battery3VoltageData.length>18){
+                            battery3VoltageData.shift();
+                            this.setState({
+                                battery3:battery3VoltageData,
+                            });
+                        }else {
+                            this.setState({
+                                battery3:battery3VoltageData,
+                            });
                         }
                         battery3Time=setTimeout(batteryVoltage3, 10000);
                     });
@@ -204,10 +204,10 @@ export default class CWBatteryVoltage extends Component {
                     for(let i=0; i<len; i++){
                         var u = results.rows.item(i);
                         battery4VoltageData.push(parseInt(u.voltage));
-                        this.setState({
-                            battery4:battery4VoltageData,
-                        })
                     }
+                    this.setState({
+                        battery4:battery4VoltageData,
+                    })
                 });
             },(error)=>{
                 console.log(error);
@@ -221,16 +221,16 @@ export default class CWBatteryVoltage extends Component {
                         for(let i=0; i<len; i++){
                             var u = results.rows.item(i);
                             battery4VoltageData.push(parseInt(u.voltage));
-                            if(battery4VoltageData.length>18){
-                                battery4VoltageData.shift();
-                                this.setState({
-                                    battery4:battery4VoltageData,
-                                });
-                            }else {
-                                this.setState({
-                                    battery4:battery4VoltageData,
-                                });
-                            }
+                        }
+                        if(battery4VoltageData.length>18){
+                            battery4VoltageData.shift();
+                            this.setState({
+                                battery4:battery4VoltageData,
+                            });
+                        }else {
+                            this.setState({
+                                battery4:battery4VoltageData,
+                            });
                         }
                         battery4Time=setTimeout(batteryVoltage4, 10000);
                     });
@@ -262,10 +262,10 @@ export default class CWBatteryVoltage extends Component {
                 for(let i=0; i<len; i++){
                     var u = results.rows.item(i);
                     battery1VoltageData.push(parseInt(u.voltage));
-                    this.setState({
-                        battery1:battery1VoltageData,
-                    })
                 }
+                this.setState({
+                    battery1:battery1VoltageData,
+                })
             });
         },(error)=>{
             console.log(error);
@@ -278,10 +278,10 @@ export default class CWBatteryVoltage extends Component {
                 for(let i=0; i<len; i++){
                     var u = results.rows.item(i);
                     battery2VoltageData.push(parseInt(u.voltage));
-                    this.setState({
-                        battery2:battery2VoltageData,
-                    })
                 }
+                this.setState({
+                    battery2:battery2VoltageData,
+                })
             });
         },(error)=>{
             console.log(error);
@@ -294,10 +294,10 @@ export default class CWBatteryVoltage extends Component {
                 for(let i=0; i<len; i++){
                     var u = results.rows.item(i);
                     battery3VoltageData.push(parseInt(u.voltage));
-                    this.setState({
-                        battery3:battery3VoltageData,
-                    })
                 }
+                this.setState({
+                    battery3:battery3VoltageData,
+                })
             });
         },(error)=>{
             console.log(error);
@@ -310,10 +310,10 @@ export default class CWBatteryVoltage extends Component {
                 for(let i=0; i<len; i++){
                     var u = results.rows.item(i);
                     battery4VoltageData.push(parseInt(u.voltage));
-                    this.setState({
-                        battery4:battery4VoltageData,
-                    })
                 }
+                this.setState({
+                    battery4:battery4VoltageData,
+                })
             });
         },(error)=>{
             console.log(error);

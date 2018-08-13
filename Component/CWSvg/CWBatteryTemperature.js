@@ -75,10 +75,10 @@ export default class CWBatteryTemperature extends Component {
                     for(let i=0; i<len; i++){
                         var u = results.rows.item(i);
                         battery1TemperatureData.push(parseInt(u.temperature));
-                        this.setState({
-                            battery1:battery1TemperatureData,
-                        })
                     }
+                    this.setState({
+                        battery1:battery1TemperatureData,
+                    })
                 });
             },(error)=>{
                 console.log(error);
@@ -92,16 +92,16 @@ export default class CWBatteryTemperature extends Component {
                         for(let i=0; i<len; i++){
                             var u = results.rows.item(i);
                             battery1TemperatureData.push(parseInt(u.temperature));
-                            if(battery1TemperatureData.length>18){
-                                battery1TemperatureData.shift();
-                                this.setState({
-                                    battery1:battery1TemperatureData,
-                                });
-                            }else {
-                                this.setState({
-                                    battery1:battery1TemperatureData,
-                                });
-                            }
+                        }
+                        if(battery1TemperatureData.length>18){
+                            battery1TemperatureData.shift();
+                            this.setState({
+                                battery1:battery1TemperatureData,
+                            });
+                        }else {
+                            this.setState({
+                                battery1:battery1TemperatureData,
+                            });
                         }
                         battery1Time=setTimeout(batteryTemperature1, 10000);
                     });
@@ -118,10 +118,10 @@ export default class CWBatteryTemperature extends Component {
                     for(let i=0; i<len; i++){
                         var u = results.rows.item(i);
                         battery2TemperatureData.push(parseInt(u.temperature));
-                        this.setState({
-                            battery2:battery2TemperatureData,
-                        })
                     }
+                    this.setState({
+                        battery2:battery2TemperatureData,
+                    })
                 });
             },(error)=>{
                 console.log(error);
@@ -135,16 +135,16 @@ export default class CWBatteryTemperature extends Component {
                         for(let i=0; i<len; i++){
                             var u = results.rows.item(i);
                             battery2TemperatureData.push(parseInt(u.temperature));
-                            if(battery2TemperatureData.length>18){
-                                battery2TemperatureData.shift();
-                                this.setState({
-                                    battery2:battery2TemperatureData,
-                                });
-                            }else {
-                                this.setState({
-                                    battery2:battery2TemperatureData,
-                                });
-                            }
+                        }
+                        if(battery2TemperatureData.length>18){
+                            battery2TemperatureData.shift();
+                            this.setState({
+                                battery2:battery2TemperatureData,
+                            });
+                        }else {
+                            this.setState({
+                                battery2:battery2TemperatureData,
+                            });
                         }
                         battery2Time=setTimeout(batteryTemperature2, 10000);
                     });
@@ -161,10 +161,10 @@ export default class CWBatteryTemperature extends Component {
                     for(let i=0; i<len; i++){
                         var u = results.rows.item(i);
                         battery3TemperatureData.push(parseInt(u.temperature));
-                        this.setState({
-                            battery3:battery3TemperatureData,
-                        })
                     }
+                    this.setState({
+                        battery3:battery3TemperatureData,
+                    })
                 });
             },(error)=>{
                 console.log(error);
@@ -178,16 +178,16 @@ export default class CWBatteryTemperature extends Component {
                         for(let i=0; i<len; i++){
                             var u = results.rows.item(i);
                             battery3TemperatureData.push(parseInt(u.temperature));
-                            if(battery3TemperatureData.length>18){
-                                battery3TemperatureData.shift();
-                                this.setState({
-                                    battery3:battery3TemperatureData,
-                                });
-                            }else {
-                                this.setState({
-                                    battery3:battery3TemperatureData,
-                                });
-                            }
+                        }
+                        if(battery3TemperatureData.length>18){
+                            battery3TemperatureData.shift();
+                            this.setState({
+                                battery3:battery3TemperatureData,
+                            });
+                        }else {
+                            this.setState({
+                                battery3:battery3TemperatureData,
+                            });
                         }
                         battery3Time=setTimeout(batteryTemperature3, 10000);
                     });
@@ -204,10 +204,10 @@ export default class CWBatteryTemperature extends Component {
                     for(let i=0; i<len; i++){
                         var u = results.rows.item(i);
                         battery4TemperatureData.push(parseInt(u.temperature));
-                        this.setState({
-                            battery4:battery4TemperatureData,
-                        })
                     }
+                    this.setState({
+                        battery4:battery4TemperatureData,
+                    })
                 });
             },(error)=>{
                 console.log(error);
@@ -221,16 +221,16 @@ export default class CWBatteryTemperature extends Component {
                         for(let i=0; i<len; i++){
                             var u = results.rows.item(i);
                             battery4TemperatureData.push(parseInt(u.temperature));
-                            if(battery4TemperatureData.length>18){
-                                battery4TemperatureData.shift();
-                                this.setState({
-                                    battery4:battery4TemperatureData,
-                                });
-                            }else {
-                                this.setState({
-                                    battery4:battery4TemperatureData,
-                                });
-                            }
+                        }
+                        if(battery4TemperatureData.length>18){
+                            battery4TemperatureData.shift();
+                            this.setState({
+                                battery4:battery4TemperatureData,
+                            });
+                        }else {
+                            this.setState({
+                                battery4:battery4TemperatureData,
+                            });
                         }
                         battery4Time=setTimeout(batteryTemperature4, 10000);
                     });
@@ -262,10 +262,10 @@ export default class CWBatteryTemperature extends Component {
                 for(let i=0; i<len; i++){
                     var u = results.rows.item(i);
                     battery1TemperatureData.push(parseInt(u.temperature));
-                    this.setState({
-                        battery1:battery1TemperatureData,
-                    })
                 }
+                this.setState({
+                    battery1:battery1TemperatureData,
+                })
             });
         },(error)=>{
             console.log(error);
@@ -278,10 +278,10 @@ export default class CWBatteryTemperature extends Component {
                 for(let i=0; i<len; i++){
                     var u = results.rows.item(i);
                     battery2TemperatureData.push(parseInt(u.temperature));
-                    this.setState({
-                        battery2:battery2TemperatureData,
-                    })
                 }
+                this.setState({
+                    battery2:battery2TemperatureData,
+                })
             });
         },(error)=>{
             console.log(error);
@@ -294,10 +294,10 @@ export default class CWBatteryTemperature extends Component {
                 for(let i=0; i<len; i++){
                     var u = results.rows.item(i);
                     battery3TemperatureData.push(parseInt(u.temperature));
-                    this.setState({
-                        battery3:battery3TemperatureData,
-                    })
                 }
+                this.setState({
+                    battery3:battery3TemperatureData,
+                })
             });
         },(error)=>{
             console.log(error);
@@ -310,10 +310,10 @@ export default class CWBatteryTemperature extends Component {
                 for(let i=0; i<len; i++){
                     var u = results.rows.item(i);
                     battery4TemperatureData.push(parseInt(u.temperature));
-                    this.setState({
-                        battery4:battery4TemperatureData,
-                    })
                 }
+                this.setState({
+                    battery4:battery4TemperatureData,
+                })
             });
         },(error)=>{
             console.log(error);

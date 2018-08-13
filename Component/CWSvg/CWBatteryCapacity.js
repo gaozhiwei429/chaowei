@@ -77,10 +77,10 @@ export default class CWBatteryCapacity extends Component {
                     for(let i=0; i<len; i++){
                         var u = results.rows.item(i);
                         battery1capacityData.push(parseInt(u.capacity));
-                        this.setState({
-                            battery1:battery1capacityData,
-                        })
                     }
+                    this.setState({
+                        battery1:battery1capacityData,
+                    })
                 });
             },(error)=>{
                 console.log(error);
@@ -93,16 +93,16 @@ export default class CWBatteryCapacity extends Component {
                         for(let i=0; i<len; i++){
                             var u = results.rows.item(i);
                             battery1capacityData.push(parseInt(u.capacity));
-                            if(battery1capacityData.length>18){
-                                battery1capacityData.shift();
-                                this.setState({
-                                    battery1:battery1capacityData,
-                                });
-                            }else {
-                                this.setState({
-                                    battery1:battery1capacityData,
-                                });
-                            }
+                        }
+                        if(battery1capacityData.length>18){
+                            battery1capacityData.shift();
+                            this.setState({
+                                battery1:battery1capacityData,
+                            });
+                        }else {
+                            this.setState({
+                                battery1:battery1capacityData,
+                            });
                         }
                         battery1Time=setTimeout(batteryCapacity1, 10000);
                     });
@@ -119,10 +119,10 @@ export default class CWBatteryCapacity extends Component {
                     for(let i=0; i<len; i++){
                         var u = results.rows.item(i);
                         battery2capacityData.push(parseInt(u.capacity));
-                        this.setState({
-                            battery2:battery2capacityData,
-                        })
                     }
+                    this.setState({
+                        battery2:battery2capacityData,
+                    })
                 });
             },(error)=>{
                 console.log(error);
@@ -136,16 +136,16 @@ export default class CWBatteryCapacity extends Component {
                         for(let i=0; i<len; i++){
                             var u = results.rows.item(i);
                             battery2capacityData.push(parseInt(u.capacity));
-                            if(battery2capacityData.length>18){
-                                battery2capacityData.shift();
-                                this.setState({
-                                    battery2:battery2capacityData,
-                                });
-                            }else {
-                                this.setState({
-                                    battery2:battery2capacityData,
-                                });
-                            }
+                        }
+                        if(battery2capacityData.length>18){
+                            battery2capacityData.shift();
+                            this.setState({
+                                battery2:battery2capacityData,
+                            });
+                        }else {
+                            this.setState({
+                                battery2:battery2capacityData,
+                            });
                         }
                         battery2Time=setTimeout(batteryCapacity2, 10000);
                     });
@@ -162,10 +162,10 @@ export default class CWBatteryCapacity extends Component {
                     for(let i=0; i<len; i++){
                         var u = results.rows.item(i);
                         battery3capacityData.push(parseInt(u.capacity));
-                        this.setState({
-                            battery3:battery3capacityData,
-                        })
                     }
+                    this.setState({
+                        battery3:battery3capacityData,
+                    })
                 });
             },(error)=>{
                 console.log(error);
@@ -179,16 +179,16 @@ export default class CWBatteryCapacity extends Component {
                         for(let i=0; i<len; i++){
                             var u = results.rows.item(i);
                             battery3capacityData.push(parseInt(u.capacity));
-                            if(battery3capacityData.length>18){
-                                battery3capacityData.shift();
-                                this.setState({
-                                    battery3:battery3capacityData,
-                                });
-                            }else {
-                                this.setState({
-                                    battery3:battery3capacityData,
-                                });
-                            }
+                        }
+                        if(battery3capacityData.length>18){
+                            battery3capacityData.shift();
+                            this.setState({
+                                battery3:battery3capacityData,
+                            });
+                        }else {
+                            this.setState({
+                                battery3:battery3capacityData,
+                            });
                         }
                         battery3Time=setTimeout(batteryCapacity3, 10000);
                     });
@@ -205,10 +205,10 @@ export default class CWBatteryCapacity extends Component {
                     for(let i=0; i<len; i++){
                         var u = results.rows.item(i);
                         battery4capacityData.push(parseInt(u.capacity));
-                        this.setState({
-                            battery4:battery4capacityData,
-                        })
                     }
+                    this.setState({
+                        battery4:battery4capacityData,
+                    })
                 });
             },(error)=>{
                 console.log(error);
@@ -222,16 +222,16 @@ export default class CWBatteryCapacity extends Component {
                         for(let i=0; i<len; i++){
                             var u = results.rows.item(i);
                             battery4capacityData.push(parseInt(u.capacity));
-                            if(battery4capacityData.length>18){
-                                battery4capacityData.shift();
-                                this.setState({
-                                    battery4:battery4capacityData,
-                                });
-                            }else {
-                                this.setState({
-                                    battery4:battery4capacityData,
-                                });
-                            }
+                        }
+                        if(battery4capacityData.length>18){
+                            battery4capacityData.shift();
+                            this.setState({
+                                battery4:battery4capacityData,
+                            });
+                        }else {
+                            this.setState({
+                                battery4:battery4capacityData,
+                            });
                         }
                         battery4Time=setTimeout(batteryCapacity4, 10000);
                     });
@@ -263,10 +263,10 @@ export default class CWBatteryCapacity extends Component {
                 for(let i=0; i<len; i++){
                     var u = results.rows.item(i);
                     battery1capacityData.push(parseInt(u.capacity));
-                    this.setState({
-                        battery1:battery1capacityData,
-                    })
                 }
+                this.setState({
+                    battery1:battery1capacityData,
+                })
             });
         },(error)=>{
             console.log(error);
@@ -279,10 +279,10 @@ export default class CWBatteryCapacity extends Component {
                 for(let i=0; i<len; i++){
                     var u = results.rows.item(i);
                     battery2capacityData.push(parseInt(u.capacity));
-                    this.setState({
-                        battery2:battery2capacityData,
-                    })
                 }
+                this.setState({
+                    battery2:battery2capacityData,
+                })
             });
         },(error)=>{
             console.log(error);
@@ -295,10 +295,10 @@ export default class CWBatteryCapacity extends Component {
                 for(let i=0; i<len; i++){
                     var u = results.rows.item(i);
                     battery3capacityData.push(parseInt(u.capacity));
-                    this.setState({
-                        battery3:battery3capacityData,
-                    })
                 }
+                this.setState({
+                    battery3:battery3capacityData,
+                })
             });
         },(error)=>{
             console.log(error);
@@ -311,10 +311,10 @@ export default class CWBatteryCapacity extends Component {
                 for(let i=0; i<len; i++){
                     var u = results.rows.item(i);
                     battery4capacityData.push(parseInt(u.capacity));
-                    this.setState({
-                        battery4:battery4capacityData,
-                    })
                 }
+                this.setState({
+                    battery4:battery4capacityData,
+                })
             });
         },(error)=>{
             console.log(error);

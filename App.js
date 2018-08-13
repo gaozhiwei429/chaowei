@@ -30,6 +30,10 @@ import HomepageData from './Component/HomepageLater/HomepageData';//蓄电池Nex
 import Calibration from './Component/HomepageLater/Calibration';//校准
 import RechargeRecord from './Component/RechargeRecord/RechargeRecord';//充电记录
 import Charging from './Component/Charging/Charging';//启动停止充电
+import Help from './Component/Help/Help';//充电帮助
+import PeakValley from './Component/Help/PeakValley';//峰谷电价
+import Map from './Component/Map/Map';//地图
+import PileJonining from './Component/PileJoining/PileJoining';//充电桩加盟
 
 //测试
 import ListView from './Component/ListView/ListView'
@@ -69,6 +73,10 @@ const RootStack = createStackNavigator({
         Calibration:{screen:Calibration},
         RechargeRecord:{screen:RechargeRecord},
         Charging:{screen:Charging},
+        Map:{screen:Map},
+        PileJonining:{screen:PileJonining},
+        Help:{screen:Help},
+        PeakValley:{screen:PeakValley},
 
         //测试
         CWSvgBatteryone:{screen:CWSvgBatteryone},

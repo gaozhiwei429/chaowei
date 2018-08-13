@@ -3,6 +3,7 @@ package com.chaowei;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import cn.qiuxiang.react.amap3d.AMap3DPackage;
 import com.polidea.reactnativeble.BlePackage;
 import com.horcrux.svg.SvgPackage;
 import com.learnium.RNDeviceInfo.RNDeviceInfo;
@@ -31,6 +32,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new AMap3DPackage(),
           new BlePackage(),
           new SvgPackage(),
           new RNDeviceInfo(),

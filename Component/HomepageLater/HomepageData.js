@@ -6,8 +6,7 @@ import {
     TouchableOpacity,
     Image
 } from 'react-native';
-// const { params } = this.props.navigation.state;
-// const { index,chargerImg } = params;
+
 export default class BatteryData extends Component {
     //构造函数
     constructor(props) {
@@ -22,20 +21,24 @@ export default class BatteryData extends Component {
 
     };
 
-    static navigationOptions = {
-        headerTitle:(<Text style={{fontSize:20,flex: 1, textAlign: 'center'}}>充电器</Text>),
-        headerStyle: {
-            height: 40,
-            // backgroundColor: 'red',
-            // elevation: null
-        },
-        // headerLeft:(
-        //     <View style={{height: 44,width: 55,justifyContent: 'center',paddingRight:15} }/>
-        // ),
-        headerRight: (
-            <View style={{height: 44,width: 55,justifyContent: 'center',paddingRight:15} }/>
-        ),
-        headerPressColorAndroid:'blue',
+    static navigationOptions =({ navigation }) => {
+        const {params}=navigation.state;
+        const { chargerImg } = params;
+        return{
+            headerTitle:(chargerImg == 0 ? <Text style={{fontSize:20,flex: 1, textAlign: 'center'}}>充电器</Text>:<Text style={{fontSize:20,flex: 1, textAlign: 'center'}}>蓄电池</Text>),
+            headerStyle: {
+                height: 40,
+                // backgroundColor: 'red',
+                // elevation: null
+            },
+            // headerLeft:(
+            //     <View style={{height: 44,width: 55,justifyContent: 'center',paddingRight:15} }/>
+            // ),
+            headerRight: (
+                <View style={{height: 44,width: 55,justifyContent: 'center',paddingRight:15} }/>
+            ),
+            headerPressColorAndroid:'blue',
+        }
     };
 
     render() {
@@ -54,6 +57,13 @@ export default class BatteryData extends Component {
                             <TouchableOpacity style={styles.Btn} onPress={() => this.props.navigation.navigate('ChargerSvg')
                             }>
                                 <Text style={styles.BtnText}>充电器数据曲线</Text>
+                                <Image style={styles.BtnImg} source={require('../../img/next.png')}/>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity style={styles.Btn} onPress={() => this.props.navigation.navigate('Charging',//{chargerImg:0}
+                            )
+                            }>
+                                <Text style={styles.BtnText}>启动/停止充电</Text>
                                 <Image style={styles.BtnImg} source={require('../../img/next.png')}/>
                             </TouchableOpacity>
 

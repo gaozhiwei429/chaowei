@@ -8,7 +8,6 @@ import {
     TouchableOpacity,
     Alert,
 } from 'react-native';
-// import Main from '../CWMain/CWMain'
 import * as storage from '../../storage';
 import { BATTERY_BIND_STORAGE_KEY,CHARGER_BIND_STORAGE_KEY,PHONE_BIND_STORAGE_KEY } from '../../config';
 import AlertS from '../Alert/Alert';
@@ -19,7 +18,6 @@ export default class CWScanning extends Component {
         this.state = {
             dataBattery: '',
             dataCharger:'',
-            // dataBatteryArray:[],
         }
     }
 
@@ -39,7 +37,6 @@ export default class CWScanning extends Component {
             storage.get(CHARGER_BIND_STORAGE_KEY, (error, result) => {
                 if (!result) {
                     this.refs.chargerBack.open();
-                    // Alert.alert('提示','请先扫充电器二维码',[{text:"确定",onPress:()=>this.detail()}]);
                     return;
                 }
                 this.setState({ dataCharger: result });
@@ -49,7 +46,6 @@ export default class CWScanning extends Component {
             storage.get(BATTERY_BIND_STORAGE_KEY, (error, result) => {
                 if (!result) {
                     this.refs.batterBack.open();
-                    // Alert.alert('提示','请先扫蓄电池二维码',[{text:"确定",onPress:()=>this.detail()}]);
                     return;
                 }
                 const value = result[index];
@@ -57,22 +53,16 @@ export default class CWScanning extends Component {
             });
         }
     };
-    // 解绑电池
-    _removeBattery = ()=>{
+
+    _removeBattery = ()=>{    // 解绑电池
         AsyncStorage.removeItem(BATTERY_BIND_STORAGE_KEY);
         AsyncStorage.removeItem(PHONE_BIND_STORAGE_KEY);
-        // Alert.alert('提示','蓄电池已解绑',
-        //     [{text:"确定",onPress:()=>this.detail()}]
-        // );
         this.refs.batterUnbing.open();
     };
-    // 解绑充电器
-    _removeCharger = ()=>{
+
+    _removeCharger = ()=>{    // 解绑充电器
         AsyncStorage.removeItem(CHARGER_BIND_STORAGE_KEY);
         AsyncStorage.removeItem(PHONE_BIND_STORAGE_KEY);
-        // Alert.alert('提示','充电器已解绑',
-        //     [{text:"确定",onPress:()=>this.detail()}]
-        // );
         this.refs.chargerUnbing.open();
     };
 

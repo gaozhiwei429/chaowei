@@ -51,17 +51,12 @@ export default class CWButton extends Component {
                     onPress={() => this.props.navigation.navigate('RechargeRecord')}
                 />
                 <CWBtnCell
-                    title='启动/停止充电'
-                    onPress={() => this.props.navigation.navigate('Charging')}
-                />
-                <CWBtnCell
-                    title='充电器详细数据'
+                    title='充电桩加盟'
+                    onPress={() => this.props.navigation.navigate('PileJonining')}
                 />
                 <CWBtnCell
                     title='充电桩地图'
-                />
-                <CWBtnCell
-                    title='电池使用数据'
+                    onPress={() => this.props.navigation.navigate('Map')}
                 />
                 <CWBtnCell
                     title='电池诊断'
@@ -83,9 +78,6 @@ export default class CWButton extends Component {
                 />
                 <CWBtnCell
                     title='电池价格购买方式'
-                />
-                <CWBtnCell
-                    title='充电桩加盟'
                 />
                 <CWBtnCell
                     title='中智无线电池介绍'

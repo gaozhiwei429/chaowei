@@ -64,7 +64,8 @@ Tabs.navigationOptions = ({ navigation }) => {
             <Text style={{fontSize:20,flex:1, textAlign: 'center'}}>首页</Text>
             );
             navigationOptions.headerStyle={
-                height:40
+                height:40,
+                // backgroundColor: '#f4511e',
             };
         navigationOptions.headerLeft=(
             <View style={{height: 44,width: 55,justifyContent: 'center',paddingRight:15} }/>

@@ -211,7 +211,7 @@ export default class Calibration extends Component {
         //     <View style={{height: 44,width: 55,justifyContent: 'center',paddingRight:15} }/>
         // ),
         headerRight: (
-            <View style={{height: 44,width: 55,justifyContent: 'center',paddingRight:15} }/>
+            <View />
         ),
         headerPressColorAndroid:'blue',
     };

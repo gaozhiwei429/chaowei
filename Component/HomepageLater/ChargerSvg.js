@@ -35,10 +35,7 @@ export default class ChargerSvg extends Component {
         };
     }
 
-    compennetDidUnmount(){
-        //关闭数据库
-        sqLite.close();
-    }
+
     async componentDidMount(){
         chargerVoltageData = [];
         chargerElectricCurrentData=[];
@@ -71,13 +68,14 @@ export default class ChargerSvg extends Component {
                         chargerElectricCurrentData.push(parseInt(u.electric_current));
                         chargerTemperatureData.push(parseInt(u.temperature));
                         chargerCapacityData.push(parseInt(u.capacity));
-                        this.setState({
-                            chargerVoltage:chargerVoltageData,
-                            chargerElectricCurrent:chargerElectricCurrentData,
-                            chargerTemperature:chargerTemperatureData,
-                            chargerCapacity:chargerCapacityData,
-                        })
                     }
+
+                    this.setState({
+                        chargerVoltage:chargerVoltageData,
+                        chargerElectricCurrent:chargerElectricCurrentData,
+                        chargerTemperature:chargerTemperatureData,
+                        chargerCapacity:chargerCapacityData,
+                    })
                 });
             },(error)=>{
                 console.log(error);
@@ -114,14 +112,18 @@ export default class ChargerSvg extends Component {
                                 });
                             }
                         }
-                        chargerTime=setTimeout(chargerFeedback, 10000);
+                        chargerTime = setTimeout(chargerFeedback, 10000);
                     });
                 },(error)=>{
                     console.log(error);
                 });
             };
-            setTimeout(chargerFeedback, 10000);
+            // setTimeout(chargerFeedback, 10000);
         });
+    }
+
+    componentWillUnmount() {
+        clearTimeout(chargerTime);
     }
 
     async historyTime(){

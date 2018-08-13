@@ -20,7 +20,7 @@ export default class RechargeRecord extends Component {
     };
 
     static navigationOptions = {
-        headerTitle:(<Text style={{fontSize:20,flex: 1, textAlign: 'center'}}>充记录</Text>),
+        headerTitle:(<Text style={{fontSize:20,flex: 1, textAlign: 'center'}}>充电记录</Text>),
         headerStyle: {
             height: 40,
             // backgroundColor: 'red',
@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
         paddingBottom:30,
     },
     RecordLeft:{
-        marginLeft:40,
+        marginLeft:30,
         paddingTop:30,
         paddingBottom:30,
     },

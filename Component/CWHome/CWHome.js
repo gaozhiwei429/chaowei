@@ -21,23 +21,11 @@ import ToastSuccessAndError from '../Alert/ToastSuccessAndError';
 import Confirm from '../Alert/Confirm';
 import ProgressDialogAlert from '../Alert/ProgressDialogAlert';
 import AlertS from '../Alert/Alert';
+import * as commonality from '../../commonality';
 var sqLite = new SQLite();
 var db;
-// import CWScanning from '../CWScanning/CWScanning';//绑定页面
-// import TimerMixin from 'react-timer-mixin';
-// var reactMixin = require('react-mixin');
-// import _ from 'lodash';
 
 const {width,height}=Dimensions.get('window');
-
-function padding(num, length) {
-    for(var len = (num + "").length; len < length; len = num.length) {
-        num = "0" + num;
-    }
-    return num;
-}
-
-
 var otherIndex = 0;	// 其余电池中正在处理的 index
 var currentIndex = 0; // 当前要绑定的电池 index
 var commandArr = ['0105','0106','0107','0108','0109','010a','010b','010c'];//命令符
@@ -60,84 +48,6 @@ function bindSingle(){
     otherIndex = otherIndex + 1;// otherIndex 自增
 }
 
-var base64DecodeChars = new Array(
-    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-    -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 62, -1, -1, -1, 63,
-    52, 53, 54, 55, 56, 57, 58, 59, 60, 61, -1, -1, -1, -1, -1, -1,
-    -1,  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14,
-    15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, -1, -1, -1, -1, -1,
-    -1, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
-    41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, -1, -1, -1, -1, -1);
-
-function base64decode(str) {
-    var c1, c2, c3, c4;
-    var i, len, out;
-    if(str != null){
-        len = str.length;
-        i = 0;
-        out = "";
-        while(i < len) {
-            /* c1 */
-            do {
-                c1 = base64DecodeChars[str.charCodeAt(i++) & 0xff];
-            } while(i < len && c1 == -1);
-            if(c1 == -1)
-                break;
-            /* c2 */
-            do {
-                c2 = base64DecodeChars[str.charCodeAt(i++) & 0xff];
-            } while(i < len && c2 == -1);
-            if(c2 == -1)
-                break;
-            out += String.fromCharCode((c1 << 2) | ((c2 & 0x30) >> 4));
-            /* c3 */
-            do {
-                c3 = str.charCodeAt(i++) & 0xff;
-                if(c3 == 61)
-                    return out;
-                c3 = base64DecodeChars[c3];
-            } while(i < len && c3 == -1);
-            if(c3 == -1)
-                break;
-            out += String.fromCharCode(((c2 & 0XF) << 4) | ((c3 & 0x3C) >> 2));
-            /* c4 */
-            do {
-                c4 = str.charCodeAt(i++) & 0xff;
-                if(c4 == 61)
-                    return out;
-                c4 = base64DecodeChars[c4];
-            } while(i < len && c4 == -1);
-            if(c4 == -1)
-                break;
-            out += String.fromCharCode(((c3 & 0x03) << 6) | c4);
-        }
-    }
-    return out;
-}
-
-function CharToHex(str) {
-    var out, i, len, c, h;
-    out = "";
-    if(str != null){
-        len = str.length;
-        i = 0;
-        while(i < len) {
-            c = str.charCodeAt(i++);
-            h = c.toString(16);
-            if(h.length < 2)
-                h = "0" + h;
-            out += "\\x" + h + " ";
-            if(i > 0 && i % 8 == 0)
-                out += "\r\n";
-        }
-    }
-    return out;
-}
-
-function pad(num, n) {
-    return Array(n>num?(n-(''+num).length+1):0).join(0)+num;
-}
 
 export default class CWHome extends Component {
     constructor(){
@@ -212,7 +122,7 @@ export default class CWHome extends Component {
                         var BroadcastJudgment1 = Identifier.concat(batteryArray[currentIndex]);
                         if(BleScan !== undefined){
                             for (let z = 0;z<BleScan.length;z++) {
-                                let BleDataArray=CharToHex(base64decode(BleScan[z].manufacturerData)).replace(/\\x/g,'').replace(/\s+/g,'').toLowerCase();
+                                let BleDataArray=commonality.CharToHex(commonality.base64decode(BleScan[z].manufacturerData)).replace(/\\x/g,'').replace(/\s+/g,'').toLowerCase();
                                 let InterceptionA=BleDataArray.slice(4,16);
                                 let BleScanArrayId = BleScan[z].id.replace(/\:/g, "").toLowerCase();
                                 let BleScanId1 = BleScanArrayId.slice(0, 2);
@@ -234,7 +144,7 @@ export default class CWHome extends Component {
                                         if (otherIndex === others.length){
                                             // 蓝牙广播返回绑定手机设备个数
                                             var command='0120';
-                                            var equipmentQuantity = Identifier.concat(Reserved,Reserved,pad(otherIndex,2),batteryArray[currentIndex].toString(16));
+                                            var equipmentQuantity = Identifier.concat(Reserved,Reserved,commonality.pad(otherIndex,2),batteryArray[currentIndex].toString(16));
                                             bleBroadcast.start(command ,equipmentQuantity);
 
                                             // 已经全部绑定成功，返回
@@ -322,12 +232,12 @@ export default class CWHome extends Component {
                     var h = date.getHours();
                     var mm = date.getMinutes();
                     var s = date.getSeconds();
-                    var time=  y+'-'+padding(m, 2)+'-'+padding(d, 2)+' '+padding(h, 2)+':'+padding(mm, 2)+':'+padding(s, 2);
+                    var time=  y+'-'+commonality.padding(m, 2)+'-'+commonality.padding(d, 2)+' '+commonality.padding(h, 2)+':'+commonality.padding(mm, 2)+':'+commonality.padding(s, 2);
                     var actionsBattery = [];
                     var actionsCharger = [];
                     if(BleScan !== undefined){
                         for (var i = 0;i<BleScan.length;i++) {
-                            var searchBle = CharToHex(base64decode(BleScan[i].manufacturerData)).replace(/\\x/g, '').replace(/\s+/g, '');
+                            var searchBle = commonality.CharToHex(commonality.base64decode(BleScan[i].manufacturerData)).replace(/\\x/g, '').replace(/\s+/g, '');
                             var batteryArrayID = BleScan[i].id.replace(/\:/g, "");
                             var batteryArrayID1 = batteryArrayID.slice(0, 2);
                             var batteryArrayID2 = batteryArrayID.slice(2, 4);
@@ -569,9 +479,9 @@ export default class CWHome extends Component {
                     </View>
                 </View>
                 {/*绑定按钮*/}
-                <TouchableOpacity style={{position:'absolute',bottom:20,left:20}} onPress={()=>{this.componentDidMount()}}>
-                    <Image style={{width:width/8,height:width/8 }} source={require('../../img/bind.png')}/>
-                </TouchableOpacity>
+                {/*<TouchableOpacity style={{position:'absolute',bottom:20,left:20}} onPress={()=>{this.componentDidMount()}}>*/}
+                    {/*<Image style={{width:width/8,height:width/8 }} source={require('../../img/bind.png')}/>*/}
+                {/*</TouchableOpacity>*/}
             </View>
         )
     }

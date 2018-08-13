@@ -86,7 +86,6 @@ function base64decode(str) {
 
     return out;
 }
-
 function CharToHex(str) {
     var out, i, len, c, h;
     out = "";
