@@ -121,7 +121,8 @@ export default class CWQRCode extends Component {
         headerRight: (
             <View style={{height: 44,width: 55,justifyContent: 'center',paddingRight:15} }/>
         ),
-        headerPressColorAndroid:'blue',
+        // headerPressColorAndroid:'blue',
+        headerBackImage: (<Image source={require('../../img/leftGoBack.png')} style={{width:18,height:14,marginLeft:15}}/>),
     };
 
     render() {

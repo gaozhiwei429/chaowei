@@ -117,85 +117,60 @@ export default class CWHome extends Component {
                     // this.setState({data:[...this.deviceMap.values()]},()=>{
                     BleScan = [...this.deviceMap.values()];
 
-//                    if(batteryArray.length >= 5 ){
-                        //var BroadcastJudgment = Identifier.concat(others[otherIndex-1]);//广播判断数据.toString(16)
-                        var BroadcastJudgment1 = Identifier.concat(batteryArray[currentIndex]);
-                        if(BleScan !== undefined){
-                            for (let z = 0;z<BleScan.length;z++) {
-                                let BleDataArray=commonality.CharToHex(commonality.base64decode(BleScan[z].manufacturerData)).replace(/\\x/g,'').replace(/\s+/g,'').toLowerCase();
-                                let InterceptionA=BleDataArray.slice(4,16);
-                                let BleScanArrayId = BleScan[z].id.replace(/\:/g, "").toLowerCase();
-                                let BleScanId1 = BleScanArrayId.slice(0, 2);
-                                let BleScanId2 = BleScanArrayId.slice(2, 4);
-                                let BleScanId3 = BleScanArrayId.slice(4, 6);
-                                let BleScanId4 = BleScanArrayId.slice(6, 8);
-                                let BleScanId5 = BleScanArrayId.slice(8, 10);
-                                let BleScanId6 = BleScanArrayId.slice(10, 12);
-                                let BleScanId = BleScanId6.concat(BleScanId5, BleScanId4, BleScanId3, BleScanId2, BleScanId1);
-                                let BleScanRssi=BleScan[z].rssi;//BLE信号强度
+                    var BroadcastJudgment1 = Identifier.concat(batteryArray[currentIndex]);
+                    if(BleScan !== undefined){
+                        for (let z = 0;z<BleScan.length;z++) {
+                            let BleDataArray=commonality.CharToHex(commonality.base64decode(BleScan[z].manufacturerData)).replace(/\\x/g,'').replace(/\s+/g,'').toLowerCase();
+                            let InterceptionA=BleDataArray.slice(4,16);
+                            let BleScanArrayId = BleScan[z].id.replace(/\:/g, "").toLowerCase();
+                            let BleScanId1 = BleScanArrayId.slice(0, 2);
+                            let BleScanId2 = BleScanArrayId.slice(2, 4);
+                            let BleScanId3 = BleScanArrayId.slice(4, 6);
+                            let BleScanId4 = BleScanArrayId.slice(6, 8);
+                            let BleScanId5 = BleScanArrayId.slice(8, 10);
+                            let BleScanId6 = BleScanArrayId.slice(10, 12);
+                            let BleScanId = BleScanId6.concat(BleScanId5, BleScanId4, BleScanId3, BleScanId2, BleScanId1);
+                            let BleScanRssi=BleScan[z].rssi;//BLE信号强度
 
-                                if(Identifier === InterceptionA && BleScanRssi > -80){
-                                    //var InterceptionB = BleDataArray.slice(20,32);  //截取搜索到蓝牙广播的部分数据
-                                    var InterceptionB = BleDataArray.slice(32,44);  //截取搜索到蓝牙广播的部分数据
-                                    var Interception=InterceptionA.concat(InterceptionB);
+                            if(Identifier === InterceptionA && BleScanRssi > -80){
+                                //var InterceptionB = BleDataArray.slice(20,32);  //截取搜索到蓝牙广播的部分数据
+                                var InterceptionB = BleDataArray.slice(32,44);  //截取搜索到蓝牙广播的部分数据
+                                var Interception=InterceptionA.concat(InterceptionB);
 
-                                    if(Interception === BroadcastJudgment1 && BleScanId === InterceptionB){//
-                                        // 绑定了一块
-                                        if (otherIndex === others.length){
-                                            // 蓝牙广播返回绑定手机设备个数
-                                            var command='0120';
-                                            var equipmentQuantity = Identifier.concat(Reserved,Reserved,commonality.pad(otherIndex,2),batteryArray[currentIndex].toString(16));
-                                            bleBroadcast.start(command ,equipmentQuantity);
+                                if(Interception === BroadcastJudgment1 && BleScanId === InterceptionB){//
+                                    // 绑定了一块
+                                    if (otherIndex === others.length){
+                                        // 蓝牙广播返回绑定手机设备个数
+                                        var command='0120';
+                                        var equipmentQuantity = Identifier.concat(Reserved,Reserved,commonality.pad(otherIndex,2),batteryArray[currentIndex].toString(16));
+                                        bleBroadcast.start(command ,equipmentQuantity);
 
-                                            // 已经全部绑定成功，返回
-                                            if (currentIndex === batteryArray.length -1) {
-                                                storage.get(PHONE_BIND_STORAGE_KEY, (error, result) => {
-                                                    result = (result || '').replace(result,'123');
-                                                    storage.save(PHONE_BIND_STORAGE_KEY, result, () => {
-                                                        this.setState({ phoneBind: '123'});
-                                                        if(result == '123'){
-                                                            bleBroadcast.stop();
-                                                            this.refs.toast_su.success();
-                                                            // Alert.alert('提示','绑定完成',[{text:"确定"}]);
-                                                            return;
-                                                        }
-                                                    });
+                                        // 已经全部绑定成功，返回
+                                        if (currentIndex === batteryArray.length -1) {
+                                            storage.get(PHONE_BIND_STORAGE_KEY, (error, result) => {
+                                                result = (result || '').replace(result,'123');
+                                                storage.save(PHONE_BIND_STORAGE_KEY, result, () => {
+                                                    this.setState({ phoneBind: '123'});
+                                                    if(result == '123'){
+                                                        bleBroadcast.stop();
+                                                        this.refs.toast_su.success();
+                                                        // Alert.alert('提示','绑定完成',[{text:"确定"}]);
+                                                        return;
+                                                    }
                                                 });
-                                                // BluetoothManager.stopScan();
-                                                // bleBroadcast.stop();
-                                                // Alert.alert('提示','绑定完成',[{text:"确定"}]);
-                                                // break;
-                                            }
-                                            // 绑定下一块
-                                            currentIndex = currentIndex + 1;
-                                            otherIndex = 0;
+                                            });
                                         }
-                                        bindSingle();
+                                        // 绑定下一块
+                                        currentIndex = currentIndex + 1;
+                                        otherIndex = 0;
                                     }
+                                    bindSingle();
                                 }
                             }
                         }
-//                    }else {
-//                        this.refs.confirm.open();
-//                        // Alert.alert('提示','您还未扫码',
-//                        //     [
-//                        //         {text:"取消",},
-//                        //         {text:"去扫码",onPress:()=>{this.goQRCodeBattery()}},
-//                        //     ]
-//                        // );
-//                    }
+                    }
                 }
             });
-
-            // }else {
-            //     this.refs.confirm.open();
-            //     // Alert.alert('提示','您还未扫码',
-            //     //     [
-            //     //         {text:"取消",},
-            //     //         {text:"去扫码",onPress:()=>{this.goQRCodeBattery()}},
-            //     //     ]
-            //     // );
-            // }
             //向数据库写数据
             this.writeDatabase();
         });
@@ -320,7 +295,6 @@ export default class CWHome extends Component {
                                     }
                                 }
                             }
-
                         }
                     }
                     Promise.all([actionsBattery],[actionsCharger]).then(function () {
@@ -338,7 +312,7 @@ export default class CWHome extends Component {
             // 设置获取超时的时间20秒
             timeout: 20000,
             // 示应用程序的缓存时间，每次请求都是立即去获取一个全新的对象内容
-            maximumAge: 1000
+            maximumAge: 1000,
         };
     }
 
@@ -350,11 +324,6 @@ export default class CWHome extends Component {
     componentWillUnmount(){
         // bleBroadcast.stop();
         // BluetoothManager.stopScan();
-    }
-
-    compennetDidUnmount(){
-        //关闭数据库
-        // sqLite.close();
     }
 
     // 页头
@@ -389,7 +358,6 @@ export default class CWHome extends Component {
 
     _removeText = ()=>{
         AsyncStorage.removeItem(PHONE_BIND_STORAGE_KEY);
-        // alert('1')
     };
     render(){
         return(

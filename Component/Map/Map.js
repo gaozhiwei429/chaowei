@@ -28,6 +28,7 @@ export default class Map extends Component {
             <View />
         ),
         headerPressColorAndroid:'blue',
+        headerBackImage: (<Image source={require('../../img/leftGoBack.png')} style={{width:18,height:14,marginLeft:15}}/>),
     };
 
     constructor(props) {
@@ -120,12 +121,13 @@ export default class Map extends Component {
                     zoomLevel={17}//缩放基本
                     mapType='standard'//地图模式
                     showsBuildings={true}//建筑物
+                    // tilt='30'//倾斜角度，取值范围 [0, 60]
                     showsTraffic={false}//路况
                     showsLabels={true}    //是否显示文本标签
                     onLocation={({nativeEvent}) =>this.setState({
                          mLatitude: nativeEvent.latitude,
                          mLongitude: nativeEvent.longitude,
-                         mAccuracy:nativeEvent.accuracy
+                         mAccuracy:nativeEvent.accuracy,
                     })
                     }
                     region={{
@@ -135,7 +137,7 @@ export default class Map extends Component {
                         longitudeDelta: 0.3,
                     }}//显示区域
                     showsZoomControls={false}//是否显示放大缩小按钮
-                    rotateEnabled={false}//
+                    rotateEnabled={false}//启用旋转手势，用于调整方向
                     // showsCompass={true}//指南针
                     // showsTraffic={true}//交通
                 >
@@ -168,11 +170,11 @@ export default class Map extends Component {
                         // active
                         // title='天安门'
                         // onPress={this._onMarkerPress}
-                        icon={() => (
-                            <View style={styles.customMarker}>
-                                <Image style={{width:10,height:10}}  source={require('../../img/background.jpg')}/>
-                            </View>
-                        )}
+                        // icon={() => (
+                        //     <View style={styles.customMarker}>
+                        //         <Image style={{width:10,height:10}}  source={require('../../img/background.jpg')}/>
+                        //     </View>
+                        // )}
                         active
                         infoWindowDisabled={true}
                         coordinate={this._coordinates[2]}

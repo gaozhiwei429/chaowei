@@ -4,7 +4,8 @@ import {
     Text,
     View,
     TouchableOpacity,
-    TextInput
+    TextInput,
+    Image,
 } from 'react-native';
 import BleModule from '../CWBleSearch/BleModule';
 import * as storage from '../../storage';
@@ -113,7 +114,7 @@ export default class Calibration extends Component {
         this.deviceMap = new Map();
     }
 
-    componentWillMount() {
+    componentDidMount() {
         const { params } = this.props.navigation.state;
         const { index,chargerImg } = params;
 
@@ -214,6 +215,7 @@ export default class Calibration extends Component {
             <View />
         ),
         headerPressColorAndroid:'blue',
+        headerBackImage: (<Image source={require('../../img/leftGoBack.png')} style={{width:18,height:14,marginLeft:15}}/>),
     };
 
     render() {

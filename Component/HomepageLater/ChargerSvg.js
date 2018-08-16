@@ -5,7 +5,8 @@ import {
     View,
     TouchableOpacity,
     Dimensions,
-    ScrollView
+    ScrollView,
+    Image,
 } from 'react-native';
 
 import Echarts from 'native-echarts';
@@ -180,6 +181,7 @@ export default class ChargerSvg extends Component {
             <View style={{height: 44,width: 55,justifyContent: 'center',paddingRight:15} }/>
         ),
         headerPressColorAndroid:'blue',
+        headerBackImage: (<Image source={require('../../img/leftGoBack.png')} style={{width:18,height:14,marginLeft:15}}/>),
     };
     render() {
         const option= {

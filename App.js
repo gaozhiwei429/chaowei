@@ -34,6 +34,8 @@ import Help from './Component/Help/Help';//充电帮助
 import PeakValley from './Component/Help/PeakValley';//峰谷电价
 import Map from './Component/Map/Map';//地图
 import PileJonining from './Component/PileJoining/PileJoining';//充电桩加盟
+import RepairJoining from './Component/RepairJoining/RepairJoining';//维修加盟
+
 
 //测试
 import ListView from './Component/ListView/ListView'
@@ -77,6 +79,7 @@ const RootStack = createStackNavigator({
         PileJonining:{screen:PileJonining},
         Help:{screen:Help},
         PeakValley:{screen:PeakValley},
+        RepairJoining:{screen:RepairJoining},
 
         //测试
         CWSvgBatteryone:{screen:CWSvgBatteryone},

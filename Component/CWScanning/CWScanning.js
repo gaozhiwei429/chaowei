@@ -7,6 +7,7 @@ import {
     AsyncStorage,
     TouchableOpacity,
     Alert,
+    Image,
 } from 'react-native';
 import * as storage from '../../storage';
 import { BATTERY_BIND_STORAGE_KEY,CHARGER_BIND_STORAGE_KEY,PHONE_BIND_STORAGE_KEY } from '../../config';
@@ -80,6 +81,7 @@ export default class CWScanning extends Component {
             <View style={{height: 44,width: 55,justifyContent: 'center',paddingRight:15} }/>
         ),
         headerPressColorAndroid:'blue',
+        headerBackImage: (<Image source={require('../../img/leftGoBack.png')} style={{width:18,height:14,marginLeft:15}}/>),
     };
 
     render() {

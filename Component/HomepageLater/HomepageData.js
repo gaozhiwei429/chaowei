@@ -38,6 +38,7 @@ export default class BatteryData extends Component {
                 <View style={{height: 44,width: 55,justifyContent: 'center',paddingRight:15} }/>
             ),
             headerPressColorAndroid:'blue',
+            headerBackImage: (<Image source={require('../../img/leftGoBack.png')} style={{width:18,height:14,marginLeft:15}}/>),
         }
     };
 
@@ -163,8 +164,8 @@ const styles = StyleSheet.create({
         backgroundColor:'#fff'
     },
     BtnImg:{
-        width:20,
-        height:20,
+        width:15,
+        height:15,
         position:'absolute',
         right:20,
     },

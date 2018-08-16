@@ -11,6 +11,9 @@ import DatePicker from 'react-native-datepicker';//时间
 import bleBroadcast from '../CWBleBroadcast/CWBleBroadcast';//蓝牙广播模块
 import CountDown from 'react-native-countdown-component';
 import * as commonality from '../../commonality';
+import * as storage from "../../storage";
+import {CHARGER_BIND_STORAGE_KEY} from "../../config";
+import AlertS from '../Alert/Alert';
 
 const {width,height} =Dimensions.get('window');
 var currentTimestamp = Math.round(new Date().getTime()/1000);//当前时间戳
@@ -29,20 +32,20 @@ export default class Charging extends Component {
 
     };
     peakValley(){
-        this.setState({
-            charging:!this.state.charging
-        });
         var selectTimestamp=this.state.timestamp;//选择时间戳
-        console.log(selectTimestamp,'选择时间戳');
         if(selectTimestamp !==0 ){
-            console.log(currentTimestamp,'当前时间戳');
             var TimeDifference=parseInt((selectTimestamp-currentTimestamp)/60);
             var H24=1440;
             var H24Time=commonality.padding(TimeDifference.toString(16),4);
             if(TimeDifference > H24){
-                alert('建议选择24小时以内');
+                this.refs.suggest.open();
             }else {
-                bleBroadcast.start('010b' ,'3826879215020000'+H24Time);// 蓝牙广播开始
+                this.setState({
+                    charging:!this.state.charging
+                });
+                storage.get(CHARGER_BIND_STORAGE_KEY, (error, result) => {
+                    bleBroadcast.start('0132' ,'3826879215020000'+H24Time+result);// 定时充电
+                });
             }
         }
     }
@@ -50,7 +53,17 @@ export default class Charging extends Component {
         this.setState({
             charging:!this.state.charging
         });
-        bleBroadcast.start('010b' ,'3826879215020000');// 蓝牙广播开始
+        storage.get(CHARGER_BIND_STORAGE_KEY, (error, result) => {
+            bleBroadcast.start('0130' ,'3826879215020000'+result);// 开启充电
+        });
+    }
+    stopRecharge(){
+        this.setState({
+            charging:!this.state.charging
+        });
+        storage.get(CHARGER_BIND_STORAGE_KEY, (error, result) => {
+            bleBroadcast.start('0131' ,'3826879215020000'+result);// 关闭充电
+        });
     }
 
     static navigationOptions =({ navigation }) =>  {
@@ -73,12 +86,15 @@ export default class Charging extends Component {
                 </TouchableOpacity>
             ),
             headerPressColorAndroid:'blue',
+            headerBackImage: (<Image source={require('../../img/leftGoBack.png')} style={{width:18,height:14,marginLeft:15}}/>),
         }
     };
 
     render() {
         return (
             <View style={styles.Binding}>
+                <AlertS ref='suggest' title='提示' btnText='确定' msg='建议选择24小时以内充电！' />
+
                 <View style={{width:width,height:width,justifyContent:'center',alignItems:'center',backgroundColor:'#37B111'}}>
                     {this.state.charging?<Text style={{fontSize:17,color:'#fff'}}>充电中...</Text>:<Text style={{fontSize:17,color:'#fff',}}>启动充电</Text>}
                     <View style={{width:width,justifyContent:'center',alignItems:'center',}}>
@@ -131,7 +147,7 @@ export default class Charging extends Component {
                 {/*/>*/}
                 {/*<Text>{this.state.timestamp-currentTimestamp}</Text>*/}
                 <View style={{alignItems:'center',flex:1,justifyContent:'center',flexDirection:'row'}}>
-                    {this.state.charging?<TouchableOpacity style={styles.rechargeUnselected}  onPress={()=>this.immediately()}>
+                    {this.state.charging?<TouchableOpacity style={styles.rechargeUnselected}  onPress={()=>this.stopRecharge()}>
                             <Text style={{color:'#fff',fontSize:17}}>停止充电</Text>
                     </TouchableOpacity>:
                         <TouchableOpacity style={styles.recharge}  onPress={()=>this.immediately()}>

@@ -7,6 +7,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "antd-mobile-rn": "^2.2.1",
     "lodash": "^4.17.10",
     "native-echarts": "^0.4.0",
     "prop-types": "^15.6.2",

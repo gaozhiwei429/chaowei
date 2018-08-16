@@ -37,6 +37,7 @@ export default class Help extends Component {
             <View style={{height: 44, width: 55, justifyContent: 'center', paddingRight: 15}}/>
         ),
         headerPressColorAndroid: 'blue',
+        headerBackImage: (<Image source={require('../../img/leftGoBack.png')} style={{width:18,height:14,marginLeft:15}}/>),
     };
 
     render() {
@@ -49,11 +50,17 @@ export default class Help extends Component {
                         <Text style={{fontSize:15}}>常见问题</Text>
                     </View>
                     <View style={{flex:1,height:100,justifyContent:'center',}}>
-                        <TouchableOpacity style={{flex:1,backgroundColor:'#eee',marginBottom:5,marginLeft:5,padding:10,flexDirection:'row',alignItems:'center'}} onPress={()=>this.props.navigation.navigate('PeakValley')}>
+                        <TouchableOpacity
+                            style={{flex:1,backgroundColor:'#fff',marginBottom:5,marginLeft:5,padding:10,flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}
+                            onPress={()=>this.props.navigation.navigate('PeakValley')}
+                        >
                             <Text style={{fontSize:18}}>峰谷平电价是什么意思</Text>
                             <Image source={require('../../img/next.png')} style={{width:15,height:15}}/>
                         </TouchableOpacity>
-                        <TouchableOpacity style={{flex:1,backgroundColor:'#eee',marginLeft:5,padding:10,flexDirection:'row',alignItems:'center'}}>
+                        <TouchableOpacity
+                            style={{flex:1,backgroundColor:'#fff',marginLeft:5,padding:10,flexDirection:'row',alignItems:'center',justifyContent:'space-between'}}
+                            onPress={()=>this.props.navigation.navigate('')}
+                        >
                             <Text style={{fontSize:18}}>为什么充不上电</Text>
                             <Image source={require('../../img/next.png')} style={{width:15,height:15}}/>
                         </TouchableOpacity>

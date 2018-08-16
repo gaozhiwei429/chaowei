@@ -37,6 +37,7 @@ export default class CWButton extends Component {
             <View style={{height: 44,width: 55,justifyContent: 'center',paddingRight:15} }/>
         ),
         headerPressColorAndroid:'blue',
+        headerBackImage: (<Image source={require('../../img/leftGoBack.png')} style={{width:18,height:14,marginLeft:15}}/>),
     };
 
     render() {
@@ -57,6 +58,10 @@ export default class CWButton extends Component {
                 <CWBtnCell
                     title='充电桩地图'
                     onPress={() => this.props.navigation.navigate('Map')}
+                />
+                <CWBtnCell
+                    title='电动车维修加盟'
+                    onPress={() => this.props.navigation.navigate('RepairJoining')}
                 />
                 <CWBtnCell
                     title='电池诊断'
@@ -81,15 +86,6 @@ export default class CWButton extends Component {
                 />
                 <CWBtnCell
                     title='中智无线电池介绍'
-                />
-                <CWBtnCell
-                    title='峰谷电价充电'
-                />
-                <CWBtnCell
-                    title='电动车维修加盟'
-                />
-                <CWBtnCell
-                    title='扫码充电'
                 />
                 <CWBtnCell
                     title='电池上门更换'
@@ -119,8 +115,8 @@ const styles = StyleSheet.create({
         backgroundColor:'#fff'
     },
     BtnImg:{
-        width:20,
-        height:20,
+        width:15,
+        height:15,
         position:'absolute',
         right:20,
     },
