@@ -35,7 +35,9 @@ import PeakValley from './Component/Help/PeakValley';//峰谷电价
 import Map from './Component/Map/Map';//地图
 import PileJonining from './Component/PileJoining/PileJoining';//充电桩加盟
 import RepairJoining from './Component/RepairJoining/RepairJoining';//维修加盟
-
+import WXPay from './Component/Pay/WXPay';//微信支付
+import AliPay from './Component/Pay/AliPay';//支付宝支付
+import PaymentPage from './Component/Pay/PaymentPage';//支付宝支付
 
 //测试
 import ListView from './Component/ListView/ListView'
@@ -80,6 +82,9 @@ const RootStack = createStackNavigator({
         Help:{screen:Help},
         PeakValley:{screen:PeakValley},
         RepairJoining:{screen:RepairJoining},
+        WXPay:{screen:WXPay},
+        AliPay:{screen:AliPay},
+        PaymentPage:{screen:PaymentPage},
 
         //测试
         CWSvgBatteryone:{screen:CWSvgBatteryone},

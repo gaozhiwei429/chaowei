@@ -16,6 +16,8 @@ import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 import com.oblador.vectoricons.VectorIconsPackage;
 import org.pgsqlite.SQLitePluginPackage;
+import com.theweflex.react.WeChatPackage;
+import com.alipay.RNAlipayPackage;
 
 import java.util.Arrays;
 import java.util.List;
@@ -32,7 +34,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
-            new AMap3DPackage(),
+          new AMap3DPackage(),
           new BlePackage(),
           new SvgPackage(),
           new RNDeviceInfo(),
@@ -42,7 +44,9 @@ public class MainApplication extends Application implements ReactApplication {
           new BleManagerPackage(),
           new RNCameraPackage(),
           new VectorIconsPackage(),
-          new SQLitePluginPackage()   // register SQLite Plugin here
+          new SQLitePluginPackage(),   // register SQLite Plugin here
+          new WeChatPackage(),
+          new RNAlipayPackage()
       );
     }
 

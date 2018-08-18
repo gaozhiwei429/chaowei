@@ -69,9 +69,9 @@ export default class CWBatteryVoltage extends Component {
             promiseValues=values;
             //查询电池1
             db.transaction((tx)=>{
-                // console.log(values[0][1]);
                 tx.executeSql("select id,battery_id,my_timestamp,voltage from battery where battery_id='"+values[0][0]+"' order by my_timestamp desc limit 18", [],(tx,results)=>{
                     var len = results.rows.length;
+                    // alert(len);
                     for(let i=0; i<len; i++){
                         var u = results.rows.item(i);
                         battery1VoltageData.push(parseInt(u.voltage));
@@ -318,6 +318,13 @@ export default class CWBatteryVoltage extends Component {
         },(error)=>{
             console.log(error);
         });
+    }
+
+    componentWillUnmount() {
+        clearTimeout(battery1Time);
+        clearTimeout(battery2Time);
+        clearTimeout(battery3Time);
+        clearTimeout(battery4Time);
     }
     render() {
         const option= {

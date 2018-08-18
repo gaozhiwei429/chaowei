@@ -148,18 +148,25 @@ export default class Calibration extends Component {
                     let BleScan =CharToHex(base64decode(data1[i].manufacturerData)).replace(/\\x/g,'').replace(/\s+/g,'').toLowerCase();
                     let fixed = BleScan.slice(0,16);//截取搜索数据
                     let ScanID = data1[i].id.replace(/\:/g, "").toLowerCase();//搜索到的ID
+                    let BleScanId1 = ScanID.slice(0, 2);
+                    let BleScanId2 = ScanID.slice(2, 4);
+                    let BleScanId3 = ScanID.slice(4, 6);
+                    let BleScanId4 = ScanID.slice(6, 8);
+                    let BleScanId5 = ScanID.slice(8, 10);
+                    let BleScanId6 = ScanID.slice(10, 12);
+                    let BleScanId = BleScanId6.concat(BleScanId5, BleScanId4, BleScanId3, BleScanId2, BleScanId1);
+                    let StorageChargerID = this.state.ChargerID;   //本地存储id
                     if(chargerImg === 0){
                         /**充电器*/
-                        let StorageChargerID = this.state.ChargerID;   //本地存储id
                         let ChargerFixedValue = '0288382687921502';//判断固定值
                         if(fixed === ChargerFixedValue){
-                            if(BleScan !== null && StorageChargerID === ScanID){//电压校准
+                            if(BleScan !== null && StorageChargerID === BleScanId){//电压校准
                                 storage.get(CALIBRATION_CHARGER_VOLTAGE_VALUE_STORAGE_KEY,() => {
                                     this.setState({ ChargerVoltage: BleScan});
                                 });
                             }
                         }else if(fixed ===ChargerFixedValue){
-                            if(BleScan !== null && StorageChargerID === ScanID){//电流校准
+                            if(BleScan !== null && StorageChargerID === BleScanId){//电流校准
                                 storage.get(CALIBRATION_CHARGER_ELECTRICITY_VALUE_STORAGE_KEY,() => {
                                     this.setState({ ChargerElectricity: BleScan});
                                 });
@@ -178,10 +185,25 @@ export default class Calibration extends Component {
                         }
 
                     }
+
+                    let BleScans=BleScan.slice(0,22);
+                    let bleBroadcastVoltager='02023826879215020000'+this.state.voltager;//电压
+                    let bleBroadcastElectricity='02033826879215020000'+this.state.Electricity;//电流
+                    if(BleScanId == StorageChargerID){
+                        if(BleScans == bleBroadcastVoltager){
+                            bleBroadcast.stop();
+                        }else if(BleScans == bleBroadcastElectricity){
+                            bleBroadcast.stop();
+                        }
+                    }
                 }
             }
         });
     };
+
+    componentWillUnmount(){
+        bleBroadcast.stop();
+    }
 
     searchVoltage(){
         const { params } = this.props.navigation.state;
@@ -200,6 +222,7 @@ export default class Calibration extends Component {
             bleBroadcast.start('0003','3826879215020000'+this.state.Electricity+this.state.ChargerID);//电流
         }
     }
+
 
     static navigationOptions = {
         headerTitle:(<Text style={{fontSize:20,flex: 1, textAlign: 'center'}}>校准</Text>),

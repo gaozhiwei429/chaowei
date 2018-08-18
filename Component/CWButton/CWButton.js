@@ -44,6 +44,18 @@ export default class CWButton extends Component {
         return (
             <ScrollView style={styles.Binding}>
                 <CWBtnCell
+                    title='微信支付'
+                    onPress={() => this.props.navigation.navigate('WXPay')}
+                />
+                <CWBtnCell
+                    title='支付宝支付'
+                    onPress={() => this.props.navigation.navigate('AliPay')}
+                />
+                <CWBtnCell
+                    title='确认支付'
+                    onPress={() => this.props.navigation.navigate('PaymentPage')}
+                />
+                <CWBtnCell
                     title='目前电量'
                     onPress={() => this.props.navigation.navigate('RemainingBattery')}
                 />

@@ -320,6 +320,13 @@ export default class CWBatteryCapacity extends Component {
             console.log(error);
         });
     }
+
+    componentWillUnmount() {
+        clearTimeout(battery1Time);
+        clearTimeout(battery2Time);
+        clearTimeout(battery3Time);
+        clearTimeout(battery4Time);
+    }
     render() {
         const option= {
             title: {

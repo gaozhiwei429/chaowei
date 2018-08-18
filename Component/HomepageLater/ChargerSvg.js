@@ -119,7 +119,7 @@ export default class ChargerSvg extends Component {
                     console.log(error);
                 });
             };
-            // setTimeout(chargerFeedback, 10000);
+            setTimeout(chargerFeedback, 10000);
         });
     }
 

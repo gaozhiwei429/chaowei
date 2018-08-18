@@ -321,6 +321,12 @@ export default class CWBatteryTemperature extends Component {
 
 
     }
+    componentWillUnmount() {
+        clearTimeout(battery1Time);
+        clearTimeout(battery2Time);
+        clearTimeout(battery3Time);
+        clearTimeout(battery4Time);
+    }
     render() {
         const option= {
             title: {

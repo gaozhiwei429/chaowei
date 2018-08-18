@@ -6,7 +6,7 @@ import {
     TouchableOpacity,
     View ,
     Image,
-    Dimensions
+    Dimensions,
 } from 'react-native'
 import { MapView } from 'react-native-amap3d'
 
@@ -34,12 +34,13 @@ export default class Map extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            logs: [],
             time: new Date(),
             mLatitude:'',
             mLongitude:'',
             mAccuracy:'',
             position:{
-                accuracy:0,
+                accuracy:100,
                 longitude:116.3972282409668,
                 latitude:39.90960455039752,
             },
@@ -55,8 +56,6 @@ export default class Map extends Component {
                 })
             }
         }, 1000)
-
-
     }
 
     componentWillUnmount() {
@@ -82,23 +81,23 @@ export default class Map extends Component {
         },
     ];
 
-    _onMarkerPress = () => Alert.alert('onPress');
-    _onInfoWindowPress = () => Alert.alert('onInfoWindowPress');
-    _onDragEvent = ({ nativeEvent }) => Alert.alert(`${nativeEvent.latitude}, ${nativeEvent.longitude}`);
 
-    locationB(){
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                const positionData = position.coords;
-                /**  经度：positionData.longitude*/
-                /** 纬度：positionData.latitude*/
-                this.setState({
-                    mLatitude: positionData.latitude,
-                    mLongitude: positionData.longitude
-                })
-            }
-        );
+    _log(event, data) {
+        this.setState({
+            logs: [
+                {
+                    key: Date.now(),
+                    time: new Date().toLocaleString(),
+                    event,
+                    data: JSON.stringify(data, null, 2),
+                },
+                ...this.state.logs,
+            ],
+        })
     }
+
+    _logPressEvent = ({ nativeEvent }) => this._log(console.log(`${nativeEvent.latitude}, ${nativeEvent.longitude}`));
+
     render() {
         return (
             <View style={{flex:1,backgroundColor:'white'}}>
@@ -116,8 +115,8 @@ export default class Map extends Component {
                          latitude: this.state.position.latitude,
                          longitude: this.state.position.longitude,
                     }}
-                    locationInterval={1000}
-                    distanceFilter={5}
+                    // locationInterval={5000}//时间间隔
+                    // distanceFilter={5}//定位的最小更新距离
                     zoomLevel={17}//缩放基本
                     mapType='standard'//地图模式
                     showsBuildings={true}//建筑物
@@ -140,60 +139,74 @@ export default class Map extends Component {
                     rotateEnabled={false}//启用旋转手势，用于调整方向
                     // showsCompass={true}//指南针
                     // showsTraffic={true}//交通
+                    onPress={this._logPressEvent}
                 >
                     <MapView.Marker
-                        active
-                        title='这是一个标注点'
-                        color='red'
-                        description='Hello world!'
+                        draggable
+                        title="一个可拖拽的标记"
+                        description={this.state.time.toLocaleTimeString()}
+                        // onInfoWindowPress={this._onInfoWindowPress}
                         coordinate={{
-                            latitude: 30.305637,
-                            longitude: 120.063449,
+                            latitude: 30.307006443158734,
+                            longitude: 120.06473261354672,
                         }}
-                        infoWindowDisabled={true}
-
+                        // infoWindowDisabled
+                        onPress={(e ) => {
+                            console.log((e.nativeEvent))}}
                     />
-                    <MapView.Marker
-                        color="green"
-                        coordinate={this._coordinates[1]}
-                        active
-                        infoWindowDisabled={true}
-                    >
-                        <TouchableOpacity activeOpacity={0.9} onPress={this._onInfoWindowPress}>
-                            <View style={styles.customInfoWindow}>
-                                <Text>自定义信息窗口</Text>
-                                <Text>{this.state.time.toLocaleTimeString()}</Text>
-                            </View>
-                        </TouchableOpacity>
-                    </MapView.Marker>
-                    <MapView.Marker
-                        // active
-                        // title='天安门'
-                        // onPress={this._onMarkerPress}
-                        // icon={() => (
-                        //     <View style={styles.customMarker}>
-                        //         <Image style={{width:10,height:10}}  source={require('../../img/background.jpg')}/>
-                        //     </View>
-                        // )}
-                        active
-                        infoWindowDisabled={true}
-                        coordinate={this._coordinates[2]}
-                    />
-                    <MapView.Marker
-                        title="自定义 View"
-                        active
-                        infoWindowDisabled={true}
-                        icon={() => (
-                            <View style={styles.customMarker}>
-                                <Text style={styles.markerText}>{this.state.time.toLocaleTimeString()}</Text>
-                            </View>
-                        )}
-                        coordinate={this._coordinates[3]}
-                    />
+                    {/*<MapView.Marker*/}
+                        {/*// active*/}
+                        {/*title='这是一个标注点'*/}
+                        {/*color='red'*/}
+                        {/*description='Hello world!'*/}
+                        {/*coordinate={{*/}
+                            {/*latitude: 30.307006443158734,*/}
+                            {/*longitude: 120.06473261354672,*/}
+                        {/*}}*/}
+                        {/*// infoWindowDisabled={true}*/}
+                        {/*onPress={this._onDragEvent}*/}
+                        {/*// onLocation={this._logPressEvent}*/}
+                    {/*/>*/}
+                    {/*<MapView.Marker*/}
+                        {/*color="green"*/}
+                        {/*coordinate={this._coordinates[1]}*/}
+                        {/*active*/}
+                        {/*infoWindowDisabled={true}*/}
+                        {/*clickDisabled={true}*/}
+                    {/*>*/}
+                        {/*<TouchableOpacity activeOpacity={0.9} onPress={this._onInfoWindowPress}>*/}
+                            {/*<View style={styles.customInfoWindow}>*/}
+                                {/*<Text>自定义信息窗口</Text>*/}
+                                {/*<Text>{this.state.time.toLocaleTimeString()}</Text>*/}
+                            {/*</View>*/}
+                        {/*</TouchableOpacity>*/}
+                    {/*</MapView.Marker>*/}
+                    {/*<MapView.Marker*/}
+                        {/*title='天安门'*/}
+                        {/*// icon={() => (*/}
+                        {/*//     <View style={styles.customMarker}>*/}
+                        {/*//         <Image style={{width:10,height:10}}  source={require('../../img/background.jpg')}/>*/}
+                        {/*//     </View>*/}
+                        {/*// )}*/}
+                        {/*active*/}
+                        {/*infoWindowDisabled={true}*/}
+                        {/*coordinate={this._coordinates[2]}*/}
+                    {/*/>*/}
+                    {/*<MapView.Marker*/}
+                        {/*title="自定义 View"*/}
+                        {/*active*/}
+                        {/*infoWindowDisabled={true}*/}
+                        {/*icon={() => (*/}
+                            {/*<View style={styles.customMarker}>*/}
+                                {/*<Text style={styles.markerText}>{this.state.time.toLocaleTimeString()}</Text>*/}
+                            {/*</View>*/}
+                        {/*)}*/}
+                        {/*coordinate={this._coordinates[3]}*/}
+                    {/*/>*/}
                 </MapView>
-                <TouchableOpacity style={styles.locationButton} onPress={()=>{ this.locationB()}}>
-                    <Image style={{width:35,height:35}}  source={require('../../img/locationButton.png')}/>
-                </TouchableOpacity>
+                {/*<TouchableOpacity style={styles.locationButton} >*/}
+                    {/*<Image style={{width:35,height:35}}  source={require('../../img/locationButton.png')}/>*/}
+                {/*</TouchableOpacity>*/}
             </View>
         )
     }
