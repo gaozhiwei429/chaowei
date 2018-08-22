@@ -105,8 +105,8 @@ export default class Calibration extends Component {
         this.state = {
             BatteryID: '',
             ChargerID:'',
-            ChargerVoltage:'',
-            ChargerElectricity:'',
+            ChargerCalibration:'',
+            // ChargerElectricity:'',
             BatteryVoltage:'',
             voltager:40,
             Electricity:15,
@@ -158,20 +158,21 @@ export default class Calibration extends Component {
                     let StorageChargerID = this.state.ChargerID;   //本地存储id
                     if(chargerImg === 0){
                         /**充电器*/
-                        let ChargerFixedValue = '0288382687921502';//判断固定值
+                        let ChargerFixedValue = '0289382687921502';//判断固定值
                         if(fixed === ChargerFixedValue){
-                            if(BleScan !== null && StorageChargerID === BleScanId){//电压校准
+                            if(BleScan !== null && StorageChargerID == BleScanId){//电压、电流校准
                                 storage.get(CALIBRATION_CHARGER_VOLTAGE_VALUE_STORAGE_KEY,() => {
-                                    this.setState({ ChargerVoltage: BleScan});
-                                });
-                            }
-                        }else if(fixed ===ChargerFixedValue){
-                            if(BleScan !== null && StorageChargerID === BleScanId){//电流校准
-                                storage.get(CALIBRATION_CHARGER_ELECTRICITY_VALUE_STORAGE_KEY,() => {
-                                    this.setState({ ChargerElectricity: BleScan});
+                                    this.setState({ ChargerCalibration: BleScan});
                                 });
                             }
                         }
+                        // else if(fixed === ChargerFixedValue){
+                        //     if(BleScan !== null && StorageChargerID == BleScanId){//电流校准
+                        //         storage.get(CALIBRATION_CHARGER_ELECTRICITY_VALUE_STORAGE_KEY,() => {
+                        //             this.setState({ ChargerElectricity: BleScan});
+                        //         });
+                        //     }
+                        // }
                     }else {
                         /** 电池*/
                         let StorageBatteryId = this.state.BatteryID;//本地存储id
@@ -180,12 +181,11 @@ export default class Calibration extends Component {
                             if(BleScan !== null && StorageBatteryId === ScanID){
                                 storage.get(CALIBRATION_BATTERY_VOLTAGE_VALUE_STORAGE_KEY,() => {
                                     this.setState({ BatteryVoltage: BleScan});
+                                    console.log(BleScan,'2')
                                 });
                             }
                         }
-
                     }
-
                     let BleScans=BleScan.slice(0,22);
                     let bleBroadcastVoltager='02023826879215020000'+this.state.voltager;//电压
                     let bleBroadcastElectricity='02033826879215020000'+this.state.Electricity;//电流
@@ -200,10 +200,6 @@ export default class Calibration extends Component {
             }
         });
     };
-
-    componentWillUnmount(){
-        bleBroadcast.stop();
-    }
 
     searchVoltage(){
         const { params } = this.props.navigation.state;
@@ -225,10 +221,9 @@ export default class Calibration extends Component {
 
 
     static navigationOptions = {
-        headerTitle:(<Text style={{fontSize:20,flex: 1, textAlign: 'center'}}>校准</Text>),
+        headerTitle:(<Text style={{fontSize:20,flex: 1,textAlign:'center'}}>校准</Text>),
         headerStyle: {
             height: 40,
-            // backgroundColor: 'red',
             // elevation: null
         },
         // headerLeft:(
@@ -237,19 +232,18 @@ export default class Calibration extends Component {
         headerRight: (
             <View />
         ),
-        headerPressColorAndroid:'blue',
+        headerPressColorAndroid:'gray',
         headerBackImage: (<Image source={require('../../img/leftGoBack.png')} style={{width:18,height:14,marginLeft:15}}/>),
     };
 
     render() {
         const { params } = this.props.navigation.state;
         const { index,chargerImg } = params;
-        // 充电器电压
-        var ChargerVoltage = parseInt(this.state.ChargerVoltage.slice(22,24).concat(this.state.ChargerVoltage.slice(20,22)));
-        // 充电器电流
-        var ChargerElectricity =  parseInt(this.state.ChargerElectricity.slice(26,28).concat(this.state.ChargerElectricity.slice(24,26)));
-        // 电池电压
-        var BatteryVoltager = parseInt(this.state.BatteryVoltage.slice(22,24).concat(this.state.BatteryVoltage.slice(20,22)));
+        var ChargerVoltage = parseInt((this.state.ChargerCalibration.slice(22,24)).concat(this.state.ChargerCalibration.slice(20,22)),16);// 充电器电压
+
+        var ChargerElectricity =  parseInt((this.state.ChargerCalibration.slice(26,28)).concat(this.state.ChargerCalibration.slice(24,26)),16);// 充电器电流
+
+        var BatteryVoltager = parseInt(this.state.BatteryVoltage.slice(22,24).concat(this.state.BatteryVoltage.slice(20,22)),16);// 电池电压
         return (
             <View style={styles.Banding}>
                 {
@@ -266,7 +260,7 @@ export default class Calibration extends Component {
                                        editable={false}
                             />
                             <View style={styles.CalibrationInstrument}>
-                                <Text style={styles.InstrumentText}>{ChargerVoltage == NaN ? ChargerVoltage:0}</Text>
+                                <Text style={styles.InstrumentText}>{ isNaN(ChargerVoltage) ? 0 : ChargerVoltage}</Text>
                             </View>
                         </View>
                         <View style={styles.CalibrationRow}>
@@ -280,7 +274,7 @@ export default class Calibration extends Component {
                                        editable={false}
                             />
                             <View style={styles.CalibrationInstrument}>
-                                <Text style={styles.InstrumentText}>{ChargerElectricity == NaN ? ChargerElectricity:0}</Text>
+                                <Text style={styles.InstrumentText}>{ isNaN(ChargerElectricity) ? 0:ChargerElectricity}</Text>
                             </View>
                         </View>
                         <View style={styles.BtnTouchable}>
@@ -305,7 +299,7 @@ export default class Calibration extends Component {
                                        editable={false}
                             />
                             <View style={styles.CalibrationInstrument}>
-                                <Text style={styles.InstrumentText}>{BatteryVoltager == NaN ? BatteryVoltager:0}</Text>
+                                <Text style={styles.InstrumentText}>{ isNaN(BatteryVoltager) ? 0:BatteryVoltager}</Text>
                             </View>
                         </View>
 
@@ -328,7 +322,7 @@ export default class Calibration extends Component {
                                            editable={false}
                                 />
                                 <View style={styles.CalibrationInstrument}>
-                                    <Text style={styles.InstrumentText}>{BatteryVoltager == NaN ? BatteryVoltager:0}</Text>
+                                    <Text style={styles.InstrumentText}>{ isNaN(BatteryVoltager) ? 0:BatteryVoltager}</Text>
                                 </View>
                             </View>
 
@@ -351,7 +345,7 @@ export default class Calibration extends Component {
                                                editable={false}
                                     />
                                     <View style={styles.CalibrationInstrument}>
-                                        <Text style={styles.InstrumentText}>{BatteryVoltager == NaN ? BatteryVoltager:0}</Text>
+                                        <Text style={styles.InstrumentText}>{isNaN(BatteryVoltager) ? 0: BatteryVoltager }</Text>
                                     </View>
                                 </View>
 
@@ -374,7 +368,7 @@ export default class Calibration extends Component {
                                                editable={false}
                                     />
                                     <View style={styles.CalibrationInstrument}>
-                                        <Text style={styles.InstrumentText}>{BatteryVoltager == NaN ? BatteryVoltager:0}</Text>
+                                        <Text style={styles.InstrumentText}>{isNaN(BatteryVoltager) ? 0: BatteryVoltager}</Text>
                                     </View>
                                 </View>
 

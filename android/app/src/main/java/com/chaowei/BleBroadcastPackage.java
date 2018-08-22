@@ -14,7 +14,7 @@ public class BleBroadcastPackage implements ReactPackage{
     @Override
     public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
         List<NativeModule> modules = new ArrayList<>();
-        // 注册FlashLight模块
+        // 注册BleBroadcast模块
         modules.add(new BleBroadcast(reactContext));
         return modules;
     }

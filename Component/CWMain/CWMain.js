@@ -1,10 +1,8 @@
 import React from 'react';
 import {
-    StyleSheet,
     TouchableOpacity,
     Image,
     Text,
-    Dimensions,
     View
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -65,7 +63,7 @@ Tabs.navigationOptions = ({ navigation }) => {
             );
             navigationOptions.headerStyle={
                 height:40,
-                // backgroundColor: '#f4511e',
+                // backgroundColor: 'rgba(0,0,0,0.5)',
             };
         navigationOptions.headerLeft=(
             <View style={{height: 44,width: 55,justifyContent: 'center',paddingRight:15} }/>

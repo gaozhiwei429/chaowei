@@ -85,7 +85,7 @@ export default class Charging extends Component {
                     <Text style={{fontSize:15,color:'#828282',marginLeft:3}}>充电帮助</Text>
                 </TouchableOpacity>
             ),
-            headerPressColorAndroid:'blue',
+            headerPressColorAndroid:'gray',
             headerBackImage: (<Image source={require('../../img/leftGoBack.png')} style={{width:18,height:14,marginLeft:15}}/>),
         }
     };

@@ -15,7 +15,6 @@ import QRCodeScanner from 'react-native-qrcode-scanner';
 import * as storage from '../../storage';
 import { BATTERY_BIND_STORAGE_KEY,CHARGER_BIND_STORAGE_KEY } from '../../config';
 import Toast from '../Alert/Toast';
-// import DeviceInfo from 'react-native-device-info';
 
 // 引入手电筒模块
 // let FlashLight = NativeModules.FlashLight;
@@ -30,7 +29,7 @@ export default class CWQRCode extends Component {
             dataBatteryArray:[],
             isLiked: false,
             qrcodeTopBtn:true,
-
+            JudgeBtn:0,
         };
     }
 
@@ -39,68 +38,61 @@ export default class CWQRCode extends Component {
         // let id = JSON.parse(e.data);
         let data = e.data;
         let value =data.toLowerCase();
-        if(this.state.qrcodeTopBtn){
-            if( this.state.isLiked){//充电器
-                storage.get(CHARGER_BIND_STORAGE_KEY, (error, result) => {//扫码存储充电器
-                    result= (result || []).concat(value);
-                    if(result.length<2){
-                        storage.save(CHARGER_BIND_STORAGE_KEY, result, () => {
-                            this.setState({ dataCharger: value});
+
+        if(this.state.JudgeBtn===0){//蓄电池
+            storage.get(BATTERY_BIND_STORAGE_KEY, (error, result) => {//扫码存储电池
+                const set = new Set(result);
+                if(set.has(value) !== true){
+                    result = (result || []).concat(value);
+                    if(result.length<6){
+                        storage.save(BATTERY_BIND_STORAGE_KEY, result, () => {
+                            this.setState({ dataBattery: value});
+                            this.setState({ dataBatteryArray:result });
                         });
                         this.refs.succeed.open();
-                        // Alert.alert('提示','充电器扫码成功', [{text:"确定"}]);
                     }else {
-                        this.refs.chargerErr.open();
-                        // Alert.alert('提示','只支持绑定一个充电器',[{text:"确定"}]);
+                        this.refs.batteryErr.open();
                     }
-                });
-            }else{//蓄电池
-                storage.get(BATTERY_BIND_STORAGE_KEY, (error, result) => {//扫码存储电池
-                    const set = new Set(result);
-                    if(set.has(value) !== true){
-                        result = (result || []).concat(value);
-                        if(result.length<6){
-                            storage.save(BATTERY_BIND_STORAGE_KEY, result, () => {
-                                this.setState({ dataBattery: value});
-                                this.setState({ dataBatteryArray:result });
-                            });
-                            this.refs.succeed.open();
-                        }else {
-                            this.refs.batteryErr.open();
-                        }
-                    }else {
-                        this.refs.batteryExists.open();
-                    }
-                });
-            }
-        }else {
+                }else {
+                    this.refs.batteryExists.open();
+                }
+            });
+        }
+        if(this.state.JudgeBtn===1){//充电器
+            storage.get(CHARGER_BIND_STORAGE_KEY, (error, result) => {//扫码存储充电器
+                result= (result || []).concat(value);
+                if(result.length<2){
+                    storage.save(CHARGER_BIND_STORAGE_KEY, result, () => {
+                        this.setState({ dataCharger: value});
+                    });
+                    this.refs.succeed.open();
+                }else {
+                    this.refs.chargerErr.open();
+                }
+            });
+        }
+        if(this.state.JudgeBtn===2){//扫码充电
             Linking
                 .openURL(e.data)
                 .catch(err => console.error('An error occured', err));
         }
     }
 
-    charger(){
-        this.setState({
-            isLiked: !this.state.isLiked
-        });
-    }
-
     battery(){
         this.setState({
-            isLiked: !this.state.isLiked
+            JudgeBtn: 0
         });
     }
 
-    BingQrc(){
+    charger(){
         this.setState({
-            qrcodeTopBtn: !this.state.qrcodeTopBtn
+            JudgeBtn: 1
         });
     }
 
     Recharge(){
         this.setState({
-            qrcodeTopBtn: !this.state.qrcodeTopBtn
+            JudgeBtn: 2
         });
     }
 
@@ -126,7 +118,7 @@ export default class CWQRCode extends Component {
         headerTitle:(<Text style={{fontSize:20,flex: 1,textAlign:'center'}}>扫码</Text>),
         headerStyle: {
             height:0,
-            // backgroundColor: 'rgba(255,25,255,0.5)',
+            // backgroundColor: 'rgba(0,0,0,0.5)',
             elevation: null
         },
         headerTitleStyle:{
@@ -157,7 +149,7 @@ export default class CWQRCode extends Component {
                 {/*//QR覆盖层透明背景*/}
                 <View style={styles.overlay}>
                     {/**顶部按钮*/}
-                    <View style={{ height:71, backgroundColor:'rgba(0,0,0,0.7)', width:width, justifyContent:'center',}}>
+                    <View style={{ height:40, backgroundColor:'rgba(0,0,0,0.6)', width:width, justifyContent:'center',}}>
                         {/*返回键*/}
                         <TouchableOpacity
                             style={{ alignItems:'center', position: 'absolute',}}
@@ -166,75 +158,22 @@ export default class CWQRCode extends Component {
                             <Image source={require('../../img/leftGoBackWhite.png')} style={{width:18,height:14,marginLeft:15,}}/>
                         </TouchableOpacity>
 
-                        {/*中间按钮切换*/}
-                        <View style={{flex:1, flexDirection:'row', alignItems:'center', justifyContent:'center',}}>
-                            {this.state.qrcodeTopBtn?
-                                <View style={{alignItems:'center',marginRight:20,width:100,}}>
-                                    <Image source={require('../../img/BandPitchOn.png')} style={{width:30,height:30,}} />
-                                    <Text style={{fontSize:16,color:'#38ADFF'}}>扫码绑定</Text>
-                                </View>:
-                                <TouchableOpacity style={{alignItems:'center',marginRight:20,width:100,}}  onPress={()=>this.BingQrc()}>
-                                    <Image source={require('../../img/Band.png')} style={{width:30,height:30,}} />
-                                    <Text style={{fontSize:16,color:'#fff'}}>扫码绑定</Text>
-                                </TouchableOpacity>
-                            }
-                            {this.state.qrcodeTopBtn?
-                                <TouchableOpacity style={{marginLeft:20,alignItems:'center',}} onPress={()=>this.Recharge()}>
-                                    <Image source={require('../../img/recharge.png')} style={{width:30,height:30,}} />
-                                    <Text style={{fontSize:16,color:'#fff'}} >电车充电</Text>
-                                </TouchableOpacity>:
-                                <View style={{marginLeft:20,alignItems:'center',}}>
-                                    <Image source={require('../../img/rechargeOn.png')} style={{width:30,height:30,}} />
-                                    <Text style={{fontSize:16,color:'#38ADFF'}} >电车充电</Text>
-                                </View>}
+                        {/*导航标题切换*/}
+                        <View style={{flex:1, alignItems:'center', justifyContent:'center',}}>
+                            {this.state.JudgeBtn===0 ?
+                                <Text style={styles.navigationHeadline}>蓄电池扫码</Text> :
+                                this.state.JudgeBtn===1 ?
+                                    <Text style={styles.navigationHeadline}>充电器扫码</Text> :
+                                    this.state.JudgeBtn===2 ?
+                                        <Text style={styles.navigationHeadline}>扫码充电</Text> :''}
                         </View>
                     </View>
 
-                    {this.state.qrcodeTopBtn?<View>
-                        {/**QR覆盖层顶部*/}
-                        <View style={styles.overlayTop}/>
-                        {/**QR覆盖层中间部*/}
-                        <View style={styles.overlayCenter}>
-                            {/*//QR覆盖层中间左部分*/}
-                            <View style={styles.overlayCenterLeft}/>
-                            {/**QR覆盖层中间二维码扫码区域*/}
-                            <View style={styles.QROverlayConterScan}>
-                                <View style={styles.QROverlayConterScanTopLeft}/>
-                                <View style={styles.QROverlayConterScanTopRight}/>
-                                <View style={styles.QRoverlayConterScanBottomLeft}/>
-                                <View style={styles.QRoverlayConterScanBottomRight}/>
-                            </View>
-                            {/**QR覆盖层中间右部分*/}
-                            <View style={styles.overlayCenterRight}/>
-                        </View>
-
-                        {/**QR覆盖层底部*/}
-                        <View style={styles.overlayBottom}>
-                            {this.state.isLiked?
-                                <TouchableOpacity style={styles.unselected}  onPress={()=>this.battery()}>
-                                    <Image style={{width:25,height:25 }} source={require('../../img/saomiao01.png')}/>
-                                    <Text style={styles.unselectedText}>蓄电池</Text>
-                                </TouchableOpacity>:
-                                <View style={styles.selected}>
-                                    <Image style={{width:25,height:25 }} source={require('../../img/saomiao.png')}/>
-                                    <Text style={styles.selectedText}>蓄电池</Text>
-                                </View>
-                            }
-                            {this.state.isLiked?
-                                <View style={styles.selected}>
-                                    <Image style={{width:25,height:25 }} source={require('../../img/saomiao.png')}/>
-                                    <Text style={styles.selectedText}>充电器</Text>
-                                </View>:
-                                <TouchableOpacity style={styles.unselected} onPress={()=>this.charger()}>
-                                    <Image style={{width:25,height:25 }} source={require('../../img/saomiao01.png')}/>
-                                    <Text style={styles.unselectedText}>充电器</Text>
-                                </TouchableOpacity>
-                            }
-
-                        </View>
-                    </View>:
+                    {this.state.JudgeBtn===2?
                         <View style={styles.Recharge}>
+                            {/**QR覆盖层顶部*/}
                             <View style={styles.RechargeTop}/>
+                            {/**QR覆盖层中间*/}
                             <View style={styles.overlayCenter}>
                                 {/**QR覆盖层中间左部分*/}
                                 <View style={styles.RechargeBrim}/>
@@ -248,8 +187,64 @@ export default class CWQRCode extends Component {
                                 {/**QR覆盖层中间右部分*/}
                                 <View style={styles.RechargeBrim}/>
                             </View>
-                        </View>
-                    }
+                            {/**QR覆盖层底部*/}
+                            <View style={styles.RechargeBottom}/>
+                        </View>:
+                        <View>
+                            {/**QR覆盖层顶部*/}
+                            <View style={styles.overlayTop}/>
+                            {/**QR覆盖层中间部*/}
+                            <View style={styles.overlayCenter}>
+                                {/*//QR覆盖层中间左部分*/}
+                                <View style={styles.overlayCenterLeft}/>
+                                {/**QR覆盖层中间二维码扫码区域*/}
+                                <View style={styles.QROverlayConterScan}>
+                                    <View style={styles.QROverlayConterScanTopLeft}/>
+                                    <View style={styles.QROverlayConterScanTopRight}/>
+                                    <View style={styles.QRoverlayConterScanBottomLeft}/>
+                                    <View style={styles.QRoverlayConterScanBottomRight}/>
+                                </View>
+                                {/**QR覆盖层中间右部分*/}
+                                <View style={styles.overlayCenterRight}/>
+                            </View>
+                            {/**QR覆盖层底部*/}
+                            <View style={styles.overlayBottom}/>
+                        </View>}
+
+                    <View style={{flex:1,  height:70, backgroundColor:'rgba(0,0,0,0.7)', width:width, justifyContent:'space-around',flexDirection:'row', alignItems:'center',}}>
+                        {this.state.JudgeBtn===0?
+                            <View style={styles.selected}>
+                                <Image source={require('../../img/BandPitchOn.png')} style={{width:30,height:30,}} />
+                                <Text style={styles.selectedText}>蓄电池</Text>
+                            </View> :
+                            <TouchableOpacity style={styles.unselected}  onPress={()=>this.battery()}>
+                                <Image source={require('../../img/Band.png')} style={{width:30,height:30,}} />
+                                <Text style={styles.unselectedText}>蓄电池</Text>
+                            </TouchableOpacity>
+                        }
+                        {this.state.JudgeBtn===1?
+                            <View style={styles.selected}>
+                                <Image source={require('../../img/BandPitchOn.png')} style={{width:30,height:30,}} />
+                                <Text style={styles.selectedText}>充电器</Text>
+                            </View>:
+                            <TouchableOpacity style={styles.unselected} onPress={()=>this.charger()}>
+                                <Image source={require('../../img/Band.png')} style={{width:30,height:30,}} />
+                                <Text style={styles.unselectedText}>充电器</Text>
+                            </TouchableOpacity>
+                        }
+                        {this.state.JudgeBtn===2?
+                            <View style={styles.selected}>
+                                <Image source={require('../../img/rechargeOn.png')} style={{width:30,height:30,}} />
+                                <Text style={styles.selectedText}>电车充电</Text>
+                            </View>:
+                            <TouchableOpacity style={styles.unselected} onPress={()=>this.Recharge()}>
+                                <Image source={require('../../img/recharge.png')} style={{width:30,height:30,}} />
+                                <Text style={styles.unselectedText}>电车充电</Text>
+                            </TouchableOpacity>
+                        }
+                    </View>
+
+
 
                     {/*<TouchableOpacity style={styles.overlayBottom} onPress={() => {*/}
                         {/*this._switch()*/}
@@ -266,24 +261,35 @@ export default class CWQRCode extends Component {
 }
 
 const styles = StyleSheet.create({
+    navigationHeadline:{
+        fontSize:18,
+        color:'#fff'
+    },
     RechargeBrim:{
-        width: width/5, height: width/5*3,
+        width: width/5,
+        height: width/5*3+10,
     },
     RechargeTop:{
         flex:1,
-        height: height/3-70,
+        height: height/3-40,
+        width: width,
+    },
+    RechargeBottom:{
+        flex:1,
+        flexDirection:'row',
+        height: height/3-105,
         width: width,
     },
     Recharge:{
         flex:1,
     },
     selectedText:{
-        color:'#F5F5F5',
+        color:'#3BB6FF',
         fontSize:17,
         paddingLeft:5 ,
     },
     unselectedText:{
-        color:'#696969',
+        color:'#F5F5F5',
         fontSize:17,
         paddingLeft:5 ,
     },
@@ -291,8 +297,6 @@ const styles = StyleSheet.create({
         padding: 10,
         paddingLeft: 20,
         paddingRight: 20,
-        backgroundColor: '#3BB6FF',
-        borderRadius: 9,
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -300,8 +304,6 @@ const styles = StyleSheet.create({
         padding: 10,
         paddingLeft: 20,
         paddingRight: 20,
-        backgroundColor: '#F8F8FF',
-        borderRadius: 9,
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -364,15 +366,15 @@ const styles = StyleSheet.create({
     overlayBottom:{
         flex:1,
         flexDirection:'row',
-        height: height/3,
+        height: height/3-105,
         width: width,
         backgroundColor: 'rgba(0, 0, 0, 0.6)',
-        justifyContent:'space-around',
-        alignItems:'center',
+        // justifyContent:'space-around',
+        // alignItems:'center',
     },
     overlayTop:{
         flex:1,
-        height: height/3-70,
+        height: height/3-40,
         width: width,
         backgroundColor: 'rgba(0, 0, 0, 0.6)',
     },

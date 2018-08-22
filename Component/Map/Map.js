@@ -27,7 +27,7 @@ export default class Map extends Component {
         headerRight: (
             <View />
         ),
-        headerPressColorAndroid:'blue',
+        headerPressColorAndroid:'gray',
         headerBackImage: (<Image source={require('../../img/leftGoBack.png')} style={{width:18,height:14,marginLeft:15}}/>),
     };
 

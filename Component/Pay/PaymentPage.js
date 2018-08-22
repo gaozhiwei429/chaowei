@@ -57,9 +57,9 @@ export default class PaymentPage extends Component {
             appSchemeIOS: 'testapp20', //应用注册scheme,在AlixPayDemo-Info.plist定义URL types
         };
         AliPay.pay(data).then((msg) => {
-            console.log(msg);
+            alert(msg);
         }, (e) => {
-            console.log(e);
+            alert(e);
         });
     }
 

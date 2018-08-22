@@ -176,7 +176,6 @@ export default class CWHome extends Component {
         });
     }
 
-
     /**向数据库写数据*/
     async writeDatabase(){
         /**向数据库写数据*/
@@ -316,7 +315,7 @@ export default class CWHome extends Component {
         };
     }
 
-    goQRCodeBattery(){
+    goQRCode(){
         this.props.navigation.navigate('CWQRCode')
     }
 
@@ -336,24 +335,23 @@ export default class CWHome extends Component {
 
     //电池1
     banding1(){
-        bleBroadcast.start('01' ,'3826879215020000020203040506');// 蓝牙广播开始
-        // alert('1')
+        bleBroadcast.start('0101' ,'3826879215020000020203040506');// 蓝牙广播开始
     }
     //电池2
     banding2(){
-        bleBroadcast.start('01' ,'3826879215020000030203040506');// 蓝牙广播开始
+        bleBroadcast.start('0101' ,'3826879215020000030203040506');// 蓝牙广播开始
     }
     //电池3
     banding3(){
-        bleBroadcast.start('01' ,'3826879215020000040203040506');// 蓝牙广播开始
+        bleBroadcast.start('0101' ,'3826879215020000040203040506');// 蓝牙广播开始
     }
     //电池4
     banding4(){
-        bleBroadcast.start('01' ,'3826879215020000050203040506');// 蓝牙广播开始
+        bleBroadcast.start('0101' ,'3826879215020000050203040506');// 蓝牙广播开始
     }
     //充电器
     banding5(){
-        bleBroadcast.start('01' ,'3826879215020000010203040506');// 蓝牙广播开始
+        bleBroadcast.start('0101' ,'3826879215020000010203040506');// 蓝牙广播开始
     }
 
     _removeText = ()=>{
@@ -363,35 +361,29 @@ export default class CWHome extends Component {
         return(
             <View style={styles.container}>
                 <ToastSuccessAndError ref='toast_su' successMsg='绑定完成' errorMsg='请打开蓝牙'/>
-                <Confirm ref='confirm' leftFunc={() => {this.goQRCodeBattery()}} rightFunc={() => {}} btnLeftText='去扫码' btnRightText='取消' title='提示' msg='您还未扫码！'/>
+                <Confirm ref='confirm' leftFunc={() => {this.goQRCode()}} rightFunc={() => {}} btnLeftText='去扫码' btnRightText='取消' title='提示' msg='您还未扫码！'/>
                 {/*进度条*/}
                 <ProgressDialogAlert ref='pmgressbar' title='提示信息' btnText='确定' msg={10}  progress={0.7} width={200} color='red'/>
                 <AlertS ref='bleScan' title='提示' btnText='确定' msg='请先打开蓝牙开关！' />
 
                 {/*测试*/}
-                {/*<View style={{justifyContent:'space-around',flexDirection:'row'}}>*/}
-                    {/*<TouchableOpacity style={{width:40,height:40,backgroundColor:'#0fa'}} onPress={()=>this.banding1()}>*/}
-                        {/*<Text>电池1-02</Text>*/}
-                    {/*</TouchableOpacity>*/}
-                    {/*<TouchableOpacity style={{width:40,height:40,backgroundColor:'#0fa'}} onPress={()=>this.banding2()}>*/}
-                        {/*<Text>电池2-03</Text>*/}
-                    {/*</TouchableOpacity>*/}
-                    {/*<TouchableOpacity style={{width:40,height:40,backgroundColor:'#0fa'}} onPress={()=>this.banding3()}>*/}
-                        {/*<Text>电池3-04</Text>*/}
-                    {/*</TouchableOpacity>*/}
-                    {/*<TouchableOpacity style={{width:40,height:40,backgroundColor:'#0fa'}} onPress={()=>this.banding4()}>*/}
-                        {/*<Text>电池4-05</Text>*/}
-                    {/*</TouchableOpacity>*/}
-                    {/*<TouchableOpacity style={{width:40,height:40,backgroundColor:'#0fa'}} onPress={()=>this.banding5()}>*/}
-                        {/*<Text>充电器-01</Text>*/}
-                    {/*</TouchableOpacity>*/}
-                    {/*<TouchableOpacity style={{width:40,height:40,backgroundColor:'#0fa'}} onPress={()=>this.componentDidMount()}>*/}
-                        {/*<Text>测试</Text>*/}
-                    {/*</TouchableOpacity>*/}
-                    {/*<TouchableOpacity onPress={()=>this._removeText()} style={{width:40,height:40,backgroundColor:'#0fa'}}>*/}
-                        {/*<Text>清除测试</Text>*/}
-                    {/*</TouchableOpacity>*/}
-                {/*</View>*/}
+                <View style={{justifyContent:'space-around',flexDirection:'row'}}>
+                    <TouchableOpacity style={{width:40,height:40,backgroundColor:'#0fa'}} onPress={()=>this.banding1()}>
+                        <Text>电池1-02</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={{width:40,height:40,backgroundColor:'#0fa'}} onPress={()=>this.banding2()}>
+                        <Text>电池2-03</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={{width:40,height:40,backgroundColor:'#0fa'}} onPress={()=>this.banding3()}>
+                        <Text>电池3-04</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={{width:40,height:40,backgroundColor:'#0fa'}} onPress={()=>this.banding4()}>
+                        <Text>电池4-05</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={{width:40,height:40,backgroundColor:'#0fa'}} onPress={()=>this.banding5()}>
+                        <Text>充电器-01</Text>
+                    </TouchableOpacity>
+                </View>
 
                 {/*顶部电量可行驶里程*/}
                 <Text style={styles.mileageText}>还可以骑行30公里</Text>
