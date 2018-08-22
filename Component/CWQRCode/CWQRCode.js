@@ -30,6 +30,7 @@ export default class CWQRCode extends Component {
             dataBatteryArray:[],
             isLiked: false,
             qrcodeTopBtn:true,
+
         };
     }
 
@@ -122,11 +123,7 @@ export default class CWQRCode extends Component {
     }
 
     static navigationOptions = {
-        headerTitle:(
-            <View style={{flex:1,flexDirection:'row',textAlign: 'center'}}>
-                <Text style={{fontSize:20, }}>扫码</Text>
-                <Text style={{fontSize:20, }}>充电</Text>
-            </View>),
+        headerTitle:(<Text style={{fontSize:20,flex: 1,textAlign:'center'}}>扫码</Text>),
         headerStyle: {
             height:0,
             // backgroundColor: 'rgba(255,25,255,0.5)',
