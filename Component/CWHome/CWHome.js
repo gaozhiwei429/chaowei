@@ -33,8 +33,8 @@ var Reserved = '00';//
 var batteryArray;                         //绑定电池与充电器合并后的数组
 var others;                               //其他的电池
 var Identifier = '382687921502'; //识别码固定值
-var batteryIdentifier = '02aa382687921502'; //蓄电池识别固定码
-var chargerIdentifier = '03aa382687921502'; //充电器识别固定码
+var batteryIdentifier = '02382687921502'; //充电器识别固定码
+var chargerIdentifier = '03382687921502'; //蓄电池识别固定码
 var BleScan;
 
 function bindSingle(){
@@ -44,10 +44,9 @@ function bindSingle(){
     var equipmentList = Identifier.concat(Reserved,Reserved,others[otherIndex],batteryArray[currentIndex]);
      // bleBroadcast.start(commandList ,equipmentList);// 蓝牙广播开始
     var con=commandList.concat(equipmentList);//广播的数据
-     console.log(con);//广播的数据
+    console.log(con);//广播的数据
     otherIndex = otherIndex + 1;// otherIndex 自增
 }
-
 
 export default class CWHome extends Component {
     constructor(){
@@ -154,7 +153,6 @@ export default class CWHome extends Component {
                                                     if(result == '123'){
                                                         bleBroadcast.stop();
                                                         this.refs.toast_su.success();
-                                                        // Alert.alert('提示','绑定完成',[{text:"确定"}]);
                                                         return;
                                                     }
                                                 });
@@ -223,8 +221,8 @@ export default class CWHome extends Component {
                             let BleScanRssi=BleScan[i].rssi;//BLE信号强度
                             if (batteryArray !== undefined && BleScanRssi > -80) {
                                 for (var r=0;r<batteryArray.length;r++){
-                                    var batteryIdentifier = searchBle.slice(4, 16);//搜索到的电池识别码与ID
-                                    if(batteryIdentifier === Identifier && batteryArray[r] === batteryID){//判断电池识别码与ID
+                                    var scanIdentifier = (searchBle.slice(0, 2)).concat(searchBle.slice(4, 16));//搜索到的电池识别码与ID
+                                    if(scanIdentifier === batteryIdentifier && batteryArray[r] === batteryID){//判断电池识别码与ID
                                         // 电池数据
                                         var batteryData = [];
                                         var battery = {};
@@ -240,39 +238,12 @@ export default class CWHome extends Component {
                                         batteryData.push(battery);
                                         //写入电池数据库
                                         var actionBattery = sqLite.insertbatteryData(batteryData, () => {
-                                            // //查询
-                                            // db.transaction((tx)=>{
-                                            //
-                                            //     tx.executeSql("select id,charger_id,my_timestamp,temperature,capacity,equilibrium_time from battery order by id desc limit 1", [],(tx,results)=>{
-                                            //         var len = results.rows.length;
-                                            //         for(let i=0; i<len; i++){
-                                            //             var u = results.rows.item(i);
-                                            //             this.setState({
-                                            //                 charger_id:u.charger_id,
-                                            //                 my_timestamp:u.my_timestamp,
-                                            //                 temperature:u.temperature,
-                                            //                 capacity:u.capacity,
-                                            //                 equilibrium_time:u.equilibrium_time,
-                                            //             });
-                                            //             if(u.capacity !== ''){
-                                            //                 var datacapacity = parseInt(u.capacity);
-                                            //                 if(data.length>10){
-                                            //                     data.shift();
-                                            //                     data.push(datacapacity);
-                                            //                 }else {
-                                            //                     console.log('1');
-                                            //                 }
-                                            //             }
-                                            //         }
-                                            //         setTimeout(loop, 5000);
-                                            //     });
-                                            // },(error)=>{
-                                            //     console.log(error);
-                                            // });
                                         });
 
                                         actionsBattery.push(actionBattery);
 
+                                        // setTimeout(loop, 5000);
+                                    }else if(scanIdentifier === chargerIdentifier && batteryArray[r] === batteryID){
                                         // 充电器数据
                                         var chargerData = [];
                                         var charger = {};
@@ -290,7 +261,6 @@ export default class CWHome extends Component {
                                         var actionCharger = sqLite.insertchargerData(chargerData,()=>{
                                         });
                                         actionsCharger.push(actionCharger)
-                                        // setTimeout(loop, 5000);
                                     }
                                 }
                             }
@@ -354,6 +324,10 @@ export default class CWHome extends Component {
         bleBroadcast.start('0101' ,'3826879215020000010203040506');// 蓝牙广播开始
     }
 
+    aaaa(){
+        bleBroadcast.stop();
+    }
+
     _removeText = ()=>{
         AsyncStorage.removeItem(PHONE_BIND_STORAGE_KEY);
     };
@@ -382,6 +356,9 @@ export default class CWHome extends Component {
                     </TouchableOpacity>
                     <TouchableOpacity style={{width:40,height:40,backgroundColor:'#0fa'}} onPress={()=>this.banding5()}>
                         <Text>充电器-01</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={{width:40,height:40,backgroundColor:'#0fa'}} onPress={()=>this.aaaa()}>
+                        <Text>log</Text>
                     </TouchableOpacity>
                 </View>
 

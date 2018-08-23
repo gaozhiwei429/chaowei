@@ -232,16 +232,16 @@ export default class CWQRCode extends Component {
                                 <Text style={styles.unselectedText}>充电器</Text>
                             </TouchableOpacity>
                         }
-                        {this.state.JudgeBtn===2?
-                            <View style={styles.selected}>
-                                <Image source={require('../../img/rechargeOn.png')} style={{width:30,height:30,}} />
-                                <Text style={styles.selectedText}>电车充电</Text>
-                            </View>:
-                            <TouchableOpacity style={styles.unselected} onPress={()=>this.Recharge()}>
-                                <Image source={require('../../img/recharge.png')} style={{width:30,height:30,}} />
-                                <Text style={styles.unselectedText}>电车充电</Text>
-                            </TouchableOpacity>
-                        }
+                        {/*{this.state.JudgeBtn===2?*/}
+                            {/*<View style={styles.selected}>*/}
+                                {/*<Image source={require('../../img/rechargeOn.png')} style={{width:30,height:30,}} />*/}
+                                {/*<Text style={styles.selectedText}>电车充电</Text>*/}
+                            {/*</View>:*/}
+                            {/*<TouchableOpacity style={styles.unselected} onPress={()=>this.Recharge()}>*/}
+                                {/*<Image source={require('../../img/recharge.png')} style={{width:30,height:30,}} />*/}
+                                {/*<Text style={styles.unselectedText}>电车充电</Text>*/}
+                            {/*</TouchableOpacity>*/}
+                        {/*}*/}
                     </View>
 
 
@@ -277,7 +277,7 @@ const styles = StyleSheet.create({
     RechargeBottom:{
         flex:1,
         flexDirection:'row',
-        height: height/3-105,
+        height: height/3-100,
         width: width,
     },
     Recharge:{
@@ -366,7 +366,7 @@ const styles = StyleSheet.create({
     overlayBottom:{
         flex:1,
         flexDirection:'row',
-        height: height/3-105,
+        height: height/3-100,
         width: width,
         backgroundColor: 'rgba(0, 0, 0, 0.6)',
         // justifyContent:'space-around',
