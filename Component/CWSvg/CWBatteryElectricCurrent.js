@@ -74,7 +74,7 @@ export default class CWBatteryElectricCurrent extends Component {
                     var len = results.rows.length;
                     for(let i=0; i<len; i++){
                         var u = results.rows.item(i);
-                        battery1electric_currentData.push(parseInt(u.electric_current));
+                        battery1electric_currentData.push(u.electric_current);
                     }
                     this.setState({
                         battery1:battery1electric_currentData,
@@ -91,10 +91,10 @@ export default class CWBatteryElectricCurrent extends Component {
                         var len = results.rows.length;
                         for(let i=0; i<len; i++){
                             var u = results.rows.item(i);
-                            battery1electric_currentData.push(parseInt(u.electric_current));
+                            battery1electric_currentData.push(u.electric_current);
                         }
                         if(battery1electric_currentData.length>18){
-                            battery1TemperatureData.shift();
+                            battery1electric_currentData.shift();
                             this.setState({
                                 battery1:battery1electric_currentData,
                             });
@@ -117,7 +117,7 @@ export default class CWBatteryElectricCurrent extends Component {
                     var len = results.rows.length;
                     for(let i=0; i<len; i++){
                         var u = results.rows.item(i);
-                        battery2electric_currentData.push(parseInt(u.electric_current));
+                        battery2electric_currentData.push(u.electric_current);
                     }
                     this.setState({
                         battery2:battery2electric_currentData,
@@ -134,7 +134,7 @@ export default class CWBatteryElectricCurrent extends Component {
                         var len = results.rows.length;
                         for(let i=0; i<len; i++){
                             var u = results.rows.item(i);
-                            battery2electric_currentData.push(parseInt(u.electric_current));
+                            battery2electric_currentData.push(u.electric_current);
                         }
                         if(battery2electric_currentData.length>18){
                             battery2electric_currentData.shift();
@@ -160,7 +160,7 @@ export default class CWBatteryElectricCurrent extends Component {
                     var len = results.rows.length;
                     for(let i=0; i<len; i++){
                         var u = results.rows.item(i);
-                        battery3electric_currentData.push(parseInt(u.electric_current));
+                        battery3electric_currentData.push(u.electric_current);
                     }
                     this.setState({
                         battery3:battery3electric_currentData,
@@ -177,7 +177,7 @@ export default class CWBatteryElectricCurrent extends Component {
                         var len = results.rows.length;
                         for(let i=0; i<len; i++){
                             var u = results.rows.item(i);
-                            battery3electric_currentData.push(parseInt(u.electric_current));
+                            battery3electric_currentData.push(u.electric_current);
                         }
                         if(battery3electric_currentData.length>18){
                             battery3electric_currentData.shift();
@@ -203,7 +203,7 @@ export default class CWBatteryElectricCurrent extends Component {
                     var len = results.rows.length;
                     for(let i=0; i<len; i++){
                         var u = results.rows.item(i);
-                        battery4electric_currentData.push(parseInt(u.electric_current));
+                        battery4electric_currentData.push(u.electric_current);
                     }
                     this.setState({
                         battery4:battery4electric_currentData,
@@ -220,7 +220,7 @@ export default class CWBatteryElectricCurrent extends Component {
                         var len = results.rows.length;
                         for(let i=0; i<len; i++){
                             var u = results.rows.item(i);
-                            battery4electric_currentData.push(parseInt(u.electric_current));
+                            battery4electric_currentData.push(u.electric_current);
                         }
                         if(battery4electric_currentData.length>18){
                             battery4electric_currentData.shift();
@@ -262,7 +262,7 @@ export default class CWBatteryElectricCurrent extends Component {
                 var len = results.rows.length;
                 for(let i=0; i<len; i++){
                     var u = results.rows.item(i);
-                    battery1electric_currentData.push(parseInt(u.electric_current));
+                    battery1electric_currentData.push(u.electric_current);
                 }
                 this.setState({
                     battery1:battery1electric_currentData,
@@ -278,7 +278,7 @@ export default class CWBatteryElectricCurrent extends Component {
                 var len = results.rows.length;
                 for(let i=0; i<len; i++){
                     var u = results.rows.item(i);
-                    battery2electric_currentData.push(parseInt(u.electric_current));
+                    battery2electric_currentData.push(u.electric_current);
                 }
                 this.setState({
                     battery2:battery2electric_currentData,
@@ -294,7 +294,7 @@ export default class CWBatteryElectricCurrent extends Component {
                 var len = results.rows.length;
                 for(let i=0; i<len; i++){
                     var u = results.rows.item(i);
-                    battery3electric_currentData.push(parseInt(u.electric_current));
+                    battery3electric_currentData.push(u.electric_current);
                 }
                 this.setState({
                     battery3:battery3electric_currentData,
@@ -310,7 +310,7 @@ export default class CWBatteryElectricCurrent extends Component {
                 var len = results.rows.length;
                 for(let i=0; i<len; i++){
                     var u = results.rows.item(i);
-                    battery4electric_currentData.push(parseInt(u.electric_current));
+                    battery4electric_currentData.push(u.electric_current);
                 }
                 this.setState({
                     battery4:battery4electric_currentData,

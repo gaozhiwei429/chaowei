@@ -76,7 +76,7 @@ export default class CWBatteryCapacity extends Component {
                     var len = results.rows.length;
                     for(let i=0; i<len; i++){
                         var u = results.rows.item(i);
-                        battery1capacityData.push(parseInt(u.capacity));
+                        battery1capacityData.push(u.capacity);
                     }
                     this.setState({
                         battery1:battery1capacityData,
@@ -92,7 +92,7 @@ export default class CWBatteryCapacity extends Component {
                         var len = results.rows.length;
                         for(let i=0; i<len; i++){
                             var u = results.rows.item(i);
-                            battery1capacityData.push(parseInt(u.capacity));
+                            battery1capacityData.push(u.capacity);
                         }
                         if(battery1capacityData.length>18){
                             battery1capacityData.shift();
@@ -118,7 +118,7 @@ export default class CWBatteryCapacity extends Component {
                     var len = results.rows.length;
                     for(let i=0; i<len; i++){
                         var u = results.rows.item(i);
-                        battery2capacityData.push(parseInt(u.capacity));
+                        battery2capacityData.push(u.capacity);
                     }
                     this.setState({
                         battery2:battery2capacityData,
@@ -135,7 +135,7 @@ export default class CWBatteryCapacity extends Component {
                         var len = results.rows.length;
                         for(let i=0; i<len; i++){
                             var u = results.rows.item(i);
-                            battery2capacityData.push(parseInt(u.capacity));
+                            battery2capacityData.push(u.capacity);
                         }
                         if(battery2capacityData.length>18){
                             battery2capacityData.shift();
@@ -161,7 +161,7 @@ export default class CWBatteryCapacity extends Component {
                     var len = results.rows.length;
                     for(let i=0; i<len; i++){
                         var u = results.rows.item(i);
-                        battery3capacityData.push(parseInt(u.capacity));
+                        battery3capacityData.push(u.capacity);
                     }
                     this.setState({
                         battery3:battery3capacityData,
@@ -178,7 +178,7 @@ export default class CWBatteryCapacity extends Component {
                         var len = results.rows.length;
                         for(let i=0; i<len; i++){
                             var u = results.rows.item(i);
-                            battery3capacityData.push(parseInt(u.capacity));
+                            battery3capacityData.push(u.capacity);
                         }
                         if(battery3capacityData.length>18){
                             battery3capacityData.shift();
@@ -204,7 +204,7 @@ export default class CWBatteryCapacity extends Component {
                     var len = results.rows.length;
                     for(let i=0; i<len; i++){
                         var u = results.rows.item(i);
-                        battery4capacityData.push(parseInt(u.capacity));
+                        battery4capacityData.push(u.capacity);
                     }
                     this.setState({
                         battery4:battery4capacityData,
@@ -221,7 +221,7 @@ export default class CWBatteryCapacity extends Component {
                         var len = results.rows.length;
                         for(let i=0; i<len; i++){
                             var u = results.rows.item(i);
-                            battery4capacityData.push(parseInt(u.capacity));
+                            battery4capacityData.push(u.capacity);
                         }
                         if(battery4capacityData.length>18){
                             battery4capacityData.shift();
@@ -262,7 +262,7 @@ export default class CWBatteryCapacity extends Component {
                 var len = results.rows.length;
                 for(let i=0; i<len; i++){
                     var u = results.rows.item(i);
-                    battery1capacityData.push(parseInt(u.capacity));
+                    battery1capacityData.push(u.capacity);
                 }
                 this.setState({
                     battery1:battery1capacityData,
@@ -278,7 +278,7 @@ export default class CWBatteryCapacity extends Component {
                 var len = results.rows.length;
                 for(let i=0; i<len; i++){
                     var u = results.rows.item(i);
-                    battery2capacityData.push(parseInt(u.capacity));
+                    battery2capacityData.push(u.capacity);
                 }
                 this.setState({
                     battery2:battery2capacityData,
@@ -294,7 +294,7 @@ export default class CWBatteryCapacity extends Component {
                 var len = results.rows.length;
                 for(let i=0; i<len; i++){
                     var u = results.rows.item(i);
-                    battery3capacityData.push(parseInt(u.capacity));
+                    battery3capacityData.push(u.capacity);
                 }
                 this.setState({
                     battery3:battery3capacityData,
@@ -310,7 +310,7 @@ export default class CWBatteryCapacity extends Component {
                 var len = results.rows.length;
                 for(let i=0; i<len; i++){
                     var u = results.rows.item(i);
-                    battery4capacityData.push(parseInt(u.capacity));
+                    battery4capacityData.push(u.capacity);
                 }
                 this.setState({
                     battery4:battery4capacityData,
@@ -336,14 +336,14 @@ export default class CWBatteryCapacity extends Component {
                 trigger: 'none',//item,axis,none
             },
             legend: {//可以手动选择现实几个图标
-                data:['电池1','电池2','电池3','电池4'],
+                data:['电池1','电池2','电池3','电池4',],
             },
             toolbox: {//各种表格
                 orient: 'vertical',//改变icon的布局朝向
                 show : true,
                 showTitle:true,
                 feature : {
-                    dataView : {show: true, readOnly: false},//show是否显示表格，readOnly是否只读
+                    dataView : {show: true, readOnly: true},//show是否显示表格，readOnly是否只读
                     magicType : {
                         //折线图  柱形图    总数统计 分开平铺
                         //type: ['line'],//'line', 'bar','stack' ,'tiled'
@@ -391,7 +391,7 @@ export default class CWBatteryCapacity extends Component {
                     smooth:true,
                     data: this.state.battery4,
                     showSymbol: false,
-                }
+                },
             ],
             // visualMap: {//值的大小决定曲线的颜色
             //     top: 10,

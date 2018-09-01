@@ -14,8 +14,7 @@ import {
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import * as storage from '../../storage';
 import { BATTERY_BIND_STORAGE_KEY,CHARGER_BIND_STORAGE_KEY } from '../../config';
-import Toast from '../Alert/Toast';
-
+import EasyToast, {DURATION} from 'react-native-easy-toast';
 // 引入手电筒模块
 // let FlashLight = NativeModules.FlashLight;
 // import FlashLight from '../FlashLight/FlashLight'
@@ -26,55 +25,62 @@ export default class CWQRCode extends Component {
         this.state = {
             dataBattery:[],//电池
             dataCharger:[],//充电器
-            dataBatteryArray:[],
-            isLiked: false,
-            qrcodeTopBtn:true,
             JudgeBtn:0,
         };
     }
 
     onBarCodeRead(e) {
         //将返回的结果转为对象
-        // let id = JSON.parse(e.data);
-        let data = e.data;
-        let value =data.toLowerCase();
+        let QRCdata = e.data;
+        let value =QRCdata.toLowerCase();
 
-        if(this.state.JudgeBtn===0){//蓄电池
-            storage.get(BATTERY_BIND_STORAGE_KEY, (error, result) => {//扫码存储电池
-                const set = new Set(result);
-                if(set.has(value) !== true){
-                    result = (result || []).concat(value);
-                    if(result.length<6){
-                        storage.save(BATTERY_BIND_STORAGE_KEY, result, () => {
-                            this.setState({ dataBattery: value});
-                            this.setState({ dataBatteryArray:result });
-                        });
-                        this.refs.succeed.open();
+        if(this.state.JudgeBtn===0){
+            if(value.slice(10,12)=='00'){
+                storage.get(CHARGER_BIND_STORAGE_KEY, (error, result) => {//扫码存储充电器
+                    const set = new Set(result);
+                    if(set.has(value)!==true){
+                        result= (result || []).concat(value);
+                        if(result.length<2){
+                            storage.save(CHARGER_BIND_STORAGE_KEY, result, () => {
+                                this.setState({ dataCharger: value});
+                            });
+                            this.refs.toast.show('扫码成功!',1200);
+                        }else {
+                            this.refs.toast.show('目前只支持扫一个充电器!',1200);
+                        }
                     }else {
-                        this.refs.batteryErr.open();
+                        this.refs.toast.show('此块充电器已存在!',1200);
                     }
-                }else {
-                    this.refs.batteryExists.open();
-                }
-            });
+                });
+            }else if(value.slice(10,12)=='01'){
+                storage.get(BATTERY_BIND_STORAGE_KEY, (error, result) => {//扫码存储电池
+                    const set = new Set(result);
+                    if(set.has(value) !== true){
+                        result = (result || []).concat(value);
+                        if(result.length<7){
+                            storage.save(BATTERY_BIND_STORAGE_KEY, result, () => {
+                                this.setState({ dataBattery: value});
+                                this.setState({ dataBatteryArray:result });
+                            });
+                            this.refs.toast.show('扫码成功!',1000);
+                        }else {
+                            this.refs.toast.show('目前最多支持绑定6块电池!',1000);
+                        }
+                    }else {
+                        this.refs.toast.show('此块蓄电池已存在!',1000);
+                    }
+                });
+            }else {
+                this.refs.toast.show('这不是我们的产品!',1000);
+            }
         }
-        if(this.state.JudgeBtn===1){//充电器
-            storage.get(CHARGER_BIND_STORAGE_KEY, (error, result) => {//扫码存储充电器
-                result= (result || []).concat(value);
-                if(result.length<2){
-                    storage.save(CHARGER_BIND_STORAGE_KEY, result, () => {
-                        this.setState({ dataCharger: value});
-                    });
-                    this.refs.succeed.open();
-                }else {
-                    this.refs.chargerErr.open();
-                }
-            });
-        }
-        if(this.state.JudgeBtn===2){//扫码充电
-            Linking
-                .openURL(e.data)
-                .catch(err => console.error('An error occured', err));
+
+        if(this.state.JudgeBtn===1){//扫码充电
+            if(value.slice(10,12)=='aa'){
+                this.props.navigation.replace('PaymentPage',{AliPay:value})
+            }else {
+                this.refs.toast.show('您扫的不是我们充电桩二维码!',1000)
+            }
         }
     }
 
@@ -84,15 +90,9 @@ export default class CWQRCode extends Component {
         });
     }
 
-    charger(){
-        this.setState({
-            JudgeBtn: 1
-        });
-    }
-
     Recharge(){
         this.setState({
-            JudgeBtn: 2
+            JudgeBtn: 1
         });
     }
 
@@ -134,10 +134,6 @@ export default class CWQRCode extends Component {
     render() {
         return (
             <View style={styles.container}>
-                <Toast ref='batteryExists' type='wrong' msg='此块蓄电池已存在'/>
-                <Toast ref='succeed' type='success' msg='扫码成功'/>
-                <Toast ref='chargerErr' type='warning' msg='只支持绑定一个充电器'/>
-                <Toast ref='batteryErr' type='warning' msg='目前最多支持绑定5块电池'/>
                 <QRCodeScanner
                     onRead={this.onBarCodeRead.bind(this)}
                     cameraStyle={styles.camera}
@@ -161,15 +157,13 @@ export default class CWQRCode extends Component {
                         {/*导航标题切换*/}
                         <View style={{flex:1, alignItems:'center', justifyContent:'center',}}>
                             {this.state.JudgeBtn===0 ?
-                                <Text style={styles.navigationHeadline}>蓄电池扫码</Text> :
-                                this.state.JudgeBtn===1 ?
-                                    <Text style={styles.navigationHeadline}>充电器扫码</Text> :
-                                    this.state.JudgeBtn===2 ?
+                                <Text style={styles.navigationHeadline}>扫码绑定</Text>  :
+                                    this.state.JudgeBtn===1?
                                         <Text style={styles.navigationHeadline}>扫码充电</Text> :''}
                         </View>
                     </View>
 
-                    {this.state.JudgeBtn===2?
+                    {this.state.JudgeBtn===1?
                         <View style={styles.Recharge}>
                             {/**QR覆盖层顶部*/}
                             <View style={styles.RechargeTop}/>
@@ -210,38 +204,37 @@ export default class CWQRCode extends Component {
                             {/**QR覆盖层底部*/}
                             <View style={styles.overlayBottom}/>
                         </View>}
-
                     <View style={{flex:1,  height:70, backgroundColor:'rgba(0,0,0,0.7)', width:width, justifyContent:'space-around',flexDirection:'row', alignItems:'center',}}>
+                        {/*{this.state.JudgeBtn===0?*/}
+                            {/*<View style={styles.selected}>*/}
+                                {/*<Image source={require('../../img/BandPitchOn.png')} style={{width:30,height:30,}} />*/}
+                                {/*<Text style={styles.selectedText}>扫码</Text>*/}
+                            {/*</View> :*/}
+                            {/*<TouchableOpacity style={styles.unselected}  onPress={()=>this.battery()}>*/}
+                                {/*<Image source={require('../../img/Band.png')} style={{width:30,height:30,}} />*/}
+                                {/*<Text style={styles.unselectedText}>扫码</Text>*/}
+                            {/*</TouchableOpacity>*/}
+                        {/*}*/}
                         {this.state.JudgeBtn===0?
                             <View style={styles.selected}>
                                 <Image source={require('../../img/BandPitchOn.png')} style={{width:30,height:30,}} />
-                                <Text style={styles.selectedText}>蓄电池</Text>
-                            </View> :
-                            <TouchableOpacity style={styles.unselected}  onPress={()=>this.battery()}>
+                                <Text style={styles.selectedText}>扫码绑定</Text>
+                            </View>:
+                            <TouchableOpacity style={styles.unselected} onPress={()=>this.battery()}>
                                 <Image source={require('../../img/Band.png')} style={{width:30,height:30,}} />
-                                <Text style={styles.unselectedText}>蓄电池</Text>
+                                <Text style={styles.unselectedText}>扫码绑定</Text>
                             </TouchableOpacity>
                         }
                         {this.state.JudgeBtn===1?
                             <View style={styles.selected}>
-                                <Image source={require('../../img/BandPitchOn.png')} style={{width:30,height:30,}} />
-                                <Text style={styles.selectedText}>充电器</Text>
+                                <Image source={require('../../img/rechargeOn.png')} style={{width:30,height:30,}} />
+                                <Text style={styles.selectedText}>电车充电</Text>
                             </View>:
-                            <TouchableOpacity style={styles.unselected} onPress={()=>this.charger()}>
-                                <Image source={require('../../img/Band.png')} style={{width:30,height:30,}} />
-                                <Text style={styles.unselectedText}>充电器</Text>
+                            <TouchableOpacity style={styles.unselected} onPress={()=>this.Recharge()}>
+                                <Image source={require('../../img/recharge.png')} style={{width:30,height:30,}} />
+                                <Text style={styles.unselectedText}>电车充电</Text>
                             </TouchableOpacity>
                         }
-                        {/*{this.state.JudgeBtn===2?*/}
-                            {/*<View style={styles.selected}>*/}
-                                {/*<Image source={require('../../img/rechargeOn.png')} style={{width:30,height:30,}} />*/}
-                                {/*<Text style={styles.selectedText}>电车充电</Text>*/}
-                            {/*</View>:*/}
-                            {/*<TouchableOpacity style={styles.unselected} onPress={()=>this.Recharge()}>*/}
-                                {/*<Image source={require('../../img/recharge.png')} style={{width:30,height:30,}} />*/}
-                                {/*<Text style={styles.unselectedText}>电车充电</Text>*/}
-                            {/*</TouchableOpacity>*/}
-                        {/*}*/}
                     </View>
 
 
@@ -255,6 +248,11 @@ export default class CWQRCode extends Component {
                         {/*</Text>*/}
                     {/*</TouchableOpacity>*/}
                 </View>
+                <EasyToast
+                    ref="toast"
+                    style={ {backgroundColor:'rgba(0,0,0,0.5)'}}
+                    position='center'
+                />
             </View>
         );
     }

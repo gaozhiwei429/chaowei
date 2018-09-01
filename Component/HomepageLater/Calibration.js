@@ -90,7 +90,6 @@ export default class Calibration extends Component {
                         }
                     }else {
                         /** 电池*/
-
                         let BatteryVoltageValue = '0388382687921502';//固定值电压
                         if(fixed === BatteryVoltageValue){//电压校准
                             if(BleScan !== null && StorageBatteryId === BleScanId){
@@ -272,7 +271,7 @@ export default class Calibration extends Component {
                                     </TouchableOpacity>
                                 </View>
                             </View>
-                                :
+                            :index===3?
                             <View style={styles.Calibration}>
                                 <View style={styles.CalibrationRow}>
                                     <Text style={styles.CalibrationText}>电压校准值:</Text>
@@ -295,6 +294,51 @@ export default class Calibration extends Component {
                                     </TouchableOpacity>
                                 </View>
                             </View>
+                                :index===4?
+                                    <View style={styles.Calibration}>
+                                        <View style={styles.CalibrationRow}>
+                                            <Text style={styles.CalibrationText}>电压校准值:</Text>
+                                            <TextInput style={styles.CalibrationInput}
+                                                       returnKeyType="search"
+                                                       onChangeText={(voltager) => this.setState({voltager})}
+                                                       defaultValue='40'
+                                                       underlineColorAndroid='transparent'
+                                                       keyboardType='numeric'
+                                                       editable={false}
+                                            />
+                                            <View style={styles.CalibrationInstrument}>
+                                                <Text style={styles.InstrumentText}>{isNaN(BatteryVoltager) ? 0: BatteryVoltager}</Text>
+                                            </View>
+                                        </View>
+
+                                        <View style={styles.BtnTouchable}>
+                                            <TouchableOpacity onPress={()=>this.searchVoltage()} style={styles.CalibrationBtn}>
+                                                <Text style={{fontSize:20}}>电压校准</Text>
+                                            </TouchableOpacity>
+                                        </View>
+                                    </View>:
+                                    <View style={styles.Calibration}>
+                                        <View style={styles.CalibrationRow}>
+                                            <Text style={styles.CalibrationText}>电压校准值:</Text>
+                                            <TextInput style={styles.CalibrationInput}
+                                                       returnKeyType="search"
+                                                       onChangeText={(voltager) => this.setState({voltager})}
+                                                       defaultValue='40'
+                                                       underlineColorAndroid='transparent'
+                                                       keyboardType='numeric'
+                                                       editable={false}
+                                            />
+                                            <View style={styles.CalibrationInstrument}>
+                                                <Text style={styles.InstrumentText}>{isNaN(BatteryVoltager) ? 0: BatteryVoltager}</Text>
+                                            </View>
+                                        </View>
+
+                                        <View style={styles.BtnTouchable}>
+                                            <TouchableOpacity onPress={()=>this.searchVoltage()} style={styles.CalibrationBtn}>
+                                                <Text style={{fontSize:20}}>电压校准</Text>
+                                            </TouchableOpacity>
+                                        </View>
+                                    </View>
                 }
             </View>
         );

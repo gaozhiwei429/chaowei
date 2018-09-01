@@ -6,7 +6,6 @@ import {
     Image,
     TouchableOpacity,
     ScrollView,
-    Dimensions
 } from 'react-native';
 
 import RemainingBattery from '../CWRemainingBattery/CWRemainingBattery';
@@ -14,7 +13,7 @@ import RemainingBattery from '../CWRemainingBattery/CWRemainingBattery';
 class CWBtnCell extends Component {
     render() {
         return (
-            <TouchableOpacity style={styles.Btn} onPress={this.props.onPress}>
+            <TouchableOpacity style={styles.Btn} onPress={this.props.onPress} activeOpacity={0.5}>
                 <Text style={styles.BtnText}>{this.props.title}</Text>
                 <Image style={styles.BtnImg} source={require('../../img/next.png')}/>
             </TouchableOpacity>
@@ -43,18 +42,14 @@ export default class CWButton extends Component {
     render() {
         return (
             <ScrollView style={styles.Binding}>
-                {/*<CWBtnCell*/}
-                    {/*title='微信支付'*/}
-                    {/*onPress={() => this.props.navigation.navigate('WXPay')}*/}
-                {/*/>*/}
-                {/*<CWBtnCell*/}
-                    {/*title='支付宝支付'*/}
-                    {/*onPress={() => this.props.navigation.navigate('AliPay')}*/}
-                {/*/>*/}
-                {/*<CWBtnCell*/}
-                    {/*title='确认支付'*/}
-                    {/*onPress={() => this.props.navigation.navigate('PaymentPage')}*/}
-                {/*/>*/}
+                <CWBtnCell
+                    title='确认支付'
+                    onPress={() => this.props.navigation.navigate('PaymentPage')}
+                />
+                <CWBtnCell
+                    title='导数据'
+                    onPress={() => this.props.navigation.navigate('Filesystem')}
+                />
                 <CWBtnCell
                     title='目前电量'
                     onPress={() => this.props.navigation.navigate('RemainingBattery')}

@@ -74,7 +74,7 @@ export default class CWBatteryVoltage extends Component {
                     // alert(len);
                     for(let i=0; i<len; i++){
                         var u = results.rows.item(i);
-                        battery1VoltageData.push(parseInt(u.voltage));
+                        battery1VoltageData.push(u.voltage);
                     }
                     this.setState({
                         battery1:battery1VoltageData,
@@ -91,7 +91,7 @@ export default class CWBatteryVoltage extends Component {
                         var len = results.rows.length;
                         for(let i=0; i<len; i++){
                             var u = results.rows.item(i);
-                            battery1VoltageData.push(parseInt(u.voltage));
+                            battery1VoltageData.push(u.voltage);
                         }
                         if(battery1VoltageData.length>18){
                             battery1VoltageData.shift();
@@ -117,7 +117,7 @@ export default class CWBatteryVoltage extends Component {
                     var len = results.rows.length;
                     for(let i=0; i<len; i++){
                         var u = results.rows.item(i);
-                        battery2VoltageData.push(parseInt(u.voltage));
+                        battery2VoltageData.push(u.voltage);
                     }
                     this.setState({
                         battery2:battery2VoltageData,
@@ -134,7 +134,7 @@ export default class CWBatteryVoltage extends Component {
                         var len = results.rows.length;
                         for(let i=0; i<len; i++){
                             var u = results.rows.item(i);
-                            battery2VoltageData.push(parseInt(u.voltage));
+                            battery2VoltageData.push(u.voltage);
                         }
                         if(battery2VoltageData.length>18){
                             battery2VoltageData.shift();
@@ -160,7 +160,7 @@ export default class CWBatteryVoltage extends Component {
                     var len = results.rows.length;
                     for(let i=0; i<len; i++){
                         var u = results.rows.item(i);
-                        battery3VoltageData.push(parseInt(u.voltage));
+                        battery3VoltageData.push(u.voltage);
                     }
                     this.setState({
                         battery3:battery3VoltageData,
@@ -177,7 +177,7 @@ export default class CWBatteryVoltage extends Component {
                         var len = results.rows.length;
                         for(let i=0; i<len; i++){
                             var u = results.rows.item(i);
-                            battery3VoltageData.push(parseInt(u.voltage));
+                            battery3VoltageData.push(u.voltage);
                         }
                         if(battery3VoltageData.length>18){
                             battery3VoltageData.shift();
@@ -203,7 +203,7 @@ export default class CWBatteryVoltage extends Component {
                     var len = results.rows.length;
                     for(let i=0; i<len; i++){
                         var u = results.rows.item(i);
-                        battery4VoltageData.push(parseInt(u.voltage));
+                        battery4VoltageData.push(u.voltage);
                     }
                     this.setState({
                         battery4:battery4VoltageData,
@@ -220,7 +220,7 @@ export default class CWBatteryVoltage extends Component {
                         var len = results.rows.length;
                         for(let i=0; i<len; i++){
                             var u = results.rows.item(i);
-                            battery4VoltageData.push(parseInt(u.voltage));
+                            battery4VoltageData.push(u.voltage);
                         }
                         if(battery4VoltageData.length>18){
                             battery4VoltageData.shift();
@@ -261,7 +261,7 @@ export default class CWBatteryVoltage extends Component {
                 var len = results.rows.length;
                 for(let i=0; i<len; i++){
                     var u = results.rows.item(i);
-                    battery1VoltageData.push(parseInt(u.voltage));
+                    battery1VoltageData.push(u.voltage);
                 }
                 this.setState({
                     battery1:battery1VoltageData,
@@ -277,7 +277,7 @@ export default class CWBatteryVoltage extends Component {
                 var len = results.rows.length;
                 for(let i=0; i<len; i++){
                     var u = results.rows.item(i);
-                    battery2VoltageData.push(parseInt(u.voltage));
+                    battery2VoltageData.push(u.voltage);
                 }
                 this.setState({
                     battery2:battery2VoltageData,
@@ -293,7 +293,7 @@ export default class CWBatteryVoltage extends Component {
                 var len = results.rows.length;
                 for(let i=0; i<len; i++){
                     var u = results.rows.item(i);
-                    battery3VoltageData.push(parseInt(u.voltage));
+                    battery3VoltageData.push(u.voltage);
                 }
                 this.setState({
                     battery3:battery3VoltageData,
@@ -309,7 +309,7 @@ export default class CWBatteryVoltage extends Component {
                 var len = results.rows.length;
                 for(let i=0; i<len; i++){
                     var u = results.rows.item(i);
-                    battery4VoltageData.push(parseInt(u.voltage));
+                    battery4VoltageData.push(u.voltage);
                 }
                 this.setState({
                     battery4:battery4VoltageData,
@@ -342,7 +342,7 @@ export default class CWBatteryVoltage extends Component {
                 show : true,
                 showTitle:true,
                 feature : {
-                    dataView : {show: true, readOnly: false},//show是否显示表格，readOnly是否只读
+                    dataView : {show: true, readOnly: true},//show是否显示表格，readOnly是否只读
                     magicType : {
                         //折线图  柱形图    总数统计 分开平铺
                         //type: ['line'],//'line', 'bar','stack' ,'tiled'

@@ -3,6 +3,8 @@ package com.chaowei;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.rnfs.RNFSPackage;
+import org.devio.rn.splashscreen.SplashScreenReactPackage;
 import cn.qiuxiang.react.amap3d.AMap3DPackage;
 import com.polidea.reactnativeble.BlePackage;
 import com.horcrux.svg.SvgPackage;
@@ -17,10 +19,12 @@ import com.facebook.soloader.SoLoader;
 import com.oblador.vectoricons.VectorIconsPackage;
 import org.pgsqlite.SQLitePluginPackage;
 import com.theweflex.react.WeChatPackage;
-import com.alipay.RNAlipayPackage;
 
 import java.util.Arrays;
 import java.util.List;
+
+import com.chaowei.alipay.AlipayPackage;
+import com.chaowei.blebroadcast.BleBroadcastPackage;
 
 public class MainApplication extends Application implements ReactApplication {
 
@@ -34,6 +38,8 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new RNFSPackage(),
+            new SplashScreenReactPackage(),
           new AMap3DPackage(),
           new BlePackage(),
           new SvgPackage(),
@@ -46,7 +52,7 @@ public class MainApplication extends Application implements ReactApplication {
           new VectorIconsPackage(),
           new SQLitePluginPackage(),   // register SQLite Plugin here
           new WeChatPackage(),
-          new RNAlipayPackage()
+          new AlipayPackage()
       );
     }
 

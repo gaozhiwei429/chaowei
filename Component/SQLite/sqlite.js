@@ -38,24 +38,11 @@ export default class SQLite extends Component {
                     reject(err);
                 });
         });
-
-        // db = SQLiteStorage.openDatabase(
-        //     database_name,
-        //     database_version,
-        //     database_displayname,
-        //     database_size,
-        //     ()=>{
-        //         this._successCB('open');
-        //     },
-        //     (err)=>{
-        //         this._errorCB('open',err);
-        //     });
-        // return db;
     }
 
+    //创建电池表
     createBatteryTable() {
         return new Promise((resolve, reject) => {
-            //创建电池表
             db.transaction((tx)=> {
                 tx.executeSql('CREATE TABLE IF NOT EXISTS BATTERY(' +
                     'id INTEGER PRIMARY KEY  AUTOINCREMENT,' +
@@ -63,8 +50,14 @@ export default class SQLite extends Component {
                     'my_timestamp VARCHAR,' +
                     'voltage VARCHAR,' +
                     'electric_current VARCHAR,' +
+                    'equilibrium_temperature VARCHAR,'+//ADD
                     'temperature VARCHAR,' +
+                    'targetCurrent VARCHAR,'+//add
+                    'targetVoltage VARCHAR,'+//add
                     'capacity VARCHAR,' +
+                    'balanceVoltage VARCHAR,'+//add
+                    'bindingState VARCHAR,'+//add
+                    'equilibriumState VARCHAR,'+//add
                     'equilibrium_time VARCHAR,' +
                     'P_longitude VARCHAR,' +
                     'P_latitude VARCHAR)'
@@ -84,9 +77,9 @@ export default class SQLite extends Component {
         });
     }
 
+    //创建充电器表
     createChargerTable() {
         return new Promise((resolve, reject) => {
-            //创建充电器表
             db.transaction((tx)=> {
                 tx.executeSql('CREATE TABLE IF NOT EXISTS CHARGER(' +
                     'id INTEGER PRIMARY KEY  AUTOINCREMENT,' +
@@ -94,8 +87,15 @@ export default class SQLite extends Component {
                     'my_timestamp VARCHAR,' +
                     'voltage VARCHAR,' +
                     'electric_current VARCHAR,' +
-                    'temperature VARCHAR,' +
+                    'chargerTemperature VARCHAR,'+//add
+                    'batteryTemperature VARCHAR,' +
+                    'targetCurrent VARCHAR,'+//add
+                    'targetVoltage VARCHAR,'+//add
                     'capacity VARCHAR,' +
+                    'balanceVoltage VARCHAR,'+//add
+                    'bindingState VARCHAR,'+//add
+                    'chargingState VARCHAR,'+//add
+                    'ambientTemperature VARCHAR,'+//add
                     'P_longitude VARCHAR,' +
                     'P_latitude VARCHAR)'
                     , [], ()=> {
@@ -123,52 +123,6 @@ export default class SQLite extends Component {
             await this.createBatteryTable(),
             await this.createChargerTable(),
         ]);
-        // //创建电池表
-        // db.transaction((tx)=> {
-        //     tx.executeSql('CREATE TABLE IF NOT EXISTS BATTERY(' +
-        //         'id INTEGER PRIMARY KEY  AUTOINCREMENT,' +
-        //         'battery_id varchar,'+
-        //         'my_timestamp VARCHAR,' +
-        //         'voltage VARCHAR,' +
-        //         'electric_current VARCHAR,' +
-        //         'temperature VARCHAR,' +
-        //         'capacity VARCHAR,' +
-        //         'equilibrium_time VARCHAR,' +
-        //         'P_longitude VARCHAR,' +
-        //         'P_latitude VARCHAR)'
-        //         , [], ()=> {
-        //             this._successCB('executeSql');
-        //         }, (err)=> {
-        //             this._errorCB('executeSql', err);
-        //         });
-        // }, (err)=> {//所有的 transaction都应该有错误的回调方法，在方法里面打印异常信息，不然你可能不会知道哪里出错了。
-        //     this._errorCB('transaction', err);
-        // }, ()=> {
-        //     this._successCB('transaction');
-        // });
-        //
-        // //创建充电器表
-        // db.transaction((tx)=> {
-        //     tx.executeSql('CREATE TABLE IF NOT EXISTS CHARGER(' +
-        //         'id INTEGER PRIMARY KEY  AUTOINCREMENT,' +
-        //         'charger_id varchar,'+
-        //         'my_timestamp VARCHAR,' +
-        //         'voltage VARCHAR,' +
-        //         'electric_current VARCHAR,' +
-        //         'temperature VARCHAR,' +
-        //         'capacity VARCHAR,' +
-        //         'P_longitude VARCHAR,' +
-        //         'P_latitude VARCHAR)'
-        //         , [], ()=> {
-        //             this._successCB('executeSql');
-        //         }, (err)=> {
-        //             this._errorCB('executeSql', err);
-        //         });
-        // }, (err)=> {//所有的 transaction都应该有错误的回调方法，在方法里面打印异常信息，不然你可能不会知道哪里出错了。
-        //     this._errorCB('transaction', err);
-        // }, ()=> {
-        //     this._successCB('transaction');
-        // })
     }
 
     //删除蓄电池数据
@@ -213,15 +167,21 @@ export default class SQLite extends Component {
                 let battery_id= battery.battery_id;
                 let my_timestamp = battery.my_timestamp;
                 let electric_current = battery.electric_current;
+                let equilibrium_temperature=battery.equilibrium_temperature;//add
                 let voltage = battery.voltage;
                 let temperature = battery.temperature;
+                let targetCurrent=battery.targetCurrent;//add
+                let targetVoltage=battery.targetVoltage;//add
                 let capacity = battery.capacity;
+                let balanceVoltage=battery.balanceVoltage;//add
+                let bindingState=battery.bindingState;//add
+                let equilibriumState=battery.equilibriumState;//add
                 let equilibrium_time = battery.equilibrium_time;
                 let P_longitude = battery.P_longitude;
                 let P_latitude = battery.P_latitude;
-                let sql = "INSERT INTO battery(battery_id,my_timestamp,voltage,electric_current,temperature,capacity,equilibrium_time,P_longitude,P_latitude)"+
-                    "values(?,?,?,?,?,?,?,?,?)";
-                tx.executeSql(sql,[battery_id,my_timestamp,voltage,electric_current,temperature,capacity,equilibrium_time,P_longitude,P_latitude],()=>{
+                let sql = "INSERT INTO battery(battery_id,my_timestamp,voltage,electric_current,equilibrium_temperature,temperature,targetCurrent,targetVoltage,capacity,balanceVoltage,bindingState,equilibriumState,equilibrium_time,P_longitude,P_latitude)"+
+                    "values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                tx.executeSql(sql,[battery_id,my_timestamp,voltage,electric_current,equilibrium_temperature,temperature,targetCurrent,targetVoltage,capacity,balanceVoltage,bindingState,equilibriumState,equilibrium_time,P_longitude,P_latitude],()=>{
                         callback();
                     },(err)=>{
                         console.log(err);
@@ -277,14 +237,21 @@ export default class SQLite extends Component {
                 let charger_id= charger.charger_id;
                 let my_timestamp = charger.my_timestamp;
                 let electric_current = charger.electric_current;
+                let chargerTemperature=charger.chargerTemperature;//add
                 let voltage = charger.voltage;
-                let temperature = charger.temperature;
+                let batteryTemperature = charger.batteryTemperature;
+                let targetCurrent=charger.targetCurrent;//add
+                let targetVoltage=charger.targetVoltage;//add
                 let capacity = charger.capacity;
+                let balanceVoltage=charger.balanceVoltage;//add
+                let bindingState=charger.bindingState;//add
+                let chargingState=charger.chargingState;//add
+                let ambientTemperature=charger.ambientTemperature;//add
                 let P_longitude = charger.P_longitude;
                 let P_latitude = charger.P_latitude;
-                let sql = "INSERT INTO charger(charger_id,my_timestamp,voltage,electric_current,temperature,capacity,P_longitude,P_latitude)"+
-                    "values(?,?,?,?,?,?,?,?)";
-                tx.executeSql(sql,[charger_id,my_timestamp,voltage,electric_current,temperature,capacity,P_longitude,P_latitude],()=>{
+                let sql = "INSERT INTO charger(charger_id,my_timestamp,voltage,electric_current,chargerTemperature,batteryTemperature,targetCurrent,targetVoltage,capacity,balanceVoltage,bindingState,chargingState,ambientTemperature,P_longitude,P_latitude)"+
+                    "values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                tx.executeSql(sql,[charger_id,my_timestamp,voltage,electric_current,chargerTemperature,batteryTemperature,targetCurrent,targetVoltage,capacity,balanceVoltage,bindingState,chargingState,ambientTemperature,P_longitude,P_latitude],()=>{
                         callback();
                     },(err)=>{
                         console.log(err);

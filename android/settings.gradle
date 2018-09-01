@@ -1,4 +1,8 @@
 rootProject.name = 'chaoWei'
+include ':react-native-fs'
+project(':react-native-fs').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-fs/android')
+include ':react-native-splash-screen'
+project(':react-native-splash-screen').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-splash-screen/android')
 include ':react-native-amap3d'
 project(':react-native-amap3d').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-amap3d/lib/android')
 include ':react-native-ble-plx'
@@ -17,8 +21,6 @@ include ':react-native-sqlite-storage'
 project(':react-native-sqlite-storage').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-sqlite-storage/src/android')
 include ':RCTWeChat'
 project(':RCTWeChat').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-wechat/android')
-include ':rn-alipay'
-project(':rn-alipay').projectDir = new File(settingsDir, '../node_modules/rn-alipay/android')
 
 include ':app'
 

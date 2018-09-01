@@ -3,34 +3,36 @@ import {
     Text,
     View,
     Image,
-    TouchableOpacity, StyleSheet, ToastAndroid,
+    TouchableOpacity,
+    StyleSheet,
+    ToastAndroid,
+    Dimensions,
 } from 'react-native';
 import { List, Radio, WhiteSpace } from 'antd-mobile-rn';
-import AliPay from "rn-alipay";
 import * as WeChat from "react-native-wechat";
 const RadioItem = Radio.RadioItem;
-
+import Alipay from './Alipay';
+const {width,height}=Dimensions.get('window');
 export default class PaymentPage extends Component {
     constructor(props) {
         super(props);
         this.state = {
             PayValue: 1,
+            PayMoney: 3,
+            billing:0,
         };
         //应用注册
         WeChat.registerApp('wx5b3e565f96159269');
     }
 
-
     static navigationOptions = {
-        headerTitle:(<Text style={{fontSize:20,flex: 1, textAlign: 'center'}}>确认支付</Text>),
+        headerTitle:(<Text style={{fontSize:20,flex: 1, textAlign: 'center'}}>待支付订单</Text>),
         headerStyle: {
             height: 40,
-            // backgroundColor: 'red',
-            // elevation: null
         },
-        // headerLeft:(
-        //     <View style={{height: 44,width: 55,justifyContent: 'center',paddingRight:15} }/>
-        // ),
+        headerLeft:(
+            <View style={{height: 44,width: 55,justifyContent: 'center',paddingRight:15} }/>
+        ),
         headerRight: (
             <View style={{height: 44,width: 55,justifyContent: 'center',paddingRight:15} }/>
         ),
@@ -38,29 +40,13 @@ export default class PaymentPage extends Component {
         headerBackImage: (<Image source={require('../../img/leftGoBack.png')} style={{width:18,height:14,marginLeft:15}}/>),
     };
 
-    goAlipay () {
-        const privateKey = 'MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCafPVPs4gSCvcyfgcF/jH/O11E3VSX2F+tosl0/pLfGvw+tOJweJBzbYf7Mbp3snd+dUsjpeo0XbK8oRC9AmZ6Eb6sMH2hAEPxt9PP1CGPH9AvmjPivDClyVDNfICTtQo70yMtBVNbV3hMidoJdKTiHphvGQOLtvJ+kkfJUEvx12JytdnSnV7SLY7Zs9E3Ka7eEFswD9t8gizi2RRDBIL32en000RuZSCQbeXanZU5QqSi2vKxYcVtlWQVS26biRnC7ouMpjnO7f3Big/Apd4FB9rxhwfqF2WevNMWdC/iaRDHrfWXJXlfrO/QrihWqdjGM29tIRVOa5k3kqJQPnVDAgMBAAECggEBAIp9RnPCX1K9Xch3zdgDfdJt5ziaqQDOSUcgzTQCGqvCRyn3gZ6NlgDDycjXVW+EHzbP8yHr1D5JWLdcM+McSb1YNvOpLJWt5TrFLi363nKtdDWYKLczOPEFvVfYKnM/MgNbTQdI5ObXTNJgKYOce0rxXnkJlXIj+NKaU5wWTV5n69veLkPzfuO3hrYAa9fUh6bUVT9jEj5nMnHCRZn5lVFYQyNS1K0TO8lNVzNMYWCKI+QHr45C5MGWs5DwZAqfJsl057jrmoJlj0KPMLnChvfSShIFuc9TL80mgniCjiV1x0EUHGzgXYxW1OwZGn1hIFja+8qKgSMkfgvoPpO6mbECgYEA6A9KPYI1w/1aX2vRb2oevQIHNrtdaebTwQhzllXDEw5o+1mHSAk3o7pVL6lh28CCN698/xBHM8zEmKDXUFstL+sxCu/UDnHVhcPmK/0Xea0GLHtRhcoORbCHL7g2LYNtTJNjuI3MkNMFbr9wIqJBZGT4bz+2DUgaOPtWc+MbgE0CgYEAqmz/cxDfycpmbiTHYkvuExeaIbqz0EP9iAqoCqdf2u95QuqTiz3QGpLUf36vM95MuYuMXncl+OOMQ7aZjZamEjCmo1nVIFArzMKRlTQlrenT0MMgp3+tYM1+EbzhqdPgbLhtj+J78L9AVyl+5vBk8ZY2Eu8Wf49IYrwXC4psE88CgYA9WX15EWmBbQNtYqW13MpPka+yiopBqyKkT8WvIvE1ooOin6KiKr2o7WQD+7XBUP2cFyrmi7knOqVm7G6/8brahkUq7QiU4QdgG9BIJNsF8fZF4DxHMInhZq/2r66zDaHhsr2UVviT+RXgl3/fyCGdlwwO7TsF+9/i3J+Yd5wXqQKBgQCLlvF4nvadwpE5YBiLc6PRsYBGZjUHvdi4h/nxl/wUSBdrbtVgtEVyrpcswmfgtRDk3N8hNLg+bqqhf7uv1Be8SGsE2vyNFf16Hle9/NNr6lza3igt6Y7p/gZnouy2/FsS0dCzjI91tkCN4+gUYgxcMGukAH7OBl8EuAisJDm30wKBgBJ4c0XI/TwYQ4DOLYaKpyL+4PXSw1ty34eHpgJIGXVtzokZYz/U7G2//K1wnRTfsommeT8xmVJnemK2KXq6CmO/M11vC5mA3KEgJcXEXCgV6buFqtzr70lr7MOP0Yi9mh7LCYyed5h4yPoUl0U0ubZ1NsTR573ueUx1KqOchfHI';
-        const data = {
-            privateKey,
-            partner: '2088302277569230',
-            seller: '12312341234',
-            outTradeNO: '1231231231231', //订单ID（由商家自行制定）
-            subject: '测试商品标题', //商品标题
-            body: '测试产品描述', //商品描述
-            totalFee: '1', //商品价格
-            notifyURL: 'http://yuezonglun.net"', //回调URL
-            service: 'mobile.securitypay.pay',
-            paymentType: '1',
-            inputCharset: 'utf-8',
-            itBPay: '30m',
-            showURL: 'm.alipay.com',
-            appSchemeIOS: 'testapp20', //应用注册scheme,在AlixPayDemo-Info.plist定义URL types
-        };
-        AliPay.pay(data).then((msg) => {
-            alert(msg);
-        }, (e) => {
-            alert(e);
-        });
+    async goAlipay () {
+        try {
+            await Alipay.pay();
+            // alert('支付成功');
+        } catch (e) {
+            alert(e.message);
+        }
     }
 
     goWXPay(){
@@ -84,13 +70,99 @@ export default class PaymentPage extends Component {
     }
 
     render() {
+        // const {params}=this.props.navigation.state;
+        // const { AliPay } = params;
         return (
             <View style={styles.container}>
-                <View style={{marginTop:20,flex:1}}>
-                    <View style={{marginBottom:10}}>
-                        <Text>支付订单</Text>
-
+                <View style={{paddingLeft:20,}}>
+                    <View style={{flexDirection:'row',}}>
+                        <Text style={{fontSize:18}}>充电桩号：</Text>
+                        <Text style={{fontSize:18,color:'#3BB6FF'}}>1030013010303</Text>
                     </View>
+                    <View style={{marginTop:10}}>
+                        <Text style={{fontSize:18}}>充电方式:</Text>
+                        <View style={{flexDirection:'row',justifyContent:'space-around',marginTop:10,}}>
+                            {this.state.billing===0?
+                                <View
+                                    style={styles.choiceBillingOpt}
+                                >
+                                    <Text style={styles.rechargeText}>电量计费</Text>
+                                </View>:
+                                <TouchableOpacity
+                                    style={styles.choiceBilling}
+                                    onPress={()=>{this.setState({ billing: 0 });}}
+                                >
+                                    <Text style={styles.rechargeText}>电量计费</Text>
+                                </TouchableOpacity>
+                            }
+                            {this.state.billing===1?
+                                <View
+                                    style={styles.choiceBillingOpt}
+                                >
+                                    <Text style={styles.rechargeText}>时间计费</Text>
+                                </View>:
+                                <TouchableOpacity
+                                    style={styles.choiceBilling}
+                                    onPress={()=>{this.setState({ billing: 1 });}}
+                                >
+                                    <Text style={styles.rechargeText}>时间计费</Text>
+                                </TouchableOpacity>
+                            }
+                        </View>
+                    </View>
+                    <View style={{marginTop:10}}>
+                        <Text style={{fontSize:17,paddingTop:5,paddingBottom:5,}}>充电金额</Text>
+                        <View style={{flexDirection:'row',justifyContent:'space-around',width:width/3*2}}>
+                            {/**支付3元*/}
+                            {this.state.PayMoney===3?
+                                <View
+                                    style={styles.choiceRechargeMoney}
+                                >
+                                    <Text style={styles.rechargeText}>3元</Text>
+                                </View>:
+                                <TouchableOpacity
+                                    style={styles.rechargeMoney}
+                                    onPress={()=>{this.setState({ PayMoney: 3 });}}
+                                >
+                                    <Text style={styles.rechargeText}>3元</Text>
+                                </TouchableOpacity>
+                            }
+                            {/**支付2元*/}
+                            {this.state.PayMoney===2?
+                                <View
+                                    style={styles.choiceRechargeMoney}
+                                >
+                                    <Text style={styles.rechargeText}>2元</Text>
+                                </View>:
+                                <TouchableOpacity
+                                    style={styles.rechargeMoney}
+                                    onPress={()=>{this.setState({ PayMoney: 2 });}}
+                                >
+                                    <Text style={styles.rechargeText}>2元</Text>
+                                </TouchableOpacity>
+                            }
+                            {/**支付1元*/}
+                            {this.state.PayMoney===1?
+                                <View
+                                    style={styles.choiceRechargeMoney}
+                                >
+                                    <Text style={styles.rechargeText}>1元</Text>
+                                </View>:
+                                <TouchableOpacity
+                                    style={styles.rechargeMoney}
+                                    onPress={()=>{this.setState({ PayMoney: 1 });}}
+                                >
+                                    <Text style={styles.rechargeText}>1元</Text>
+                                </TouchableOpacity>
+                            }
+                        </View>
+                    </View>
+                </View>
+                <View style={{marginTop:20,flex:1}}>
+                    <View style={{marginBottom:10,paddingLeft:20,}}>
+                        <Text>支付方式</Text>
+                    </View>
+                    {/**支付宝支付*/}
                     <RadioItem
                         checked={this.state.PayValue === 1}
                         onChange={(event) => {
@@ -98,24 +170,26 @@ export default class PaymentPage extends Component {
                                 this.setState({ PayValue: 1 });
                             }
                         }}
+                        style={{}}
                     >
-                        <Image source={require('../../img/wxPay.png')} style={styles.PayImage}/>
+                        <Image source={require('../../img/aliPay.png')} style={styles.aliPayImage}/>
                     </RadioItem>
+                    {/**微信支付*/}
+                    {/*<RadioItem*/}
+                        {/*checked={this.state.PayValue === 2}*/}
+                        {/*onChange={(event) => {*/}
+                            {/*if (event.target.checked) {*/}
+                                {/*this.setState({ PayValue: 2 });*/}
+                            {/*}*/}
+                        {/*}}*/}
+                    {/*>*/}
+                        {/*<Image source={require('../../img/wxPay.png')} style={styles.PayImage}/>*/}
+                    {/*</RadioItem>*/}
 
-                    <RadioItem
-                        checked={this.state.PayValue === 2}
-                        onChange={(event) => {
-                            if (event.target.checked) {
-                                this.setState({ PayValue: 2 });
-                            }
-                        }}
-                    >
-                        <Image source={require('../../img/aliPay.png')} style={styles.PayImage}/>
-                    </RadioItem>
                     <View style={styles.GoPayView}>
                         <TouchableOpacity
                             style={styles.goPay}
-                            onPress={()=>{ this.state.PayValue === 2 ? this.goAlipay() : this.goWXPay() }}
+                            onPress={()=>{ this.state.PayValue === 1 ? this.goAlipay() : this.goWXPay() }}
                         >
                             <Text style={styles.GoPayText}>确认支付</Text>
                         </TouchableOpacity>
@@ -127,11 +201,63 @@ export default class PaymentPage extends Component {
 }
 
 const styles = StyleSheet.create({
+    choiceBillingOpt:{
+        width:120,
+        height:35,
+        padding: 8,
+        paddingLeft: 17,
+        paddingRight: 17,
+        backgroundColor: '#3BB6FF',
+        borderRadius: 9,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    choiceBilling:{
+        width:120,
+        height:35,
+        padding: 8,
+        paddingLeft: 17,
+        paddingRight: 17,
+        backgroundColor: '#ababab',
+        borderRadius: 9,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    rechargeText:{
+        fontSize:16,
+        color:'#fff',
+    },
+    rechargeMoney:{
+        width:60,
+        height:35,
+        padding: 8,
+        paddingLeft: 17,
+        paddingRight: 17,
+        backgroundColor: '#ababab',
+        borderRadius: 9,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    choiceRechargeMoney:{
+        width:60,
+        height:35,
+        padding: 10,
+        paddingLeft: 17,
+        paddingRight: 17,
+        backgroundColor: '#3BB6FF',
+        borderRadius: 9,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    aliPayImage:{
+        height:32,
+        width:165,
+        marginLeft:10,
+    },
     PayImage:{
-        height:20,
-        width:110,
-        marginTop:5,
-        marginLeft:3,
+        height:32,
+        width:120,
+        marginLeft:10,
     },
     GoPayText:{
         fontSize:18,
@@ -140,10 +266,11 @@ const styles = StyleSheet.create({
     GoPayView:{
         flex:1,
         alignItems: 'center',
-        justifyContent: 'center',
+        marginTop:50,
     },
     container:{
-      flex:1,
+        flex:1,
+        paddingTop:20,
     },
     goPay:{
         width:200,

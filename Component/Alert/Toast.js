@@ -41,7 +41,7 @@ class Toast extends Component {
 		type: PropTypes.oneOf(['success', 'info', 'help', 'warning', 'wrong']).isRequired, //类型
 		msg: PropTypes.string.isRequired, //提示信息
 		timeout: PropTypes.number //关闭时间，默认2000毫秒
-	}
+	};
 	componentWillUnmount() {
 		this.timer && clearTimeout(this.timer);
 	}
@@ -49,7 +49,7 @@ class Toast extends Component {
 		this.setState({
 			type: _type ? _type : 'success'
 		});
-	}
+	};
 	open = () => {
 		this.setState({
 			flag: true
@@ -59,14 +59,14 @@ class Toast extends Component {
 				flag: false
 			});
 		}, this.props.timeout);
-	}
+	};
 	getIconUri = () => {
 		const {
 			type
 		} = this.state;
 		const _arr = ['success', 'info', 'help', 'warning', 'wrong'];
 		return _iconArray[_arr.indexOf(type)];
-	}
+	};
 	render() {
 		return (
 			<Modal

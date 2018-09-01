@@ -1,4 +1,4 @@
-package com.chaowei;
+package com.chaowei.blebroadcast;
 
 import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.NativeModule;

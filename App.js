@@ -2,7 +2,6 @@
 import React, { Component } from 'react';
 import {
     Platform,
-    StyleSheet,
 } from 'react-native';
 
 const instructions = Platform.select({
@@ -12,6 +11,13 @@ const instructions = Platform.select({
     'Shake or press menu button for dev menu',
 });
 
+//确保全局只有一个BleManager实例，BleModule类保存着蓝牙的连接信息
+import BleModule from './Component/CWBleSearch/BleModule';
+global.BluetoothManager = new BleModule();
+
+import { createStackNavigator } from 'react-navigation';
+
+import SplashScreen from 'react-native-splash-screen';//白屏
 import CWGLaunchlmage from './Component/CWHome/CWGLaunchlmage';//启动页
 import CWMain from './Component/CWMain/CWMain';  //Navigator
 import CWHome from './Component/CWHome/CWHome';  //首页
@@ -36,27 +42,16 @@ import Map from './Component/Map/Map';//地图
 import PileJonining from './Component/PileJoining/PileJoining';//充电桩加盟
 import RepairJoining from './Component/RepairJoining/RepairJoining';//维修加盟
 import WXPay from './Component/Pay/WXPay';//微信支付
-import AliPay from './Component/Pay/AliPay';//支付宝支付
 import PaymentPage from './Component/Pay/PaymentPage';//支付宝支付
+import Filesystem from './Component/Filesystem/Filesystem';//写文件
 
 //测试
 import ListView from './Component/ListView/ListView'
-import CWSvgBatteryone from './Component/CWSvg/CWSvgBatteryOne';
-import CWSvgBatterTwo from './Component/CWSvg/CWSvgBatteryTwo';
-import CWSvgBatteryThree from './Component/CWSvg/CWSvgBatteryThree';
-import CWSvgBatteryFour from './Component/CWSvg/CWSvgBatteryFour';
-import SQLiteDemo from './Component/SQLite/SQLiteDemo';
 import SQLiteTextDemo from './Component/SQLiteText/SQLiteTextDemo';//测试
 import cha from './Component/SQLite/cha'
 import Alert from './Component/Alert/AlertShow';
 import CWEchart from './Component/CWSvg/CWEchart';
-import CWSvgText from './Component/CWSvg/CWSvgText';
-
-import BleModule from './Component/CWBleSearch/BleModule';
-//确保全局只有一个BleManager实例，BleModule类保存着蓝牙的连接信息
-global.BluetoothManager = new BleModule();
-
-import { createStackNavigator } from 'react-navigation';
+import ListViewText from './Component/ListView/ListViewText'
 
 const RootStack = createStackNavigator({
         CWGLaunchlmage:{screen:CWGLaunchlmage},
@@ -83,35 +78,26 @@ const RootStack = createStackNavigator({
         PeakValley:{screen:PeakValley},
         RepairJoining:{screen:RepairJoining},
         WXPay:{screen:WXPay},
-        AliPay:{screen:AliPay},
         PaymentPage:{screen:PaymentPage},
+        Filesystem:{screen:Filesystem},
 
         //测试
-        CWSvgBatteryone:{screen:CWSvgBatteryone},
-        CWSvgBatterTwo:{screen:CWSvgBatterTwo},
-        CWSvgBatteryThree:{screen:CWSvgBatteryThree},
-        CWSvgBatteryFour:{screen:CWSvgBatteryFour},
         ListView:{screen:ListView},
-        SQLiteDemo:{screen:SQLiteDemo},//
+        ListViewText:{screen:ListViewText},
         SQLiteTextDemo:{screen:SQLiteTextDemo},
         cha:{screen:cha},
         Alert:{screen:Alert},//alert弹窗
         CWEchart:{screen:CWEchart},
-        CWSvgText:{screen:CWSvgText},
     },
     {
         initialRouteName: 'CWGLaunchlmage',
-        // headerMode: 'screen',
-        // mode: 'modal',
-        // navigationOptions: {
-        //     gesturesEnabled: true,
-        // },
     }
 );
 
 export default class App extends Component {
     /** 获取地理位置（经纬度） */
     componentDidMount() {
+        SplashScreen.hide();
         navigator.geolocation.getCurrentPosition(
             (position) => {
                 const positionData = position.coords;

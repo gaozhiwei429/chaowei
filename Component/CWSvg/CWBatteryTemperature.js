@@ -74,7 +74,7 @@ export default class CWBatteryTemperature extends Component {
                     var len = results.rows.length;
                     for(let i=0; i<len; i++){
                         var u = results.rows.item(i);
-                        battery1TemperatureData.push(parseInt(u.temperature));
+                        battery1TemperatureData.push(u.temperature);
                     }
                     this.setState({
                         battery1:battery1TemperatureData,
@@ -91,7 +91,7 @@ export default class CWBatteryTemperature extends Component {
                         var len = results.rows.length;
                         for(let i=0; i<len; i++){
                             var u = results.rows.item(i);
-                            battery1TemperatureData.push(parseInt(u.temperature));
+                            battery1TemperatureData.push(u.temperature);
                         }
                         if(battery1TemperatureData.length>18){
                             battery1TemperatureData.shift();
@@ -117,7 +117,7 @@ export default class CWBatteryTemperature extends Component {
                     var len = results.rows.length;
                     for(let i=0; i<len; i++){
                         var u = results.rows.item(i);
-                        battery2TemperatureData.push(parseInt(u.temperature));
+                        battery2TemperatureData.push(u.temperature);
                     }
                     this.setState({
                         battery2:battery2TemperatureData,
@@ -134,7 +134,7 @@ export default class CWBatteryTemperature extends Component {
                         var len = results.rows.length;
                         for(let i=0; i<len; i++){
                             var u = results.rows.item(i);
-                            battery2TemperatureData.push(parseInt(u.temperature));
+                            battery2TemperatureData.push(u.temperature);
                         }
                         if(battery2TemperatureData.length>18){
                             battery2TemperatureData.shift();
@@ -160,7 +160,7 @@ export default class CWBatteryTemperature extends Component {
                     var len = results.rows.length;
                     for(let i=0; i<len; i++){
                         var u = results.rows.item(i);
-                        battery3TemperatureData.push(parseInt(u.temperature));
+                        battery3TemperatureData.push(u.temperature);
                     }
                     this.setState({
                         battery3:battery3TemperatureData,
@@ -177,7 +177,7 @@ export default class CWBatteryTemperature extends Component {
                         var len = results.rows.length;
                         for(let i=0; i<len; i++){
                             var u = results.rows.item(i);
-                            battery3TemperatureData.push(parseInt(u.temperature));
+                            battery3TemperatureData.push(u.temperature);
                         }
                         if(battery3TemperatureData.length>18){
                             battery3TemperatureData.shift();
@@ -203,7 +203,7 @@ export default class CWBatteryTemperature extends Component {
                     var len = results.rows.length;
                     for(let i=0; i<len; i++){
                         var u = results.rows.item(i);
-                        battery4TemperatureData.push(parseInt(u.temperature));
+                        battery4TemperatureData.push(u.temperature);
                     }
                     this.setState({
                         battery4:battery4TemperatureData,
@@ -220,7 +220,7 @@ export default class CWBatteryTemperature extends Component {
                         var len = results.rows.length;
                         for(let i=0; i<len; i++){
                             var u = results.rows.item(i);
-                            battery4TemperatureData.push(parseInt(u.temperature));
+                            battery4TemperatureData.push(u.temperature);
                         }
                         if(battery4TemperatureData.length>18){
                             battery4TemperatureData.shift();
@@ -261,7 +261,7 @@ export default class CWBatteryTemperature extends Component {
                 var len = results.rows.length;
                 for(let i=0; i<len; i++){
                     var u = results.rows.item(i);
-                    battery1TemperatureData.push(parseInt(u.temperature));
+                    battery1TemperatureData.push(u.temperature);
                 }
                 this.setState({
                     battery1:battery1TemperatureData,
@@ -277,7 +277,7 @@ export default class CWBatteryTemperature extends Component {
                 var len = results.rows.length;
                 for(let i=0; i<len; i++){
                     var u = results.rows.item(i);
-                    battery2TemperatureData.push(parseInt(u.temperature));
+                    battery2TemperatureData.push(u.temperature);
                 }
                 this.setState({
                     battery2:battery2TemperatureData,
@@ -293,7 +293,7 @@ export default class CWBatteryTemperature extends Component {
                 var len = results.rows.length;
                 for(let i=0; i<len; i++){
                     var u = results.rows.item(i);
-                    battery3TemperatureData.push(parseInt(u.temperature));
+                    battery3TemperatureData.push(u.temperature);
                 }
                 this.setState({
                     battery3:battery3TemperatureData,
@@ -309,7 +309,7 @@ export default class CWBatteryTemperature extends Component {
                 var len = results.rows.length;
                 for(let i=0; i<len; i++){
                     var u = results.rows.item(i);
-                    battery4TemperatureData.push(parseInt(u.temperature));
+                    battery4TemperatureData.push(u.temperature);
                 }
                 this.setState({
                     battery4:battery4TemperatureData,
@@ -343,7 +343,7 @@ export default class CWBatteryTemperature extends Component {
                 show : true,
                 showTitle:true,
                 feature : {
-                    dataView : {show: true, readOnly: false},//show是否显示表格，readOnly是否只读
+                    dataView : {show: true, readOnly: true},//show是否显示表格，readOnly是否只读
                     magicType : {
                         //折线图  柱形图    总数统计 分开平铺
                         //type: ['line'],//'line', 'bar','stack' ,'tiled'

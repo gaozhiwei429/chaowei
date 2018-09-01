@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import {
-    AppRegistry,
     StyleSheet,
     Text,
     View,
@@ -8,12 +7,10 @@ import {
     ProgressBarAndroid,
     TouchableOpacity,
     Dimensions,
-    Alert, AsyncStorage,
+    AsyncStorage,
 } from 'react-native';
 
-import CWQRCode from '../CWQRCode/CWQRCode';
 import bleBroadcast from '../CWBleBroadcast/CWBleBroadcast';//蓝牙广播模块
-import HomepageData from '../HomepageLater/HomepageData';//蓄电池Next
 import * as storage from '../../storage';
 import { BATTERY_BIND_STORAGE_KEY,CHARGER_BIND_STORAGE_KEY,PHONE_BIND_STORAGE_KEY } from '../../config';
 import SQLite from '../SQLite/sqlite';
@@ -22,6 +19,7 @@ import Confirm from '../Alert/Confirm';
 import ProgressDialogAlert from '../Alert/ProgressDialogAlert';
 import AlertS from '../Alert/Alert';
 import * as commonality from '../../commonality';
+import EasyToast, {DURATION} from 'react-native-easy-toast';//tost
 var sqLite = new SQLite();
 var db;
 
@@ -33,18 +31,26 @@ var Reserved = '00';//
 var batteryArray;                         //绑定电池与充电器合并后的数组
 var others;                               //其他的电池
 var Identifier = '382687921502'; //识别码固定值
-var batteryIdentifier = '02382687921502'; //充电器识别固定码
-var chargerIdentifier = '03382687921502'; //蓄电池识别固定码
+var chargerIdentifier = '0289382687921502'; //充电器识别固定码
+var batteryIdentifier = '0388382687921502'; //蓄电池识别固定码
 var BleScan;
+var BroadcastJudgment;
 
 function bindSingle(){
     others = batteryArray.filter(x => x !== batteryArray[currentIndex]); // 其他的电池
     var commandList = commandArr[otherIndex];
     // 向 batteryArray[currentIndex] 发送 commandArr[otherIndex] + others[otherIndex] 的值
     var equipmentList = Identifier.concat(Reserved,Reserved,others[otherIndex],batteryArray[currentIndex]);
-     // bleBroadcast.start(commandList ,equipmentList);// 蓝牙广播开始
-    var con=commandList.concat(equipmentList);//广播的数据
-    console.log(con);//广播的数据
+    BroadcastJudgment = Identifier.concat(others[otherIndex]);
+    var endMark=equipmentList.concat('20',commonality.padding(others.length+1,2));//
+    var endRepair = equipmentList.concat('0000');//填补
+    if(others.length === otherIndex+1){
+        bleBroadcast.start(commandList ,endMark);// BLE广播
+    }else {
+        bleBroadcast.start(commandList ,endRepair);// BLE广播
+    }
+    // var con=commandList.concat(equipmentList);//广播的数据
+    // console.log(con);//广播的数据
     otherIndex = otherIndex + 1;// otherIndex 自增
 }
 
@@ -52,23 +58,55 @@ export default class CWHome extends Component {
     constructor(){
         super();
         this.state = {
-            dataCharger:[],//充电器
-            dataBatteryArray:[],//电池数组
-            data:[],
-            phoneBind:'',
-            battery_id:"",
-            my_timestamp:"",
-            capacity:"",
-            temperature:"",
-            equilibrium_time:"",
-            P_longitude:'',
-            P_latitude:'',
-            electric_current:'',
+            bandingImg:0,
+            chargerStorage:0,
+            batteryStorage:0,
         };
         this.deviceMap = new Map();
     }
 
     componentDidMount() {
+        /** 是否绑定*/
+        storage.get(PHONE_BIND_STORAGE_KEY, (error, result) => {
+            if(result == '123' ){
+                this.setState({
+                    bandingImg: 1
+                });
+            }
+        });
+        /** 充电器*/
+        const chargerStorage=()=>{
+            storage.get(CHARGER_BIND_STORAGE_KEY, (error, result) => {
+                if(result !== null){
+                    this.setState({
+                        chargerStorage: 1
+                    });
+                }else {
+                    this.setState({
+                        chargerStorage: 0
+                    });
+                }
+            });
+            setTimeout(chargerStorage,1000);
+        };
+        chargerStorage();
+        /** 蓄电池*/
+        const batteryStorage =()=>{
+            storage.get(BATTERY_BIND_STORAGE_KEY, (error, result) => {
+                if(result !== null){
+                    this.setState({
+                        batteryStorage: result.length,
+                    });
+                }else {
+                    this.setState({
+                        batteryStorage: 0,
+                    });
+                }
+            });
+            setTimeout(batteryStorage,900);
+        };
+        batteryStorage();
+
         /** 充电器*/
         let promise1=new Promise(function (resolve, reject) {
             return storage.get(CHARGER_BIND_STORAGE_KEY, (error, result) => {
@@ -94,83 +132,21 @@ export default class CWHome extends Component {
         /** 电池充电器数据广播*/
         Promise.all([promise1,promise2]).then((values) => {
             batteryArray=[].concat.apply([],values);//绑定电池与充电器合并后的数组
-            // if(batteryArray.length >= 5 ){
-            storage.get(PHONE_BIND_STORAGE_KEY, (error, result) => {
-                if(result !== '123'){
-                    bindSingle();
-                }
-                // console.log(result);
-            });
-            // bindSingle();
 
             /**蓝牙扫描绑定*/
             this.deviceMap.clear();
             BluetoothManager.manager.startDeviceScan(null, null, (error, device) => {
                 if (error) {
-                    // if(error.code == 102){
-                    //     alert('请打开手机蓝牙后再搜索');
-                    // }
                     this.refs.bleScan.open();
                 }else{
                     this.deviceMap.set(device.id,device); //使用Map类型保存搜索到的蓝牙设备，确保列表不显示重复的设备
-                    // this.setState({data:[...this.deviceMap.values()]},()=>{
                     BleScan = [...this.deviceMap.values()];
-
-                    var BroadcastJudgment1 = Identifier.concat(batteryArray[currentIndex]);
-                    if(BleScan !== undefined){
-                        for (let z = 0;z<BleScan.length;z++) {
-                            let BleDataArray=commonality.CharToHex(commonality.base64decode(BleScan[z].manufacturerData)).replace(/\\x/g,'').replace(/\s+/g,'').toLowerCase();
-                            let InterceptionA=BleDataArray.slice(4,16);
-                            let BleScanArrayId = BleScan[z].id.replace(/\:/g, "").toLowerCase();
-                            let BleScanId1 = BleScanArrayId.slice(0, 2);
-                            let BleScanId2 = BleScanArrayId.slice(2, 4);
-                            let BleScanId3 = BleScanArrayId.slice(4, 6);
-                            let BleScanId4 = BleScanArrayId.slice(6, 8);
-                            let BleScanId5 = BleScanArrayId.slice(8, 10);
-                            let BleScanId6 = BleScanArrayId.slice(10, 12);
-                            let BleScanId = BleScanId6.concat(BleScanId5, BleScanId4, BleScanId3, BleScanId2, BleScanId1);
-                            let BleScanRssi=BleScan[z].rssi;//BLE信号强度
-
-                            if(Identifier === InterceptionA && BleScanRssi > -80){
-                                //var InterceptionB = BleDataArray.slice(20,32);  //截取搜索到蓝牙广播的部分数据
-                                var InterceptionB = BleDataArray.slice(32,44);  //截取搜索到蓝牙广播的部分数据
-                                var Interception=InterceptionA.concat(InterceptionB);
-
-                                if(Interception === BroadcastJudgment1 && BleScanId === InterceptionB){//
-                                    // 绑定了一块
-                                    if (otherIndex === others.length){
-                                        // 蓝牙广播返回绑定手机设备个数
-                                        var command='0120';
-                                        var equipmentQuantity = Identifier.concat(Reserved,Reserved,commonality.pad(otherIndex,2),batteryArray[currentIndex].toString(16));
-                                        bleBroadcast.start(command ,equipmentQuantity);
-
-                                        // 已经全部绑定成功，返回
-                                        if (currentIndex === batteryArray.length -1) {
-                                            storage.get(PHONE_BIND_STORAGE_KEY, (error, result) => {
-                                                result = (result || '').replace(result,'123');
-                                                storage.save(PHONE_BIND_STORAGE_KEY, result, () => {
-                                                    this.setState({ phoneBind: '123'});
-                                                    if(result == '123'){
-                                                        bleBroadcast.stop();
-                                                        this.refs.toast_su.success();
-                                                        return;
-                                                    }
-                                                });
-                                            });
-                                        }
-                                        // 绑定下一块
-                                        currentIndex = currentIndex + 1;
-                                        otherIndex = 0;
-                                    }
-                                    bindSingle();
-                                }
-                            }
-                        }
-                    }
                 }
             });
+
             //向数据库写数据
             this.writeDatabase();
+            // this.abuttons();
         });
     }
 
@@ -208,7 +184,7 @@ export default class CWHome extends Component {
                     var actionsBattery = [];
                     var actionsCharger = [];
                     if(BleScan !== undefined){
-                        for (var i = 0;i<BleScan.length;i++) {
+                        for (var i = 0;i<BleScan.length;i++){
                             var searchBle = commonality.CharToHex(commonality.base64decode(BleScan[i].manufacturerData)).replace(/\\x/g, '').replace(/\s+/g, '');
                             var batteryArrayID = BleScan[i].id.replace(/\:/g, "");
                             var batteryArrayID1 = batteryArrayID.slice(0, 2);
@@ -217,49 +193,57 @@ export default class CWHome extends Component {
                             var batteryArrayID4 = batteryArrayID.slice(6, 8);
                             var batteryArrayID5 = batteryArrayID.slice(8, 10);
                             var batteryArrayID6 = batteryArrayID.slice(10, 12);
-                            var batteryID = batteryArrayID6.concat(batteryArrayID5, batteryArrayID4, batteryArrayID3, batteryArrayID2, batteryArrayID1);
+                            var equipmentID = batteryArrayID6.concat(batteryArrayID5, batteryArrayID4, batteryArrayID3, batteryArrayID2, batteryArrayID1);
                             let BleScanRssi=BleScan[i].rssi;//BLE信号强度
                             if (batteryArray !== undefined && BleScanRssi > -80) {
                                 for (var r=0;r<batteryArray.length;r++){
-                                    var scanIdentifier = (searchBle.slice(0, 2)).concat(searchBle.slice(4, 16));//搜索到的电池识别码与ID
-                                    if(scanIdentifier === batteryIdentifier && batteryArray[r] === batteryID){//判断电池识别码与ID
+                                    var scanIdentifier = searchBle.slice(0, 16);//搜索到的电池识别码与ID
+                                    if(scanIdentifier === batteryIdentifier && batteryArray[r] === equipmentID){//判断电池识别码与ID
                                         // 电池数据
                                         var batteryData = [];
                                         var battery = {};
-                                        battery.battery_id = batteryID;//设备id
+                                        battery.battery_id = equipmentID;//设备id
                                         battery.my_timestamp = time;//当前时间
-                                        battery.voltage = parseInt(searchBle.slice(20,24),16);//电压
-                                        battery.electric_current = parseInt(searchBle.slice(24,26),16);//电流
-                                        battery.temperature = parseInt(searchBle.slice(26,30),16);
-                                        battery.capacity = parseInt(searchBle.slice(30,34),16);
-                                        battery.equilibrium_time = parseInt(searchBle.slice(34,36),16);
+                                        battery.voltage = parseInt((searchBle.slice(22,24).concat(searchBle.slice(20,22))),16)/10;//电压
+                                        battery.equilibrium_time = parseInt(searchBle.slice(24,26),16)/100;//平衡时间
+                                        battery.electric_current = parseInt(searchBle.slice(26,28),16)/100;//均衡电流
+                                        battery.equilibriumTemperature=parseInt(searchBle.slice(28,30),16);//均衡温度1
+                                        battery.temperature = parseInt(searchBle.slice(30,32),16);//环境温度
+                                        battery.targetCurrent=parseInt((searchBle.slice(34,36).concat(searchBle.slice(32,34))),16)/100;//目标电流2
+                                        battery.targetVoltage=parseInt((searchBle.slice(38,40).concat(searchBle.slice(36,38))),16)/10;//目标电压2
+                                        battery.capacity = parseInt((searchBle.slice(42,44).concat(searchBle.slice(40,42))),16)/100;//容量
+                                        battery.balanceVoltage=parseInt((searchBle.slice(46,48).concat(searchBle.slice(44,46))),16)/10;//均衡电压2
+                                        battery.bindingState = parseInt(searchBle.slice(48,50),16);//绑定状态1
+                                        battery.equilibriumState = parseInt(searchBle.slice(50,52),16);//均衡状态1
                                         battery.P_longitude=positionData.longitude;
                                         battery.P_latitude=positionData.latitude;
                                         batteryData.push(battery);
                                         //写入电池数据库
-                                        var actionBattery = sqLite.insertbatteryData(batteryData, () => {
-                                        });
-
+                                        var actionBattery = sqLite.insertbatteryData(batteryData, () => {});
                                         actionsBattery.push(actionBattery);
-
-                                        // setTimeout(loop, 5000);
-                                    }else if(scanIdentifier === chargerIdentifier && batteryArray[r] === batteryID){
+                                    }else if(scanIdentifier === chargerIdentifier && batteryArray[r] === equipmentID){
                                         // 充电器数据
                                         var chargerData = [];
                                         var charger = {};
-                                        charger.charger_id = batteryID;//设备id
+                                        console.log(searchBle);
+                                        charger.charger_id = equipmentID;//设备id
                                         charger.my_timestamp = time;//当前时间
-                                        charger.voltage = parseInt(searchBle.slice(20,24),16);//电压
-                                        charger.electric_current = parseInt(searchBle.slice(24,26),16);//电流
-                                        charger.temperature = parseInt(searchBle.slice(26,30),16);
-                                        charger.capacity = parseInt(searchBle.slice(30,34),16);
-                                        charger.equilibrium_time = parseInt(searchBle.slice(34,36),16);
+                                        charger.voltage = parseInt((searchBle.slice(22,24).concat(searchBle.slice(20,22))),16)/10;//电压
+                                        charger.electric_current =parseInt((searchBle.slice(26,28).concat(searchBle.slice(24,26))),16)/100;//电流
+                                        charger.chargerTemperature=parseInt(searchBle.slice(28,30),16);//充电器温度1
+                                        charger.batteryTemperature = parseInt(searchBle.slice(30,32),16);//电池温度
+                                        charger.targetCurrent = parseInt((searchBle.slice(34,36).concat(searchBle.slice(32,34))),16)/100;//目标电流2
+                                        charger.targetVoltage = parseInt((searchBle.slice(38,40).concat(searchBle.slice(36,38))),16)/10;//目标电压2
+                                        charger.capacity = parseInt((searchBle.slice(42,44).concat(searchBle.slice(40,42))),16)/100;//容量
+                                        charger.balanceVoltage = parseInt((searchBle.slice(46,48).concat(searchBle.slice(44,46))),16)/10;//均衡电压2
+                                        charger.bindingState = parseInt(searchBle.slice(48,50),16);//绑定状态1
+                                        charger.chargingState = parseInt(searchBle.slice(50,52),16);//充电状态1
+                                        charger.ambientTemperature = parseInt(searchBle.slice(52,54),16);//环境温度1
                                         charger.P_longitude=positionData.longitude;
                                         charger.P_latitude=positionData.latitude;
                                         chargerData.push(charger);
                                         //写入充电器数据库
-                                        var actionCharger = sqLite.insertchargerData(chargerData,()=>{
-                                        });
+                                        var actionCharger = sqLite.insertchargerData(chargerData,()=>{});
                                         actionsCharger.push(actionCharger)
                                     }
                                 }
@@ -267,10 +251,10 @@ export default class CWHome extends Component {
                         }
                     }
                     Promise.all([actionsBattery],[actionsCharger]).then(function () {
-                        setTimeout(loop, 5000);
+                        setTimeout(loop, 1000);
                     });
                 };
-                setTimeout(loop, 5000);
+                setTimeout(loop, 1000);
             }
         ),
             (error) => {
@@ -285,8 +269,95 @@ export default class CWHome extends Component {
         };
     }
 
+    /**绑定*/
+    cbanding(){
+        storage.get(PHONE_BIND_STORAGE_KEY, (error, result) => {
+            if(result !== '123'){
+                bindSingle();
+                this.refs.toast.show('已全部绑定!',1000)
+            }
+        });
+        /**蓝牙扫描绑定*/
+        this.deviceMap.clear();
+        BluetoothManager.manager.startDeviceScan(null, null, (error, device) => {
+            if (error) {
+                this.refs.bleScan.open();
+            }else{
+                this.deviceMap.set(device.id,device); //使用Map类型保存搜索到的蓝牙设备，确保列表不显示重复的设备
+                BleScan = [...this.deviceMap.values()];
+                if(BleScan !== undefined){
+                    for (let z = 0;z<BleScan.length;z++) {
+                        var BleDataArray=commonality.CharToHex(commonality.base64decode(BleScan[z].manufacturerData)).replace(/\\x/g,'').replace(/\s+/g,'').toLowerCase();
+                        let InterceptionA=BleDataArray.slice(4,16);
+                        let BleScanArrayId = BleScan[z].id.replace(/\:/g, "").toLowerCase();
+                        let BleScanId1 = BleScanArrayId.slice(0, 2);
+                        let BleScanId2 = BleScanArrayId.slice(2, 4);
+                        let BleScanId3 = BleScanArrayId.slice(4, 6);
+                        let BleScanId4 = BleScanArrayId.slice(6, 8);
+                        let BleScanId5 = BleScanArrayId.slice(8, 10);
+                        let BleScanId6 = BleScanArrayId.slice(10, 12);
+                        let BleScanId = BleScanId6.concat(BleScanId5, BleScanId4, BleScanId3, BleScanId2, BleScanId1);
+
+                        var InterceptionB = BleDataArray.slice(20,32);  //截取搜索到蓝牙广播的部分数据
+                        var Interception=InterceptionA.concat(InterceptionB);
+                        var BleBroadcastID=batteryArray[currentIndex];
+                        if(Interception === BroadcastJudgment && BleBroadcastID === BleScanId){
+                            // 绑定了一块
+                            console.log(otherIndex);
+                            if (otherIndex === others.length){
+                                this.refs.band.success();
+                                // 已经全部绑定成功，返回
+                                if (currentIndex === batteryArray.length -1) {
+                                    storage.get(PHONE_BIND_STORAGE_KEY, (error, result) => {
+                                        result = (result || '').replace(result,'123');
+                                        storage.save(PHONE_BIND_STORAGE_KEY, result, () => {
+                                            if(result == '123'){
+                                                bleBroadcast.stop();
+                                                this.refs.toast_su.success();
+                                                this.setState({
+                                                    bandingImg: 1
+                                                });
+                                                return;
+                                            }
+                                        });
+                                    });
+                                }
+                                // 绑定下一块
+                                currentIndex = currentIndex + 1;
+                                otherIndex = 0;
+                            }
+                            bindSingle();
+                        }
+                    }
+                }
+            }
+        });
+    }
+
     goQRCode(){
         this.props.navigation.navigate('CWQRCode')
+    }
+
+    abbc(){
+        return new Promise((resolve, reject)=>{
+            /**蓝牙扫描绑定*/
+            this.deviceMap.clear();
+            BluetoothManager.manager.startDeviceScan(null, null, (error, device) => {
+                if (error) {
+                    this.refs.bleScan.open();
+                    reject(error)
+                }else{
+                    this.deviceMap.set(device.id,device); //使用Map类型保存搜索到的蓝牙设备，确保列表不显示重复的设备
+                    var BleS = [...this.deviceMap.values()];
+                    resolve(BleS);
+                }
+            });
+        })
+    }
+
+    async abuttons(){
+        var resff =await this.abbc();
+        console.log(resff);
     }
 
     // 蓝牙广播结束
@@ -305,36 +376,33 @@ export default class CWHome extends Component {
 
     //电池1
     banding1(){
-        bleBroadcast.start('0101' ,'3826879215020000020203040506');// 蓝牙广播开始
+        bleBroadcast.start('0101' ,'3826879215020000010203040501');// 蓝牙广播开始
     }
     //电池2
     banding2(){
-        bleBroadcast.start('0101' ,'3826879215020000030203040506');// 蓝牙广播开始
+        bleBroadcast.start('0101' ,'3826879215020000020203040501');// 蓝牙广播开始
     }
     //电池3
     banding3(){
-        bleBroadcast.start('0101' ,'3826879215020000040203040506');// 蓝牙广播开始
+        bleBroadcast.start('0101' ,'3826879215020000030203040501');// 蓝牙广播开始
     }
     //电池4
     banding4(){
-        bleBroadcast.start('0101' ,'3826879215020000050203040506');// 蓝牙广播开始
+        bleBroadcast.start('0101' ,'3826879215020000040203040501');// 蓝牙广播开始
     }
     //充电器
     banding5(){
-        bleBroadcast.start('0101' ,'3826879215020000010203040506');// 蓝牙广播开始
+        bleBroadcast.start('0101' ,'3826879215020000010203040500');// 蓝牙广播开始
     }
 
-    aaaa(){
-        bleBroadcast.stop();
-    }
-
-    _removeText = ()=>{
+    aaaa = ()=>{
         AsyncStorage.removeItem(PHONE_BIND_STORAGE_KEY);
     };
     render(){
         return(
             <View style={styles.container}>
                 <ToastSuccessAndError ref='toast_su' successMsg='绑定完成' errorMsg='请打开蓝牙'/>
+                <ToastSuccessAndError ref='band' successMsg="绑定一个" />
                 <Confirm ref='confirm' leftFunc={() => {this.goQRCode()}} rightFunc={() => {}} btnLeftText='去扫码' btnRightText='取消' title='提示' msg='您还未扫码！'/>
                 {/*进度条*/}
                 <ProgressDialogAlert ref='pmgressbar' title='提示信息' btnText='确定' msg={10}  progress={0.7} width={200} color='red'/>
@@ -343,22 +411,22 @@ export default class CWHome extends Component {
                 {/*测试*/}
                 <View style={{justifyContent:'space-around',flexDirection:'row'}}>
                     <TouchableOpacity style={{width:40,height:40,backgroundColor:'#0fa'}} onPress={()=>this.banding1()}>
-                        <Text>电池1-02</Text>
+                        <Text>电池1-01</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={{width:40,height:40,backgroundColor:'#0fa'}} onPress={()=>this.banding2()}>
-                        <Text>电池2-03</Text>
+                        <Text>电池2-02</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={{width:40,height:40,backgroundColor:'#0fa'}} onPress={()=>this.banding3()}>
-                        <Text>电池3-04</Text>
+                        <Text>电池3-03</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={{width:40,height:40,backgroundColor:'#0fa'}} onPress={()=>this.banding4()}>
-                        <Text>电池4-05</Text>
+                        <Text>电池4-04</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={{width:40,height:40,backgroundColor:'#0fa'}} onPress={()=>this.banding5()}>
                         <Text>充电器-01</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={{width:40,height:40,backgroundColor:'#0fa'}} onPress={()=>this.aaaa()}>
-                        <Text>log</Text>
+                        <Text>sotp</Text>
                     </TouchableOpacity>
                 </View>
 
@@ -369,56 +437,138 @@ export default class CWHome extends Component {
                 {/*电源、电池按钮*/}
                 <View style={styles.BtnView}>
                     {/*充电器按钮*/}
-                    <TouchableOpacity
-                        onPress={() => this.props.navigation.navigate('HomepageData',{chargerImg: 0}) }
+                    {this.state.chargerStorage===0?<View
+                        // onPress={() => this.props.navigation.navigate('HomepageData',{chargerImg: 0}) }
                     >
                         <Image style={{width:Dimensions.get('window').width/3,height:Dimensions.get('window').width/2}} source={require('../../img/charger.png')}/>
-                    </TouchableOpacity>
+                    </View>:
+                        <TouchableOpacity
+                            onPress={() => this.props.navigation.navigate('HomepageData',{chargerImg: 0}) }
+                        >
+                            <Image style={{width:Dimensions.get('window').width/3,height:Dimensions.get('window').width/2}} source={require('../../img/QRCCharger.png')}/>
+                        </TouchableOpacity>}
                     {/*右侧电池按钮*/}
                     <View style={styles.viewRightImage} >
-                        <TouchableOpacity
-                            activeOpacity={0.5}
-                            onPress={() => this.props.navigation.navigate('HomepageData', { index: 0 })}
-                            style={{justifyContent:'center'}}
-                        >
-                            <Image
-                                style={styles.ImagesStyle}
-                                source={require('../../img/battery.png')}
-                            />
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            activeOpacity={0.5}
-                            onPress={() => this.props.navigation.navigate('HomepageData', { index: 1 })}
-                        >
-                            <Image
-                                style={styles.ImagesStyle}
-                                source={require('../../img/battery.png')}
-                            />
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            activeOpacity={0.5}
-                            onPress={() => this.props.navigation.navigate('HomepageData', { index: 2 })}
-                        >
-                            <Image
-                                style={styles.ImagesStyle}
-                                source={require('../../img/battery.png')}
-                            />
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            activeOpacity={0.5}
-                            onPress={() => this.props.navigation.navigate('HomepageData', { index: 3 })}
-                        >
-                            <Image
-                                style={styles.ImagesStyle}
-                                source={require('../../img/battery.png')}
-                            />
-                        </TouchableOpacity>
+                        {this.state.batteryStorage===1||this.state.batteryStorage===2||this.state.batteryStorage===3||this.state.batteryStorage===4||this.state.batteryStorage===5||this.state.batteryStorage===6?
+                            <TouchableOpacity
+                                activeOpacity={0.5}
+                                onPress={() => this.props.navigation.navigate('HomepageData', { index: 0 })}
+                                style={{justifyContent:'center'}}
+                            >
+                                <Image
+                                    style={styles.ImagesStyle}
+                                    source={require('../../img/QRCBattery.png')}
+                                />
+                            </TouchableOpacity>:
+                            <View style={{justifyContent:'center'}}>
+                                <Image
+                                    style={styles.ImagesStyle}
+                                    source={require('../../img/battery.png')}
+                                />
+                            </View>
+                        }
+                        {this.state.batteryStorage===2||this.state.batteryStorage===3||this.state.batteryStorage===4||this.state.batteryStorage===5||this.state.batteryStorage===6?
+                            <TouchableOpacity
+                                activeOpacity={0.5}
+                                onPress={() => this.props.navigation.navigate('HomepageData', { index: 1 })}
+                                style={{justifyContent:'center'}}
+                            >
+                                <Image
+                                    style={styles.ImagesStyle}
+                                    source={require('../../img/QRCBattery.png')}
+                                />
+                            </TouchableOpacity>:
+                            <View style={{justifyContent:'center'}}>
+                                <Image
+                                    style={styles.ImagesStyle}
+                                    source={require('../../img/battery.png')}
+                                />
+                            </View>
+                        }
+                        {this.state.batteryStorage===3||this.state.batteryStorage===4||this.state.batteryStorage===5||this.state.batteryStorage===6?
+                            <TouchableOpacity
+                                activeOpacity={0.5}
+                                onPress={() => this.props.navigation.navigate('HomepageData', { index: 2 })}
+                                style={{justifyContent:'center'}}
+                            >
+                                <Image
+                                    style={styles.ImagesStyle}
+                                    source={require('../../img/QRCBattery.png')}
+                                />
+                            </TouchableOpacity>:
+                            <View style={{justifyContent:'center'}}>
+                                <Image
+                                    style={styles.ImagesStyle}
+                                    source={require('../../img/battery.png')}
+                                />
+                            </View>
+                        }
+                        {this.state.batteryStorage===4||this.state.batteryStorage===5||this.state.batteryStorage===6?
+                            <TouchableOpacity
+                                activeOpacity={0.5}
+                                onPress={() => this.props.navigation.navigate('HomepageData', { index: 3 })}
+                                style={{justifyContent:'center'}}
+                            >
+                                <Image
+                                    style={styles.ImagesStyle}
+                                    source={require('../../img/QRCBattery.png')}
+                                />
+                            </TouchableOpacity>:
+                            <View style={{justifyContent:'center'}}>
+                                <Image
+                                    style={styles.ImagesStyle}
+                                    source={require('../../img/battery.png')}
+                                />
+                            </View>
+                        }
+                        {this.state.batteryStorage===5||this.state.batteryStorage===6?
+                            <TouchableOpacity
+                                activeOpacity={0.5}
+                                onPress={() => this.props.navigation.navigate('HomepageData', { index: 4 })}
+                                style={{justifyContent:'center'}}
+                            >
+                                <Image
+                                    style={styles.ImagesStyle}
+                                    source={require('../../img/QRCBattery.png')}
+                                />
+                            </TouchableOpacity>:
+                            <View style={{justifyContent:'center'}}>
+                                <Image
+                                    style={styles.ImagesStyle}
+                                    source={require('../../img/battery.png')}
+                                />
+                            </View>
+                        }
+                        {this.state.batteryStorage===6?
+                            <TouchableOpacity
+                                activeOpacity={0.5}
+                                onPress={() => this.props.navigation.navigate('HomepageData', { index: 5 })}
+                                style={{justifyContent:'center'}}
+                            >
+                                <Image
+                                    style={styles.ImagesStyle}
+                                    source={require('../../img/QRCBattery.png')}
+                                />
+                            </TouchableOpacity>:
+                            <View style={{justifyContent:'center'}}>
+                                <Image
+                                    style={styles.ImagesStyle}
+                                    source={require('../../img/battery.png')}
+                                />
+                            </View>
+                        }
                     </View>
                 </View>
                 {/*绑定按钮*/}
-                {/*<TouchableOpacity style={{position:'absolute',bottom:20,left:20}} onPress={()=>{this.componentDidMount()}}>*/}
-                    {/*<Image style={{width:width/8,height:width/8 }} source={require('../../img/bind.png')}/>*/}
-                {/*</TouchableOpacity>*/}
+                {this.state.bandingImg===0?
+                    <TouchableOpacity style={{position:'absolute',bottom:20,left:20}} onPress={()=>{this.cbanding()}}>
+                        <Image style={{width:width/8,height:width/8 }} source={require('../../img/bind.png')}/>
+                    </TouchableOpacity>:<View/>}
+                <EasyToast
+                    ref="toast"
+                    style={ {backgroundColor:'rgba(0,0,0,0.5)'}}
+                    position='top'
+                />
             </View>
         )
     }
@@ -427,14 +577,14 @@ export default class CWHome extends Component {
 const styles = StyleSheet.create({
     container:{
         flex:1,
-        backgroundColor:'#fff'
+        backgroundColor:'#fff',
     },
     mileageText:{
         fontSize:20,
         textAlign:'center',
         backgroundColor:'#527FE4',
         color:'#fff',
-        lineHeight:50
+        lineHeight:50,
     },
     BtnView:{
         flex:1,
@@ -445,8 +595,8 @@ const styles = StyleSheet.create({
     viewRightImage:{
     },
     ImagesStyle:{
-        width:width/7 ,
-        height:height/7
+        width:width/9 ,
+        height:height/9,
     }
 });
 

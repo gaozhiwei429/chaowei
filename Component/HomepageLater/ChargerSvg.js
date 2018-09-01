@@ -52,7 +52,7 @@ export default class ChargerSvg extends Component {
         //删除数据
         // sqLite.deleteData();
 
-        /** 电池*/
+        /** 充电器*/
         storage.get(CHARGER_BIND_STORAGE_KEY, (error, result) => {
             if (error) {
                 reject(error);
@@ -65,12 +65,12 @@ export default class ChargerSvg extends Component {
                     var len = results.rows.length;
                     for(var i=0; i<len; i++){
                         var u = results.rows.item(i);
-                        chargerVoltageData.push(parseInt(u.voltage));
-                        chargerElectricCurrentData.push(parseInt(u.electric_current));
-                        chargerTemperatureData.push(parseInt(u.temperature));
-                        chargerCapacityData.push(parseInt(u.capacity));
+                        chargerVoltageData.push(u.voltage);
+                        chargerElectricCurrentData.push(u.electric_current);
+                        chargerTemperatureData.push(u.temperature);
+                        chargerCapacityData.push(u.capacity);
+                        console.log(chargerCapacityData);
                     }
-
                     this.setState({
                         chargerVoltage:chargerVoltageData,
                         chargerElectricCurrent:chargerElectricCurrentData,
@@ -89,47 +89,42 @@ export default class ChargerSvg extends Component {
                         var len = results.rows.length;
                         for(var i=0; i<len; i++){
                             var u = results.rows.item(i);
-                            chargerVoltageData.push(parseInt(u.voltage));
-                            chargerElectricCurrentData.push(parseInt(u.electric_current));
-                            chargerTemperatureData.push(parseInt(u.temperature));
-                            chargerCapacityData.push(parseInt(u.capacity));
-                            if(chargerVoltageData.length>18 && chargerElectricCurrentData.length>18 && chargerTemperatureData.length>18 && chargerCapacityData.length>18){
-                                chargerVoltageData.shift();
-                                chargerElectricCurrentData.shift();
-                                chargerTemperatureData.shift();
-                                chargerCapacityData.shift();
-                                this.setState({
-                                    chargerVoltage:chargerVoltageData,
-                                    chargerElectricCurrent:chargerElectricCurrentData,
-                                    chargerTemperature:chargerTemperatureData,
-                                    chargerCapacity:chargerCapacityData,
-                                });
-                            }else {
-                                this.setState({
-                                    chargerVoltage:chargerVoltageData,
-                                    chargerElectricCurrent:chargerElectricCurrentData,
-                                    chargerTemperature:chargerTemperatureData,
-                                    chargerCapacity:chargerCapacityData,
-                                });
-                            }
+                            chargerVoltageData.push(u.voltage);
+                            chargerElectricCurrentData.push(u.electric_current);
+                            chargerTemperatureData.push(u.chargerTemperature);
+                            chargerCapacityData.push(u.capacity);
                         }
-                        chargerTime = setTimeout(chargerFeedback, 10000);
+                        if(chargerVoltageData.length>18 && chargerElectricCurrentData.length>18 && chargerTemperatureData.length>18 && chargerCapacityData.length>18){
+                            chargerVoltageData.shift();
+                            chargerElectricCurrentData.shift();
+                            chargerTemperatureData.shift();
+                            chargerCapacityData.shift();
+                            this.setState({
+                                chargerVoltage:chargerVoltageData,
+                                chargerElectricCurrent:chargerElectricCurrentData,
+                                chargerTemperature:chargerTemperatureData,
+                                chargerCapacity:chargerCapacityData,
+                            });
+                        }else {
+                            this.setState({
+                                chargerVoltage:chargerVoltageData,
+                                chargerElectricCurrent:chargerElectricCurrentData,
+                                chargerTemperature:chargerTemperatureData,
+                                chargerCapacity:chargerCapacityData,
+                            });
+                        }
+                        chargerTime = setTimeout(chargerFeedback, 1000);
                     });
                 },(error)=>{
                     console.log(error);
                 });
             };
-            setTimeout(chargerFeedback, 10000);
+            setTimeout(chargerFeedback, 1000);
         });
-    }
-
-    componentWillUnmount() {
-        clearTimeout(chargerTime);
     }
 
     async historyTime(){
         chargerVoltageData = [];
-        console.log(chargerVoltageData);
         chargerElectricCurrentData=[];
         chargerTemperatureData=[];
         chargerCapacityData=[];
@@ -145,21 +140,22 @@ export default class ChargerSvg extends Component {
 
         //查询
         db.transaction((tx)=>{
-            tx.executeSql("select * from charger where charger_id='"+promiseValues[0]+"' order by my_timestamp desc limit 16,34", [],(tx,results)=>{
+            tx.executeSql("select * from charger where charger_id='"+promiseValues[0]+"' order by my_timestamp desc limit 17 OFFSET 16", [],(tx,results)=>{
                 var len = results.rows.length;
+                console.log(len);
                 for(var i=0; i<len; i++){
                     var u = results.rows.item(i);
-                    chargerVoltageData.push(parseInt(u.voltage));
-                    chargerElectricCurrentData.push(parseInt(u.electric_current));
-                    chargerTemperatureData.push(parseInt(u.temperature));
-                    chargerCapacityData.push(parseInt(u.capacity));
-                    this.setState({
-                        chargerVoltage:chargerVoltageData,
-                        chargerElectricCurrent:chargerElectricCurrentData,
-                        chargerTemperature:chargerTemperatureData,
-                        chargerCapacity:chargerCapacityData,
-                    })
+                    chargerVoltageData.push(u.voltage);
+                    chargerElectricCurrentData.push(u.electric_current);
+                    chargerTemperatureData.push(u.chargerTemperature);
+                    chargerCapacityData.push(u.capacity);
                 }
+                this.setState({
+                    chargerVoltage:chargerVoltageData,
+                    chargerElectricCurrent:chargerElectricCurrentData,
+                    chargerTemperature:chargerTemperatureData,
+                    chargerCapacity:chargerCapacityData,
+                })
             });
         },(error)=>{
             console.log(error);
@@ -167,16 +163,15 @@ export default class ChargerSvg extends Component {
 
     }
 
+    componentWillUnmount() {
+        clearTimeout(chargerTime);
+    }
+
     static navigationOptions = {
         headerTitle:(<Text style={{fontSize:20,flex: 1, textAlign: 'center'}}>充电器数据曲线</Text>),
         headerStyle: {
             height: 40,
-            // backgroundColor: 'red',
-            // elevation: null
         },
-        // headerLeft:(
-        //     <View style={{height: 44,width: 55,justifyContent: 'center',paddingRight:15} }/>
-        // ),
         headerRight: (
             <View style={{height: 44,width: 55,justifyContent: 'center',paddingRight:15} }/>
         ),
@@ -185,21 +180,28 @@ export default class ChargerSvg extends Component {
     };
     render() {
         const option= {
-            title: {
-                text: '',//充电器
+            title : {
+                text: '充电器数据曲线',
+                // subtext: '数据来自西安兰特水电测控技术有限公司',
+                x: 'center',
+                // align: 'right'
+                // y:'bottom'
             },
             tooltip : { //点击某一个点的数据的时候，显示出悬浮窗
                 trigger: 'none',//item,axis,none
             },
             legend: {//可以手动选择现实几个图标
                 data:['电压(V)','电流(A)','温度(℃)','容量(C)'],
+                y:'bottom',
+                // x: 'center',
+                // orient:'vertical'
             },
             toolbox: {//各种表格
                 orient: 'vertical',//改变icon的布局朝向
                 show : true,
                 showTitle:true,
                 feature : {
-                    dataView : {show: true, readOnly: false},//show是否显示表格，readOnly是否只读
+                    dataView : {show: true, readOnly: true},//show是否显示表格，readOnly是否只读
                     magicType : {
                         //折线图  柱形图    总数统计 分开平铺
                         //type: ['line'],//'line', 'bar','stack' ,'tiled'
@@ -217,22 +219,21 @@ export default class ChargerSvg extends Component {
                 name : '',//时间
                 data: [0,1, 2, 3, 4, 5, 6,7, 8, 9, 10, 11, 12,13, 14, 15, 16, 17,],
             },
-            yAxis: {
-                type:'value',
-                name : '',//   V /A /℃ /C
-            },
+            yAxis: [
+                {
+                    type:'value',
+                    name : '电压/温度',//   V /A /℃ /C
+                },{
+                    type:'value',
+                    name : '电流/容量',//   V /A /℃ /C
+                },
+            ],
             series: [
                 {
                     name: '电压(V)',
                     type: 'line',
                     smooth:true,
                     data: this.state.chargerVoltage,
-                    showSymbol: false,
-                },{
-                    name: '电流(A)',
-                    type: 'line',
-                    smooth:true,
-                    data: this.state.chargerElectricCurrent,
                     showSymbol: false,
                 }, {
                     name: '温度(℃)',
@@ -247,6 +248,14 @@ export default class ChargerSvg extends Component {
                     smooth:true,
                     data: this.state.chargerCapacity,
                     showSymbol: false,
+                    yAxisIndex:1,
+                },{
+                    name: '电流(A)',
+                    type: 'line',
+                    smooth:true,
+                    data: this.state.chargerElectricCurrent,
+                    showSymbol: false,
+                    yAxisIndex:1,
                 }
             ],
             // visualMap: {//值的大小决定曲线的颜色
