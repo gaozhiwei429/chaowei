@@ -25,6 +25,7 @@ import java.util.List;
 
 import com.chaowei.alipay.AlipayPackage;
 import com.chaowei.blebroadcast.BleBroadcastPackage;
+import com.chaowei.openfolder.OpenfolderPackage;
 
 public class MainApplication extends Application implements ReactApplication {
 
@@ -52,7 +53,8 @@ public class MainApplication extends Application implements ReactApplication {
           new VectorIconsPackage(),
           new SQLitePluginPackage(),   // register SQLite Plugin here
           new WeChatPackage(),
-          new AlipayPackage()
+          new AlipayPackage(),
+          new OpenfolderPackage()
       );
     }
 

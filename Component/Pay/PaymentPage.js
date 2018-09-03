@@ -40,7 +40,7 @@ export default class PaymentPage extends Component {
         headerBackImage: (<Image source={require('../../img/leftGoBack.png')} style={{width:18,height:14,marginLeft:15}}/>),
     };
 
-    async goAlipay () {
+    async goAlipay () {   
         try {
             await Alipay.pay();
             // alert('支付成功');

@@ -250,8 +250,8 @@ export default class CWQRCode extends Component {
                 </View>
                 <EasyToast
                     ref="toast"
-                    style={ {backgroundColor:'rgba(0,0,0,0.5)'}}
-                    position='center'
+                    style={ {backgroundColor:'rgba(0,0,0,0.5)',padding:12}}
+                    position='center'  
                 />
             </View>
         );

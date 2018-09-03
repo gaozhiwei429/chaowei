@@ -3,12 +3,15 @@ import {
     StyleSheet,
     Text,
     View,
-    TouchableOpacity, Dimensions,
+    TouchableOpacity, 
+    Dimensions,
+    Image,
 } from 'react-native';
 import RNFS from 'react-native-fs';
 import SQLiteText from '../SQLite/sqlite';
 import AlertProgress from '../Alert/AlertProgress';
 import EasyToast, {DURATION} from 'react-native-easy-toast';
+import OpenFolder from '../OpenFolder/Openfolder'
 var sqLite = new SQLiteText();
 var db;
 var batterypath = RNFS.ExternalDirectoryPath  + '/电池数据.csv'; // 文件路径
@@ -156,10 +159,16 @@ export default class Filesystem extends Component {
         });
     }
 
-
     // 删除电池文件
     deleteFile(){
-        RNFS.unlink(batterypath)
+        RNFS.unlink(batterypath)  
+            .then(()=>{
+                this.refs.toast.show('文件删除成功!',2000);
+            })
+            .catch((err)=>{
+                this.refs.toast.show('没有文件可以删除!',2000);
+            });
+        RNFS.unlink(chargerpath)
             .then(()=>{
                 this.refs.toast.show('文件删除成功!',2000);
             })
@@ -173,13 +182,14 @@ export default class Filesystem extends Component {
         headerStyle: {
             height: 40,
         },
-        headerLeft:(
-            <View/>
-        ),
+        // headerLeft:(
+        //     <View/>
+        // ),
         headerRight: (
             <View style={{height: 44, width: 55, justifyContent: 'center', paddingRight: 15}}/>
         ),
-        headerPressColorAndroid: 'blue',
+        // headerPressColorAndroid: 'blue',   
+        headerBackImage: (<Image source={require('../../img/leftGoBack.png')} style={{width:18,height:14,marginLeft:15,marginRight:15}}/>),
     };
 
     render() {
@@ -196,9 +206,12 @@ export default class Filesystem extends Component {
                 <TouchableOpacity onPress={()=>this.deleteFile()}>
                     <Text style={{margin:20,fontSize:20}}>删除文件</Text>
                 </TouchableOpacity>
+                <TouchableOpacity onPress={()=>OpenFolder.open()}>
+                    <Text style={{margin:20,fontSize:20}}>打开文件夹</Text>
+                </TouchableOpacity>
                 <EasyToast
                     ref="toast"
-                    style={ {backgroundColor:'rgba(0,0,0,0.5)'}}
+                    style={ {backgroundColor:'rgba(0,0,0,0.5)',padding:12}}
                     position='top'
                 />
             </View>

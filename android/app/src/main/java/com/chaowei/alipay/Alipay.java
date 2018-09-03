@@ -18,7 +18,8 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.Promise;
 import com.chaowei.alipay.util.OrderInfoUtil2_0;
-
+import android.os.Environment;
+import android.net.Uri;
 import java.util.Map;
 
 /**
@@ -53,7 +54,7 @@ public class Alipay  extends ReactContextBaseJavaModule {
     }
     //函数不能有返回值,被调用的原生代码是异步的,原生代码执行结束之后只能通过回调函数发送消息给RN
     @ReactMethod
-    public void pay(Promise promise){
+    public void pay(final Promise promise){
         /**
          * 这里只是为了方便直接向商户展示支付宝的整个支付流程；所以Demo中加签过程直接放在客户端完成；
          * 真实App里，privateKey等数据严禁放在客户端，加签过程务必要放在服务端完成；
@@ -69,51 +70,39 @@ public class Alipay  extends ReactContextBaseJavaModule {
         String sign = OrderInfoUtil2_0.getSign(params, privateKey, rsa2);
         final String orderInfo = orderParam + "&" + sign;
 
-        PayTask alipay = new PayTask(getCurrentActivity());
-        Map<String, String> result = alipay.payV2(orderInfo, true);
-        PayResult payResult = new PayResult(result);
-        Log.i("msp", result.toString());
-        /**
-         对于支付结果，请商户依赖服务端的异步通知结果。同步通知结果，仅作为支付结束的通知。
-         */
-        String resultInfo = payResult.getResult();// 同步返回需要验证的信息
-        String resultStatus = payResult.getResultStatus();
-        // 判断resultStatus 为9000则代表支付成功
-        if (TextUtils.equals(resultStatus, "9000")) {
-            // 该笔订单是否真实支付成功，需要依赖服务端的异步通知。
-            // Toast.makeText(mContext, "支付成功", Toast.LENGTH_SHORT).show();
-            promise.resolve(resultInfo);
-        } else {
-            // 该笔订单真实的支付结果，需要依赖服务端的异步通知。
-            promise.reject("支付失败", new Exception("支付失败"));
-        }
-
-
-        
-       // Runnable payRunnable = new Runnable() {
-       //     @Override  
-       //     public void run() {
-       //         PayTask alipay = new PayTask(getCurrentActivity());
-       //         Map<String, String> result = alipay.payV2(orderInfo, true);
-       //         PayResult payResult = new PayResult(result);
-       //         Log.i("msp", result.toString());f
-       //         /**
-       //          对于支付结果，请商户依赖服务端的异步通知结果。同步通知结果，仅作为支付结束的通知。
-       //          */
-       //         String resultInfo = payResult.getResult();// 同步返回需要验证的信息
-       //         String resultStatus = payResult.getResultStatus();
-       //         // 判断resultStatus 为9000则代表支付成功
-       //         if (TextUtils.equals(resultStatus, "9000")) {
-       //             // 该笔订单是否真实支付成功，需要依赖服务端的异步通知。
-       //             //Toast.makeText(mContext, "支付成功", Toast.LENGTH_SHORT).show();
-       //             promise.resolve(resultInfo);
-       //         } else {
-       //             // 该笔订单真实的支付结果，需要依赖服务端的异步通知。
-       //             promise.reject("E_PAYMENT_ERROR", new Exception("E_PAYMENT_ERROR"));
-       //         }
-       //     }
-       // };
-       // Thread payThread = new Thread(payRunnable);
-       // payThread.start();
+        Runnable payRunnable = new Runnable() {
+            @Override  
+            public void run() {
+                PayTask alipay = new PayTask(getCurrentActivity());
+                Map<String, String> result = alipay.payV2(orderInfo, true);
+                PayResult payResult = new PayResult(result);
+                Log.i("msp", result.toString());
+                /**
+                    对于支付结果，请商户依赖服务端的异步通知结果。同步通知结果，仅作为支付结束的通知。
+                    */
+                String resultInfo = payResult.getResult();// 同步返回需要验证的信息
+                String resultStatus = payResult.getResultStatus();
+                // 判断resultStatus 为9000则代表支付成功
+                if (TextUtils.equals(resultStatus, "9000")) {
+                    // 该笔订单是否真实支付成功，需要依赖服务端的异步通知。
+                    //Toast.makeText(mContext, "支付成功", Toast.LENGTH_SHORT).show();
+                    promise.resolve(resultInfo);
+                } else {
+                    // 该笔订单真实的支付结果，需要依赖服务端的异步通知。
+                    promise.reject("E_PAYMENT_ERROR", new Exception("E_PAYMENT_ERROR"));
+                }
+            }
+        };
+        Thread payThread = new Thread(payRunnable);
+        payThread.start();
     }
+
+    //打开文件夹
+    // @ReactMethod
+    // public void open() {  //String path
+    //     Intent intent = new Intent(Intent.ACTION_VIEW);
+    //     Uri uri = Uri.parse("/storage/emulated/0/Android/data/com.chaowei/files/");
+    //     intent.setDataAndType(uri, "resource/folder");
+    //     mContext.startActivity(Intent.createChooser(intent, "Open folder"));
+    // }
 }
