@@ -32,7 +32,7 @@ export default class CWButton extends Component {
         this.state = {
             version: '',
             phoneNumber:''
-        }
+        } 
     }
 
     componentDidMount(){
