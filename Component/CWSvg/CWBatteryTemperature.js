@@ -11,15 +11,14 @@ import {
 import Echarts from 'native-echarts';
 import SQLiteText from '../SQLite/sqlite';
 import * as storage from '../../storage';
-// import _ from 'lodash';
 import { BATTERY_BIND_STORAGE_KEY,CHARGER_BIND_STORAGE_KEY } from '../../config';
 var sqLite = new SQLiteText();
 var db;
 
 var battery1TemperatureData= [];
-var battery2TemperatureData=[];
-var battery3TemperatureData=[];
-var battery4TemperatureData=[];
+var battery2TemperatureData= [];
+var battery3TemperatureData= [];
+var battery4TemperatureData= [];
 var promiseValues;
 var battery1Time;
 var battery2Time;
@@ -36,10 +35,7 @@ export default class CWBatteryTemperature extends Component {
             isLiked: false,
         };
     }
-    compennetDidUnmount(){
-        //关闭数据库
-        sqLite.close();
-    }
+
     async componentDidMount(){
         battery1TemperatureData= [];
         battery2TemperatureData=[];
@@ -65,11 +61,10 @@ export default class CWBatteryTemperature extends Component {
                 resolve(result);
             })}
         );
-        Promise.all([promise2]).then((values) => {
+        Promise.all([promise2]).then((values)=>{
             promiseValues=values;
             //查询电池1
             db.transaction((tx)=>{
-                // console.log(values[0][1]);
                 tx.executeSql("select id,battery_id,my_timestamp,temperature from battery where battery_id='"+values[0][0]+"' order by my_timestamp desc limit 18", [],(tx,results)=>{
                     var len = results.rows.length;
                     for(let i=0; i<len; i++){
@@ -331,12 +326,15 @@ export default class CWBatteryTemperature extends Component {
         const option= {
             title: {
                 text: '温度',
+                x:'center'
             },
             tooltip : { //点击某一个点的数据的时候，显示出悬浮窗
                 trigger: 'none',//item,axis,none
             },
             legend: {//可以手动选择现实几个图标
                 data:['电池1','电池2','电池3','电池4'],
+                y:'bottom',
+                type: 'legendToggleSelect',
             },
             toolbox: {//各种表格
                 orient: 'vertical',//改变icon的布局朝向
@@ -348,7 +346,7 @@ export default class CWBatteryTemperature extends Component {
                         //折线图  柱形图    总数统计 分开平铺
                         //type: ['line'],//'line', 'bar','stack' ,'tiled'
                     },
-                }
+                },
             },
             color:['rgb(67,205,126)','rgb(249,159,94)','rgb(255,106,106)','rgb(105,89,205)'],//图形的颜色组
             xAxis: {
@@ -358,8 +356,13 @@ export default class CWBatteryTemperature extends Component {
                 //就是一月份这个显示为一个线段，而不是数轴那种一个点点
                 boundaryGap:false,
                 type : 'category',
-                name : '',//时间
+                name : '时间',//时间
                 data: [0,1, 2, 3, 4, 5, 6,7, 8, 9, 10, 11, 12,13, 14, 15, 16, 17,],
+                axisLabel:{ 
+                    textStyle:{ 
+                        fontSize: 9,
+                    }
+                }
             },
             yAxis: {
                 type:'value',

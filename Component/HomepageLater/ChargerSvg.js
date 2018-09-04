@@ -12,6 +12,7 @@ import {
 import Echarts from 'native-echarts';
 import SQLiteText from '../SQLite/sqlite';
 import * as storage from '../../storage';
+import * as commonality from '../../commonality';
 // import _ from 'lodash';
 import { BATTERY_BIND_STORAGE_KEY,CHARGER_BIND_STORAGE_KEY } from '../../config';
 var sqLite = new SQLiteText();
@@ -22,8 +23,9 @@ var chargerVoltageData = [];
 var chargerElectricCurrentData=[];
 var chargerTemperatureData=[];
 var chargerCapacityData=[];
+var chargerTimeData=[];
 var promiseValues;
-var chargerTime;
+var chargerClearTime;
 export default class ChargerSvg extends Component {
     constructor(props) {
         super(props);
@@ -32,6 +34,7 @@ export default class ChargerSvg extends Component {
             chargerElectricCurrent:[],
             chargerTemperature:[],
             chargerCapacity:[],
+            chargerTimeData:[],
             isLiked: false,
         };
     }
@@ -42,6 +45,7 @@ export default class ChargerSvg extends Component {
         chargerElectricCurrentData=[];
         chargerTemperatureData=[];
         chargerCapacityData=[];
+        chargerTimeData=[];
         this.setState({
             isLiked: !this.state.isLiked
         });
@@ -61,21 +65,22 @@ export default class ChargerSvg extends Component {
             promiseValues=result;
             //查询
             db.transaction((tx)=>{
-                tx.executeSql("select charger_id,my_timestamp,voltage,electric_current,temperature,capacity from charger where charger_id='"+result[0]+"' order by my_timestamp desc limit 18", [],(tx,results)=>{
+                tx.executeSql("select * from charger where charger_id='"+result[0]+"' order by my_timestamp desc limit 18", [],(tx,results)=>{
                     var len = results.rows.length;
                     for(var i=0; i<len; i++){
-                        var u = results.rows.item(i);
+                        var u = results.rows.item(i); 
                         chargerVoltageData.push(u.voltage);
                         chargerElectricCurrentData.push(u.electric_current);
-                        chargerTemperatureData.push(u.temperature);
+                        chargerTemperatureData.push(u.chargerTemperature);
                         chargerCapacityData.push(u.capacity);
-                        console.log(chargerCapacityData);
+                        chargerTimeData.push(commonality.replaceTime(u.my_timestamp));
                     }
                     this.setState({
                         chargerVoltage:chargerVoltageData,
                         chargerElectricCurrent:chargerElectricCurrentData,
                         chargerTemperature:chargerTemperatureData,
                         chargerCapacity:chargerCapacityData,
+                        chargerTime:chargerTimeData,
                     })
                 });
             },(error)=>{
@@ -93,33 +98,37 @@ export default class ChargerSvg extends Component {
                             chargerElectricCurrentData.push(u.electric_current);
                             chargerTemperatureData.push(u.chargerTemperature);
                             chargerCapacityData.push(u.capacity);
+                            chargerTimeData.push(commonality.replaceTime(u.my_timestamp));
                         }
                         if(chargerVoltageData.length>18 && chargerElectricCurrentData.length>18 && chargerTemperatureData.length>18 && chargerCapacityData.length>18){
                             chargerVoltageData.shift();
                             chargerElectricCurrentData.shift();
                             chargerTemperatureData.shift();
                             chargerCapacityData.shift();
+                            chargerTimeData.shift();
                             this.setState({
                                 chargerVoltage:chargerVoltageData,
                                 chargerElectricCurrent:chargerElectricCurrentData,
                                 chargerTemperature:chargerTemperatureData,
                                 chargerCapacity:chargerCapacityData,
+                                chargerTime:chargerTimeData,
                             });
-                        }else {
+                        }else{
                             this.setState({
                                 chargerVoltage:chargerVoltageData,
                                 chargerElectricCurrent:chargerElectricCurrentData,
                                 chargerTemperature:chargerTemperatureData,
                                 chargerCapacity:chargerCapacityData,
+                                chargerTime:chargerTimeData,
                             });
                         }
-                        chargerTime = setTimeout(chargerFeedback, 1000);
+                        chargerClearTime = setTimeout(chargerFeedback, 10000);
                     });
                 },(error)=>{
                     console.log(error);
                 });
             };
-            setTimeout(chargerFeedback, 1000);
+            setTimeout(chargerFeedback, 10000);
         });
     }
 
@@ -128,7 +137,8 @@ export default class ChargerSvg extends Component {
         chargerElectricCurrentData=[];
         chargerTemperatureData=[];
         chargerCapacityData=[];
-        clearTimeout(chargerTime);
+        chargerTimeData=[];
+        clearTimeout(chargerClearTime);
         this.setState({
             isLiked: !this.state.isLiked
         });
@@ -142,19 +152,20 @@ export default class ChargerSvg extends Component {
         db.transaction((tx)=>{
             tx.executeSql("select * from charger where charger_id='"+promiseValues[0]+"' order by my_timestamp desc limit 17 OFFSET 16", [],(tx,results)=>{
                 var len = results.rows.length;
-                console.log(len);
                 for(var i=0; i<len; i++){
                     var u = results.rows.item(i);
                     chargerVoltageData.push(u.voltage);
                     chargerElectricCurrentData.push(u.electric_current);
                     chargerTemperatureData.push(u.chargerTemperature);
                     chargerCapacityData.push(u.capacity);
+                    chargerTimeData.push(commonality.replaceTime(u.my_timestamp));
                 }
                 this.setState({
                     chargerVoltage:chargerVoltageData,
                     chargerElectricCurrent:chargerElectricCurrentData,
                     chargerTemperature:chargerTemperatureData,
                     chargerCapacity:chargerCapacityData,
+                    chargerTime:chargerTimeData,
                 })
             });
         },(error)=>{
@@ -164,7 +175,7 @@ export default class ChargerSvg extends Component {
     }
 
     componentWillUnmount() {
-        clearTimeout(chargerTime);
+        clearTimeout(chargerClearTime);
     }
 
     static navigationOptions = {
@@ -216,13 +227,20 @@ export default class ChargerSvg extends Component {
                 //就是一月份这个显示为一个线段，而不是数轴那种一个点点
                 boundaryGap:false,
                 type : 'category',
-                name : '',//时间
-                data: [0,1, 2, 3, 4, 5, 6,7, 8, 9, 10, 11, 12,13, 14, 15, 16, 17,],
+                name : '时间',//时间
+                data: this.state.chargerTime,
+                axisLabel:{ 
+                    textStyle:{ 
+                        fontSize: 9,
+                    }
+                }
             },
-            yAxis: [
+            yAxis: [  
                 {
                     type:'value',
                     name : '电压/温度',//   V /A /℃ /C
+                    // max:100,
+                    // min:30,
                 },{
                     type:'value',
                     name : '电流/容量',//   V /A /℃ /C

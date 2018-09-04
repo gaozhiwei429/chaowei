@@ -51,6 +51,10 @@ export default class CWButton extends Component {
                     onPress={() => this.props.navigation.navigate('Filesystem')}
                 />
                 <CWBtnCell
+                    title='关于我们'
+                    onPress={()=>this.props.navigation.navigate('AboutUs')}
+                />
+                <CWBtnCell
                     title='目前电量'
                     onPress={() => this.props.navigation.navigate('RemainingBattery')}
                 />

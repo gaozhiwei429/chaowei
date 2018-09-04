@@ -23,7 +23,6 @@ import CWMain from './Component/CWMain/CWMain';  //Navigator
 import CWHome from './Component/CWHome/CWHome';  //首页
 import CWButton from './Component/CWButton/CWButton';//更多BTN
 import CWQRCode from './Component/CWQRCode/CWQRCode';//二维码
-import CWBle from './Component/CWBleSearch/CWBle';//蓝牙接收
 import TAB from './Component/CWSvg/TAB';//
 import RemainingBattery from './Component/CWRemainingBattery/CWRemainingBattery';//剩余电量模块
 import CWScanning from './Component/CWScanning/CWScanning';//页面绑定
@@ -44,14 +43,16 @@ import RepairJoining from './Component/RepairJoining/RepairJoining';//维修加�
 import WXPay from './Component/Pay/WXPay';//微信支付
 import PaymentPage from './Component/Pay/PaymentPage';//支付宝支付
 import Filesystem from './Component/Filesystem/Filesystem';//写文件
+import AboutUs from './Component/AboutUs/AboutUs';//关于我们
 
 //测试
+import CWBle from './Component/CWBleSearch/CWBle';//蓝牙接收
 import ListView from './Component/ListView/ListView'
 import SQLiteTextDemo from './Component/SQLiteText/SQLiteTextDemo';//测试
 import cha from './Component/SQLite/cha'
 import Alert from './Component/Alert/AlertShow';
 import CWEchart from './Component/CWSvg/CWEchart';
-import ListViewText from './Component/ListView/ListViewText'
+import ListViewText from './Component/ListView/ListViewText';
 
 const RootStack = createStackNavigator({
         CWGLaunchlmage:{screen:CWGLaunchlmage},
@@ -80,6 +81,7 @@ const RootStack = createStackNavigator({
         WXPay:{screen:WXPay},
         PaymentPage:{screen:PaymentPage},
         Filesystem:{screen:Filesystem},
+        AboutUs:{screen:AboutUs},
 
         //测试
         ListView:{screen:ListView},

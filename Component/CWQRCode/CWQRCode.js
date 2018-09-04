@@ -28,7 +28,7 @@ export default class CWQRCode extends Component {
             JudgeBtn:0,
         };
     }
-
+    
     onBarCodeRead(e) {
         //将返回的结果转为对象
         let QRCdata = e.data;
@@ -60,18 +60,17 @@ export default class CWQRCode extends Component {
                         if(result.length<7){
                             storage.save(BATTERY_BIND_STORAGE_KEY, result, () => {
                                 this.setState({ dataBattery: value});
-                                this.setState({ dataBatteryArray:result });
                             });
-                            this.refs.toast.show('扫码成功!',1000);
-                        }else {
-                            this.refs.toast.show('目前最多支持绑定6块电池!',1000);
+                            this.refs.toast.show('扫码成功!',1200);
+                        }else{
+                            this.refs.toast.show('目前最多支持绑定6块电池!',1200);
                         }
-                    }else {
-                        this.refs.toast.show('此块蓄电池已存在!',1000);
+                    }else{
+                        this.refs.toast.show('此块蓄电池已存在!',1200);
                     }
                 });
             }else {
-                this.refs.toast.show('这不是我们的产品!',1000);
+                this.refs.toast.show('这不是我们的产品!',1200);
             }
         }
 
@@ -79,7 +78,7 @@ export default class CWQRCode extends Component {
             if(value.slice(10,12)=='aa'){
                 this.props.navigation.replace('PaymentPage',{AliPay:value})
             }else {
-                this.refs.toast.show('您扫的不是我们充电桩二维码!',1000)
+                this.refs.toast.show('您扫的不是我们充电桩二维码!',1200)
             }
         }
     }

@@ -63,7 +63,7 @@ export default class CWHome extends Component {
             batteryStorage:0,
         };
         this.deviceMap = new Map();
-    }
+    } 
 
     componentDidMount() {
         /** 是否绑定*/
@@ -90,6 +90,7 @@ export default class CWHome extends Component {
             setTimeout(chargerStorage,1000);
         };
         chargerStorage();
+
         /** 蓄电池*/
         const batteryStorage =()=>{
             storage.get(BATTERY_BIND_STORAGE_KEY, (error, result) => {
@@ -147,6 +148,19 @@ export default class CWHome extends Component {
             //向数据库写数据
             this.writeDatabase();
             // this.abuttons();
+        });
+    }
+    
+    /**充电器*/ 
+    chargerStorage(val){
+        this.setState({
+            chargerStorage:val
+        });
+    }
+    /**蓄电池*/ 
+    batteryStorage(val){
+        this.setState({
+            batteryStorage:val
         });
     }
 

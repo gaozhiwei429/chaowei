@@ -36,10 +36,7 @@ export default class CWBatteryElectricCurrent extends Component {
             isLiked: false,
         };
     }
-    compennetDidUnmount(){
-        //关闭数据库
-        sqLite.close();
-    }
+    
     async componentDidMount(){
         battery1electric_currentData=[];
         battery2electric_currentData=[];
@@ -331,13 +328,15 @@ export default class CWBatteryElectricCurrent extends Component {
     render() {
         const option= {
             title: {
-                text: '电流',
+                text: '电池电流',
+                x:'center'
             },
             tooltip : { //点击某一个点的数据的时候，显示出悬浮窗
                 trigger: 'none',//item,axis,none
             },
             legend: {//可以手动选择现实几个图标
                 data:['电池1','电池2','电池3','电池4'],
+                y:'bottom',
             },
             toolbox: {//各种表格
                 orient: 'vertical',//改变icon的布局朝向
@@ -369,8 +368,13 @@ export default class CWBatteryElectricCurrent extends Component {
                 //就是一月份这个显示为一个线段，而不是数轴那种一个点点
                 boundaryGap:false,
                 type : 'category',
-                name : '',//时间
+                name : '时间',//时间
                 data: [0,1, 2, 3, 4, 5, 6,7, 8, 9, 10, 11, 12,13, 14, 15, 16, 17,],
+                axisLabel:{ 
+                    textStyle:{ 
+                        fontSize: 9,
+                    }
+                }
             },
             yAxis: {
                 type:'value',
@@ -404,37 +408,6 @@ export default class CWBatteryElectricCurrent extends Component {
                     showSymbol: false,
                 }
             ],
-            // visualMap: {//值的大小决定曲线的颜色
-            //     top: 10,
-            //     right: 10,
-            //     pieces: [{
-            //         gt: 0,
-            //         lte: 50,
-            //         color: '#096'
-            //     }, {
-            //         gt: 50,
-            //         lte: 100,
-            //         color: '#ffde33'
-            //     }, {
-            //         gt: 100,
-            //         lte: 150,
-            //         color: '#ff9933'
-            //     }, {
-            //         gt: 150,
-            //         lte: 200,
-            //         color: '#cc0033'
-            //     }, {
-            //         gt: 200,
-            //         lte: 300,
-            //         color: '#660099'
-            //     }, {
-            //         gt: 300,
-            //         color: '#7e0023'
-            //     }],
-            //     outOfRange: {
-            //         color: '#999'
-            //     }
-            // },
         };
         return (
             <View style={styles.container}>

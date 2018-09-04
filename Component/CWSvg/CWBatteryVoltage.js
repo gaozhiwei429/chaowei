@@ -36,10 +36,7 @@ export default class CWBatteryVoltage extends Component {
             isLiked: false,
         };
     }
-    compennetDidUnmount(){
-        //关闭数据库
-        sqLite.close();
-    }
+
     async componentDidMount(){
         battery1VoltageData= [];
         battery2VoltageData=[];
@@ -329,13 +326,15 @@ export default class CWBatteryVoltage extends Component {
     render() {
         const option= {
             title: {
-                text: '电压',
+                text: '电池电压',
+                x:'center',
             },
             tooltip : { //点击某一个点的数据的时候，显示出悬浮窗
                 trigger: 'none',//item,axis,none
             },
             legend: {//可以手动选择现实几个图标
                 data:['电池1','电池2','电池3','电池4'],
+                y:'bottom',
             },
             toolbox: {//各种表格
                 // orient: 'vertical',//改变icon的布局朝向
@@ -357,8 +356,13 @@ export default class CWBatteryVoltage extends Component {
                 //就是一月份这个显示为一个线段，而不是数轴那种一个点点
                 boundaryGap:false,
                 type : 'category',
-                name : '',//时间
+                name : '时间',//时间
                 data: [0,1, 2, 3, 4, 5, 6,7, 8, 9, 10, 11, 12,13, 14, 15, 16, 17,],
+                axisLabel:{ 
+                    textStyle:{ 
+                        fontSize: 9,
+                    }
+                }
             },
             yAxis: {
                 type:'value',

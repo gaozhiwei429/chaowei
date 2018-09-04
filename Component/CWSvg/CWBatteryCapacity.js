@@ -5,7 +5,6 @@ import {
     View,
     TouchableOpacity,
     Dimensions,
-    ScrollView
 } from 'react-native';
 
 import Echarts from 'native-echarts';
@@ -15,7 +14,6 @@ import * as storage from '../../storage';
 import { BATTERY_BIND_STORAGE_KEY,CHARGER_BIND_STORAGE_KEY } from '../../config';
 var sqLite = new SQLiteText();
 var db;
-
 
 var battery1capacityData = [];
 var battery2capacityData=[];
@@ -39,10 +37,6 @@ export default class CWBatteryCapacity extends Component {
         };
     }
 
-    compennetDidUnmount(){
-        //关闭数据库
-        sqLite.close();
-    }
     async componentDidMount(){
         battery1capacityData = [];
         battery2capacityData=[];
@@ -330,13 +324,16 @@ export default class CWBatteryCapacity extends Component {
     render() {
         const option= {
             title: {
-                text: '容量',
+                text: '电池容量',
+                // align: 'right',
+                x: 'center',
             },
             tooltip : { //点击某一个点的数据的时候，显示出悬浮窗
                 trigger: 'none',//item,axis,none
             },
             legend: {//可以手动选择现实几个图标
                 data:['电池1','电池2','电池3','电池4',],
+                y:'bottom',
             },
             toolbox: {//各种表格
                 orient: 'vertical',//改变icon的布局朝向
@@ -358,8 +355,13 @@ export default class CWBatteryCapacity extends Component {
                 //就是一月份这个显示为一个线段，而不是数轴那种一个点点
                 boundaryGap:false,
                 type : 'category',
-                name : '',//时间
+                name : '时间',//时间
                 data: [0,1, 2, 3, 4, 5, 6,7, 8, 9, 10, 11, 12,13, 14, 15, 16, 17,],
+                axisLabel:{ 
+                    textStyle:{ 
+                        fontSize: 9,
+                    }
+                }
             },
             yAxis: {
                 type:'value',
@@ -392,6 +394,7 @@ export default class CWBatteryCapacity extends Component {
                     data: this.state.battery4,
                     showSymbol: false,
                 },
+                
             ],
             // visualMap: {//值的大小决定曲线的颜色
             //     top: 10,

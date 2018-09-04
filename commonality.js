@@ -85,3 +85,15 @@ export function CharToHex(str) {
 export function pad(num, n) {
     return Array(n>num?(n-(''+num).length+1):0).join(0)+num;
 }
+
+
+export function replaceTime(txt){
+        // var txt='2013-01-31 20:20';
+        var re2='.*?((?:(?:[0-1][0-9])|(?:[2][0-3])|(?:[0-9])):(?:[0-5][0-9])?(?:\\s?(?:am|AM|pm|PM))?)';	// HourMinuteSec 1
+        var p = new RegExp(re2,["i"]);
+        var m = p.exec(txt);
+        if (m != null){
+            var time1=m[1].replace(/</,"&lt;")+"\n";
+        }
+        return time1;
+}
