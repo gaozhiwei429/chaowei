@@ -32,13 +32,13 @@ export default class RepairJoining extends Component {
             // elevation: null
         },
         // headerLeft:(
-        //     <View style={{height: 44,width: 55,justifyContent: 'center',paddingRight:15} }/>
+        //     <View />
         // ),
         headerRight: (
-            <View style={{height: 44, width: 55, justifyContent: 'center', paddingRight: 15}}/>
+            <View />
         ),
         headerPressColorAndroid:'gray',
-        headerBackImage: (<Image source={require('../../img/leftGoBack.png')} style={{width:18,height:14,marginLeft:15}}/>),
+        headerBackImage: (<Image source={require('../../img/leftGoBack.png')} style={{width:18,height:14,marginLeft:15,marginRight:15}}/>),
     };
 
     render() {

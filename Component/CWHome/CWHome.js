@@ -8,6 +8,7 @@ import {
     TouchableOpacity,
     Dimensions,
     AsyncStorage,
+    DeviceEventEmitter,
 } from 'react-native';
 
 import bleBroadcast from '../CWBleBroadcast/CWBleBroadcast';//蓝牙广播模块
@@ -61,6 +62,7 @@ export default class CWHome extends Component {
             bandingImg:0,
             chargerStorage:0,
             batteryStorage:0,
+            chargerLen:0,
         };
         this.deviceMap = new Map();
     } 
@@ -74,39 +76,45 @@ export default class CWHome extends Component {
                 });
             }
         });
-        /** 充电器*/
-        const chargerStorage=()=>{
-            storage.get(CHARGER_BIND_STORAGE_KEY, (error, result) => {
-                if(result !== null){
-                    this.setState({
-                        chargerStorage: 1
-                    });
-                }else {
-                    this.setState({
-                        chargerStorage: 0
-                    });
-                }
-            });
-            setTimeout(chargerStorage,1000);
-        };
-        chargerStorage();
 
-        /** 蓄电池*/
-        const batteryStorage =()=>{
-            storage.get(BATTERY_BIND_STORAGE_KEY, (error, result) => {
-                if(result !== null){
-                    this.setState({
-                        batteryStorage: result.length,
-                    });
-                }else {
-                    this.setState({
-                        batteryStorage: 0,
-                    });
-                }
+        // 添加监听者
+        this.listener = DeviceEventEmitter.addListener('charger', (len) => {
+            this.setState({
+                chargerStorage: len
             });
-            setTimeout(batteryStorage,900);
-        };
-        batteryStorage();
+        })
+
+        /** 充电器*/   
+        storage.get(CHARGER_BIND_STORAGE_KEY, (error, result) => {
+            if(result !== null){
+                this.setState({
+                    chargerStorage: 1
+                });
+            }else {
+                this.setState({
+                    chargerStorage: 0
+                });
+            }
+        });
+
+        // 添加监听者
+        this.listener = DeviceEventEmitter.addListener('battery', (len) => {
+            this.setState({
+                batteryStorage: len
+            });  
+        })
+        /** 电池*/
+        storage.get(BATTERY_BIND_STORAGE_KEY, (error, result) => {
+            if(result !== null){
+                this.setState({
+                    batteryStorage: result.length,
+                });
+            }else {
+                this.setState({
+                    batteryStorage: 0,
+                });
+            }
+        });
 
         /** 充电器*/
         let promise1=new Promise(function (resolve, reject) {
@@ -115,7 +123,7 @@ export default class CWHome extends Component {
                     reject(error);
                     return;
                 }
-                resolve(result);
+                resolve(result);    
             })}
         );
 
@@ -133,7 +141,7 @@ export default class CWHome extends Component {
         /** 电池充电器数据广播*/
         Promise.all([promise1,promise2]).then((values) => {
             batteryArray=[].concat.apply([],values);//绑定电池与充电器合并后的数组
-
+            // console.log(batteryArray);
             /**蓝牙扫描绑定*/
             this.deviceMap.clear();
             BluetoothManager.manager.startDeviceScan(null, null, (error, device) => {
@@ -264,10 +272,10 @@ export default class CWHome extends Component {
                         }
                     }
                     Promise.all([actionsBattery],[actionsCharger]).then(function () {
-                        setTimeout(loop, 1000);
+                        setTimeout(loop, 60000);
                     });
                 };
-                setTimeout(loop, 1000);
+                setTimeout(loop, 60000);
             }
         ),
             (error) => {
@@ -325,7 +333,7 @@ export default class CWHome extends Component {
                                     storage.get(PHONE_BIND_STORAGE_KEY, (error, result) => {
                                         result = (result || '').replace(result,'123');
                                         storage.save(PHONE_BIND_STORAGE_KEY, result, () => {
-                                            if(result == '123'){
+                                            if(result == '123'){ 
                                                 bleBroadcast.stop();
                                                 this.refs.toast_su.success();
                                                 this.setState({
@@ -467,11 +475,11 @@ export default class CWHome extends Component {
                     </TouchableOpacity>
                     <TouchableOpacity style={{width:35,height:35,backgroundColor:'#0fa'}} onPress={()=>this.bbbb()}>
                         <Text>解绑</Text>
-                    </TouchableOpacity>
+                    </TouchableOpacity> 
                 </View>
 
                 {/*顶部电量可行驶里程*/}
-                <Text style={styles.mileageText}>还可以骑行30公里</Text>
+                <Text style={styles.mileageText}>还可以骑行30公里</Text> 
                 {/*进度条*/}
                 <ProgressBarAndroid  styleAttr="Horizontal" color="red" indeterminate={false} progress={0.7} />
                 {/*电源、电池按钮*/}

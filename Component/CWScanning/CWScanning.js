@@ -1,13 +1,12 @@
 import React, { Component } from 'react';
 import {
-    AppRegistry,
     StyleSheet,
     Text,
     View,
     AsyncStorage,
     TouchableOpacity,
-    Alert,
     Image,
+    DeviceEventEmitter,
 } from 'react-native';
 import * as storage from '../../storage';
 import { BATTERY_BIND_STORAGE_KEY,CHARGER_BIND_STORAGE_KEY,PHONE_BIND_STORAGE_KEY } from '../../config';
@@ -58,12 +57,14 @@ export default class CWScanning extends Component {
     _removeBattery = ()=>{    // 解绑电池
         AsyncStorage.removeItem(BATTERY_BIND_STORAGE_KEY);
         AsyncStorage.removeItem(PHONE_BIND_STORAGE_KEY);
+        DeviceEventEmitter.emit('battery', 0)
         this.refs.batterUnbing.open();
     };
 
     _removeCharger = ()=>{    // 解绑充电器
         AsyncStorage.removeItem(CHARGER_BIND_STORAGE_KEY);
         AsyncStorage.removeItem(PHONE_BIND_STORAGE_KEY);
+        DeviceEventEmitter.emit('charger', 0)
         this.refs.chargerUnbing.open();
     };
 
@@ -81,7 +82,7 @@ export default class CWScanning extends Component {
             <View style={{height: 44,width: 55,justifyContent: 'center',paddingRight:15} }/>
         ),
         headerPressColorAndroid:'gray',
-        headerBackImage: (<Image source={require('../../img/leftGoBack.png')} style={{width:18,height:14,marginLeft:15}}/>),
+        headerBackImage: (<Image source={require('../../img/leftGoBack.png')} style={{width:18,height:14,marginLeft:15,marginRight:15}}/>),
     };
 
     render() {

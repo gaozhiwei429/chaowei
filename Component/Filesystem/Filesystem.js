@@ -188,7 +188,7 @@ export default class Filesystem extends Component {
         headerRight: (
             <View style={{height: 44, width: 55, justifyContent: 'center', paddingRight: 15}}/>
         ),
-        // headerPressColorAndroid: 'blue',   
+        headerPressColorAndroid:'gray',
         headerBackImage: (<Image source={require('../../img/leftGoBack.png')} style={{width:18,height:14,marginLeft:15,marginRight:15}}/>),
     };
 
@@ -206,9 +206,10 @@ export default class Filesystem extends Component {
                 <TouchableOpacity onPress={()=>this.deleteFile()}>
                     <Text style={{margin:20,fontSize:20}}>删除文件</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={()=>OpenFolder.open()}>
+                {/* <TouchableOpacity onPress={()=>OpenFolder.open()}>
                     <Text style={{margin:20,fontSize:20}}>打开文件夹</Text>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
+                <Text style={{width:_width/2}}>注：导出文件在安卓手机文件管理系统下的 Android/data/com.chaowei/files/文件夹下</Text>
                 <EasyToast
                     ref="toast"
                     style={ {backgroundColor:'rgba(0,0,0,0.5)',padding:12}}

@@ -19,7 +19,7 @@ export default class PeakValley extends Component {
             tableData: [
                 ['时段', '08:00-22:00(高峰)', '22:00-次日8:00(低谷)',],
                 ['充电单价(元/度)', '0.5680', '0.2880',],
-                // ['服务费(元/度)', '1', 'c','1', 'b', 'c','1',],
+                // ['服务费(元/度)', '1', 'c',],
                 ['实际费用(元/度)','0.5680', '0.2880',],
             ]
         }
@@ -37,13 +37,13 @@ export default class PeakValley extends Component {
             // elevation: null
         },
         // headerLeft:(
-        //     <View style={{height: 44,width: 55,justifyContent: 'center',paddingRight:15} }/>
+        //     <View />
         // ),
         headerRight: (
             <View style={{height: 44, width: 55, justifyContent: 'center', paddingRight: 15}}/>
         ),
         headerPressColorAndroid:'gray',
-        headerBackImage: (<Image source={require('../../img/leftGoBack.png')} style={{width:18,height:14,marginLeft:15}}/>),
+        headerBackImage: (<Image source={require('../../img/leftGoBack.png')} style={{width:18,height:14,marginLeft:15,marginRight:15}}/>),
     };
 
     render() {

@@ -31,13 +31,13 @@ export default class PaymentPage extends Component {
             height: 40,
         },
         headerLeft:(
-            <View style={{height: 44,width: 55,justifyContent: 'center',paddingRight:15} }/>
+            <View />
         ),
         headerRight: (
-            <View style={{height: 44,width: 55,justifyContent: 'center',paddingRight:15} }/>
+            <View/>
         ),
-        headerPressColorAndroid:'blue',
-        headerBackImage: (<Image source={require('../../img/leftGoBack.png')} style={{width:18,height:14,marginLeft:15}}/>),
+        headerPressColorAndroid:'gray',
+        headerBackImage: (<Image source={require('../../img/leftGoBack.png')} style={{width:18,height:14,marginLeft:15,marginRight:15}}/>),
     };
 
     async goAlipay () {   

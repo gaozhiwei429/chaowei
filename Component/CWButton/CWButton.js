@@ -35,8 +35,8 @@ export default class CWButton extends Component {
         headerRight: (
             <View style={{height: 44,width: 55,justifyContent: 'center',paddingRight:15} }/>
         ),
-        headerPressColorAndroid:'blue',
-        headerBackImage: (<Image source={require('../../img/leftGoBack.png')} style={{width:18,height:14,marginLeft:15}}/>),
+        headerPressColorAndroid:'gray',
+        headerBackImage: (<Image source={require('../../img/leftGoBack.png')} style={{width:18,height:14,marginLeft:15,marginRight:15}}/>),
     };
 
     render() {
@@ -74,36 +74,36 @@ export default class CWButton extends Component {
                     title='电动车维修加盟'
                     onPress={() => this.props.navigation.navigate('RepairJoining')}
                 />
-                <CWBtnCell
-                    title='电池诊断'
-                />
-                <CWBtnCell
-                    title='高端充电器介绍'
-                />
-                <CWBtnCell
-                    title='充电器送货上门'
-                />
-                <CWBtnCell
-                    title='红包购充电器'
-                />
-                <CWBtnCell
-                    title='充电成本估算'
-                />
-                <CWBtnCell
-                    title='电池衰退曲线'
-                />
-                <CWBtnCell
-                    title='电池价格购买方式'
-                />
-                <CWBtnCell
-                    title='中智无线电池介绍'
-                />
-                <CWBtnCell
-                    title='电池上门更换'
-                />
-                <CWBtnCell
-                    title='红包充电'
-                />
+                {/*<CWBtnCell*/}
+                    {/*title='电池诊断'*/}
+                {/*/>*/}
+                {/*<CWBtnCell*/}
+                    {/*title='高端充电器介绍'*/}
+                {/*/>*/}
+                {/*<CWBtnCell*/}
+                    {/*title='充电器送货上门'*/}
+                {/*/>*/}
+                {/*<CWBtnCell*/}
+                    {/*title='红包购充电器'*/}
+                {/*/>*/}
+                {/*<CWBtnCell*/}
+                    {/*title='充电成本估算'*/}
+                {/*/>*/}
+                {/*<CWBtnCell*/}
+                    {/*title='电池衰退曲线'*/}
+                {/*/>*/}
+                {/*<CWBtnCell*/}
+                    {/*title='电池价格购买方式'*/}
+                {/*/>*/}
+                {/*<CWBtnCell*/}
+                    {/*title='中智无线电池介绍'*/}
+                {/*/>*/}
+                {/*<CWBtnCell*/}
+                    {/*title='电池上门更换'*/}
+                {/*/>*/}
+                {/*<CWBtnCell*/}
+                    {/*title='红包充电'*/}
+                {/*/>*/}
                 {/*<TouchableOpacity >*/}
                     {/*<Text*/}
                         {/*style={{width:width,textAlign:'center',marginTop:40,marginBottom:20}}*/}

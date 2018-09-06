@@ -9,6 +9,7 @@ import {
     Linking,
     Dimensions,
     NativeModules,
+    DeviceEventEmitter,
 } from 'react-native';
 
 import QRCodeScanner from 'react-native-qrcode-scanner';
@@ -23,8 +24,8 @@ export default class CWQRCode extends Component {
     constructor(){
         super();
         this.state = {
-            dataBattery:[],//电池
-            dataCharger:[],//充电器
+            // dataBattery:[],//电池
+            // dataCharger:[],//充电器
             JudgeBtn:0,
         };
     }
@@ -42,7 +43,9 @@ export default class CWQRCode extends Component {
                         result= (result || []).concat(value);
                         if(result.length<2){
                             storage.save(CHARGER_BIND_STORAGE_KEY, result, () => {
-                                this.setState({ dataCharger: value});
+                                // console.log(result.length,'charger'); 
+                                DeviceEventEmitter.emit('charger', result.length)
+                                // this.setState({ dataCharger: value});
                             });
                             this.refs.toast.show('扫码成功!',1200);
                         }else {
@@ -59,7 +62,9 @@ export default class CWQRCode extends Component {
                         result = (result || []).concat(value);
                         if(result.length<7){
                             storage.save(BATTERY_BIND_STORAGE_KEY, result, () => {
-                                this.setState({ dataBattery: value});
+                                // console.log(result.length,'battery'); 
+                                DeviceEventEmitter.emit('battery', result.length)
+                                // this.setState({ dataBattery: value});
                             });
                             this.refs.toast.show('扫码成功!',1200);
                         }else{
@@ -203,7 +208,7 @@ export default class CWQRCode extends Component {
                             {/**QR覆盖层底部*/}
                             <View style={styles.overlayBottom}/>
                         </View>}
-                    <View style={{flex:1,zIndex:10,height:70, backgroundColor:'rgba(0,0,0,0.7)', width:width, justifyContent:'space-around',flexDirection:'row', alignItems:'center',position:'absolute',bottom:30}}>
+                    <View style={{flex:1,  height:height/7, backgroundColor:'rgba(0,0,0,0.7)', width:width, justifyContent:'space-around',flexDirection:'row', alignItems:'center',}}>
                         {this.state.JudgeBtn===0?
                             <View style={styles.selected}>
                                 <Image source={require('../../img/BandPitchOn.png')} style={{width:30,height:30,}} />
@@ -225,8 +230,6 @@ export default class CWQRCode extends Component {
                             </TouchableOpacity>
                         }
                     </View>
-
-
 
                     {/*<TouchableOpacity style={styles.overlayBottom} onPress={() => {*/}
                         {/*this._switch()*/}
@@ -258,13 +261,13 @@ const styles = StyleSheet.create({
     },
     RechargeTop:{
         flex:1,
-        height: height/3-40,
+        height: height/3-60,
         width: width,
     },
     RechargeBottom:{
         flex:1,
-        flexDirection:'row',
-        height: height/3,
+        // flexDirection:'row',
+        height: height/3-height/7,
         width: width,
     },
     Recharge:{
@@ -352,8 +355,8 @@ const styles = StyleSheet.create({
     },
     overlayBottom:{
         flex:1,
-        flexDirection:'row',
-        height: height/3,   
+        // flexDirection:'row',
+        height: height/3-height/7,
         width: width,
         backgroundColor: 'rgba(0, 0, 0, 0.6)',
         // justifyContent:'space-around',
@@ -361,7 +364,7 @@ const styles = StyleSheet.create({
     },
     overlayTop:{
         flex:1,
-        height: height/3-40,
+        height: height/3-60,
         width: width,
         backgroundColor: 'rgba(0, 0, 0, 0.6)',
     },

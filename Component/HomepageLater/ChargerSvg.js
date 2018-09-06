@@ -122,13 +122,13 @@ export default class ChargerSvg extends Component {
                                 chargerTime:chargerTimeData,
                             });
                         }
-                        chargerClearTime = setTimeout(chargerFeedback, 10000);
+                        chargerClearTime = setTimeout(chargerFeedback, 60000);
                     });
                 },(error)=>{
                     console.log(error);
                 });
             };
-            setTimeout(chargerFeedback, 10000);
+            setTimeout(chargerFeedback, 60000);
         });
     }
 
@@ -184,10 +184,10 @@ export default class ChargerSvg extends Component {
             height: 40,
         },
         headerRight: (
-            <View style={{height: 44,width: 55,justifyContent: 'center',paddingRight:15} }/>
+            <View/>
         ),
         headerPressColorAndroid:'gray',
-        headerBackImage: (<Image source={require('../../img/leftGoBack.png')} style={{width:18,height:14,marginLeft:15}}/>),
+        headerBackImage: (<Image source={require('../../img/leftGoBack.png')} style={{width:18,height:14,marginLeft:15,marginRight:15}}/>),
     };
     render() {
         const option= {
