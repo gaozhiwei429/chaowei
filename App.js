@@ -92,7 +92,7 @@ const RootStack = createStackNavigator({
         CWEchart:{screen:CWEchart},
     },
     {
-        initialRouteName: 'CWGLaunchlmage',
+        initialRouteName: 'CWGLaunchlmage',  
     }
 );
 

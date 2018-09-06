@@ -20,11 +20,15 @@ var battery1VoltageData= [];
 var battery2VoltageData=[];
 var battery3VoltageData=[];
 var battery4VoltageData=[];
+var battery5VoltageData=[];
+var battery6VoltageData=[];
 var promiseValues;
 var battery1Time;
 var battery2Time;
 var battery3Time;
 var battery4Time;
+var battery5Time;
+var battery6Time;
 export default class CWBatteryVoltage extends Component {
     constructor(props) {
         super(props);
@@ -33,6 +37,8 @@ export default class CWBatteryVoltage extends Component {
             battery2:[],
             battery3:[],
             battery4:[],
+            battery5:[],
+            battery6:[],
             isLiked: false,
         };
     }
@@ -42,6 +48,8 @@ export default class CWBatteryVoltage extends Component {
         battery2VoltageData=[];
         battery3VoltageData=[];
         battery4VoltageData=[];
+        battery5VoltageData=[];
+        battery6VoltageData=[];
         this.setState({
             isLiked: !this.state.isLiked
         });
@@ -236,6 +244,92 @@ export default class CWBatteryVoltage extends Component {
                 });
             };
             setTimeout(batteryVoltage4, 10000);
+
+            //查询电池5
+            db.transaction((tx)=>{
+                tx.executeSql("select id,battery_id,my_timestamp,voltage from battery where battery_id='"+values[0][4]+"' order by my_timestamp desc limit 18", [],(tx,results)=>{
+                    var len = results.rows.length;
+                    for(let i=0; i<len; i++){
+                        var u = results.rows.item(i);
+                        battery5VoltageData.push(u.voltage);
+                    }
+                    this.setState({
+                        battery5:battery5VoltageData,
+                    })
+                });
+            },(error)=>{
+                console.log(error);
+            });
+
+            const batteryVoltage5 = () => {
+                //查询
+                db.transaction((tx)=>{
+                    tx.executeSql("select id,battery_id,my_timestamp,voltage from battery where battery_id= '"+values[0][4]+"' order by my_timestamp desc limit 1", [],(tx,results)=>{
+                        var len = results.rows.length;
+                        for(let i=0; i<len; i++){
+                            var u = results.rows.item(i);
+                            battery5VoltageData.push(u.voltage);
+                        }
+                        if(battery5VoltageData.length>18){
+                            battery5VoltageData.shift();
+                            this.setState({
+                                battery5:battery5VoltageData,
+                            });
+                        }else {
+                            this.setState({
+                                battery5:battery5VoltageData,
+                            });
+                        }
+                        battery5Time=setTimeout(batteryVoltage5, 10000);
+                    });
+                },(error)=>{
+                    console.log(error);
+                });
+            };
+            setTimeout(batteryVoltage5, 10000);
+
+            //查询电池5
+            db.transaction((tx)=>{
+                tx.executeSql("select id,battery_id,my_timestamp,voltage from battery where battery_id='"+values[0][5]+"' order by my_timestamp desc limit 18", [],(tx,results)=>{
+                    var len = results.rows.length;
+                    for(let i=0; i<len; i++){
+                        var u = results.rows.item(i);
+                        battery6VoltageData.push(u.voltage);
+                    }
+                    this.setState({
+                        battery6:battery6VoltageData,
+                    })
+                });
+            },(error)=>{
+                console.log(error);
+            });
+
+            const batteryVoltage6 = () => {
+                //查询
+                db.transaction((tx)=>{
+                    tx.executeSql("select id,battery_id,my_timestamp,voltage from battery where battery_id= '"+values[0][5]+"' order by my_timestamp desc limit 1", [],(tx,results)=>{
+                        var len = results.rows.length;
+                        for(let i=0; i<len; i++){
+                            var u = results.rows.item(i);
+                            battery6VoltageData.push(u.voltage);
+                        }
+                        if(battery6VoltageData.length>18){
+                            battery6VoltageData.shift();
+                            this.setState({
+                                battery6:battery6VoltageData,
+                            });
+                        }else {
+                            this.setState({
+                                battery6:battery6VoltageData,
+                            });
+                        }
+                        battery6Time=setTimeout(batteryVoltage6, 10000);
+                    });
+                },(error)=>{
+                    console.log(error);
+                });
+            };
+            setTimeout(batteryVoltage6, 10000);
         });
     }
 
@@ -244,10 +338,14 @@ export default class CWBatteryVoltage extends Component {
         battery2VoltageData=[];
         battery3VoltageData=[];
         battery4VoltageData=[];
+        battery5VoltageData=[];
+        battery6VoltageData=[];
         clearTimeout(battery1Time);
         clearTimeout(battery2Time);
         clearTimeout(battery3Time);
         clearTimeout(battery4Time);
+        clearTimeout(battery5Time);
+        clearTimeout(battery6Time);
         this.setState({
             isLiked: !this.state.isLiked
         });
@@ -315,6 +413,38 @@ export default class CWBatteryVoltage extends Component {
         },(error)=>{
             console.log(error);
         });
+
+        //查询电池5
+        db.transaction((tx)=>{
+            tx.executeSql("select id,battery_id,my_timestamp,voltage from battery where battery_id='"+promiseValues[0][4]+"' order by my_timestamp desc limit 18", [],(tx,results)=>{
+                var len = results.rows.length;
+                for(let i=0; i<len; i++){
+                    var u = results.rows.item(i);
+                    battery5VoltageData.push(u.voltage);
+                }
+                this.setState({
+                    battery5:battery5VoltageData,
+                })
+            });
+        },(error)=>{
+            console.log(error);
+        });
+
+        //查询电池6
+        db.transaction((tx)=>{
+            tx.executeSql("select id,battery_id,my_timestamp,voltage from battery where battery_id='"+promiseValues[0][5]+"' order by my_timestamp desc limit 18", [],(tx,results)=>{
+                var len = results.rows.length;
+                for(let i=0; i<len; i++){
+                    var u = results.rows.item(i);
+                    battery6VoltageData.push(u.voltage);
+                }
+                this.setState({
+                    battery6:battery6VoltageData,
+                })
+            });
+        },(error)=>{
+            console.log(error);
+        });
     }
 
     componentWillUnmount() {
@@ -322,6 +452,8 @@ export default class CWBatteryVoltage extends Component {
         clearTimeout(battery2Time);
         clearTimeout(battery3Time);
         clearTimeout(battery4Time);
+        clearTimeout(battery5Time);
+        clearTimeout(battery6Time);
     }
     render() {
         const option= {
@@ -333,7 +465,7 @@ export default class CWBatteryVoltage extends Component {
                 trigger: 'none',//item,axis,none
             },
             legend: {//可以手动选择现实几个图标
-                data:['电池1','电池2','电池3','电池4'],
+                data:['电池1','电池2','电池3','电池4','电池5','电池6'],
                 y:'bottom',
             },
             toolbox: {//各种表格
@@ -348,7 +480,7 @@ export default class CWBatteryVoltage extends Component {
                     },
                 }
             },
-            color:['rgb(67,205,126)','rgb(249,159,94)','rgb(255,106,106)','rgb(105,89,205)'],//图形的颜色组
+            color:['rgb(67,205,126)','rgb(249,159,94)','rgb(255,106,106)','rgb(105,89,205)','rgb(255, 0, 203)','rgb(0,0,205)'],//图形的颜色组
             xAxis: {
                 splitLine: {
                     show: false,
@@ -394,39 +526,22 @@ export default class CWBatteryVoltage extends Component {
                     smooth:true,
                     data: this.state.battery4,
                     showSymbol: false,
+                },
+                {
+                    name: '电池5',
+                    type: 'line',
+                    smooth:true,
+                    data: this.state.battery5,
+                    showSymbol: false,
+                },
+                {
+                    name: '电池6',
+                    type: 'line',
+                    smooth:true,
+                    data: this.state.battery6,
+                    showSymbol: false,
                 }
-            ],
-            // visualMap: {//值的大小决定曲线的颜色
-            //     top: 10,
-            //     right: 10,
-            //     pieces: [{
-            //         gt: 0,
-            //         lte: 50,
-            //         color: '#096'
-            //     }, {
-            //         gt: 50,
-            //         lte: 100,
-            //         color: '#ffde33'
-            //     }, {
-            //         gt: 100,
-            //         lte: 150,
-            //         color: '#ff9933'
-            //     }, {
-            //         gt: 150,
-            //         lte: 200,
-            //         color: '#cc0033'
-            //     }, {
-            //         gt: 200,
-            //         lte: 300,
-            //         color: '#660099'
-            //     }, {
-            //         gt: 300,
-            //         color: '#7e0023'
-            //     }],
-            //     outOfRange: {
-            //         color: '#999'
-            //     }
-            // },
+            ],    
         };
         return (
             <View style={styles.container}>

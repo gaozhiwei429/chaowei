@@ -155,11 +155,11 @@ export default class Calibration extends Component {
     render() {
         const { params } = this.props.navigation.state;
         const { index,chargerImg } = params;
-        var ChargerVoltage = parseInt((this.state.ChargerCalibration.slice(22,24)).concat(this.state.ChargerCalibration.slice(20,22)),16);// 充电器电压
+        var ChargerVoltage = parseInt((this.state.ChargerCalibration.slice(22,24)).concat(this.state.ChargerCalibration.slice(20,22)),16)/100;// 充电器电压
 
-        var ChargerElectricity =  parseInt((this.state.ChargerCalibration.slice(26,28)).concat(this.state.ChargerCalibration.slice(24,26)),16);// 充电器电流
+        var ChargerElectricity =  parseInt((this.state.ChargerCalibration.slice(26,28)).concat(this.state.ChargerCalibration.slice(24,26)),16)/10;// 充电器电流
 
-        var BatteryVoltager = parseInt(this.state.BatteryVoltage.slice(22,24).concat(this.state.BatteryVoltage.slice(20,22)),16);// 电池电压
+        var BatteryVoltager = parseInt(this.state.BatteryVoltage.slice(22,24).concat(this.state.BatteryVoltage.slice(20,22)),16)/100;// 电池电压
         return (
             <View style={styles.Banding}>
                 {
@@ -368,7 +368,7 @@ const styles = StyleSheet.create({
     },
     CalibrationInstrument:{
         marginRight:20,
-        width:50,
+        width:55,    
         height:44,
         backgroundColor:'#ccc',
         alignItems:'center',

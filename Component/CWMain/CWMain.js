@@ -30,7 +30,7 @@ const tabBarConfig = {
 const Tabs = createBottomTabNavigator(
     {
         Home: { screen: Homescreen },
-        Tab:{screen:TABscreen},
+        Tab: {screen:TABscreen},
         More: { screen: Buttonscreen },
     },
     {
@@ -63,10 +63,9 @@ Tabs.navigationOptions = ({ navigation }) => {
             );
             navigationOptions.headerStyle={
                 height:40,
-                // backgroundColor: 'rgba(0,0,0,0.5)',
             };
         navigationOptions.headerLeft=(
-            <View style={{height: 44,width: 55,justifyContent: 'center',paddingRight:15} }/>
+            <View/>  
         );
         navigationOptions.headerRight=(
             <TouchableOpacity style={{paddingRight:15} } onPress={()=>navigation.navigate('CWQRCode')}>

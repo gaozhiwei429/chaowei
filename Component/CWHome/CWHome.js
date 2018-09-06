@@ -143,7 +143,7 @@ export default class CWHome extends Component {
                     this.deviceMap.set(device.id,device); //使用Map类型保存搜索到的蓝牙设备，确保列表不显示重复的设备
                     BleScan = [...this.deviceMap.values()];
                 }
-            });
+            })
 
             //向数据库写数据
             this.writeDatabase();
@@ -213,7 +213,6 @@ export default class CWHome extends Component {
                                 for (var r=0;r<batteryArray.length;r++){
                                     var scanIdentifier = searchBle.slice(0, 16);//搜索到的电池识别码与ID   
                                     if(scanIdentifier == batteryIdentifier && batteryArray[r] == equipmentID){//判断电池识别码与ID
-                                    console.log(searchBle);    
                                         // 电池数据
                                         var batteryData = [];
                                         var battery = {};
@@ -290,7 +289,7 @@ export default class CWHome extends Component {
                 bindSingle();
                 this.refs.toast.show('开始绑定!',1500)
             }else{
-                this.refs.toast.show('绑定完成!',1500)
+                this.refs.toast.show('已绑定完成!',1500)
             }
         });
         /**蓝牙扫描绑定*/
@@ -636,8 +635,9 @@ const styles = StyleSheet.create({
     viewRightImage:{
     },
     ImagesStyle:{
-        width:width/9 ,
-        height:height/9,
+        width:40,
+        height:70, 
+        // flex:1,   
     }
 });
 

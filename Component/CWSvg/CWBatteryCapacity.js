@@ -19,11 +19,15 @@ var battery1capacityData = [];
 var battery2capacityData=[];
 var battery3capacityData=[];
 var battery4capacityData=[];
+var battery5capacityData=[];
+var battery6capacityData=[];
 var promiseValues;
 var battery1Time;
 var battery2Time;
 var battery3Time;
 var battery4Time;
+var battery5Time;
+var battery6Time;
 export default class CWBatteryCapacity extends Component {
 
     constructor(props) {
@@ -33,6 +37,8 @@ export default class CWBatteryCapacity extends Component {
             battery2:[],
             battery3:[],
             battery4:[],
+            battery5:[],
+            battery6:[],
             isLiked: false,
         };
     }
@@ -42,6 +48,8 @@ export default class CWBatteryCapacity extends Component {
         battery2capacityData=[];
         battery3capacityData=[];
         battery4capacityData=[];
+        battery5capacityData=[];
+        battery6capacityData=[];
         this.setState({
             isLiked: !this.state.isLiked
         });
@@ -234,6 +242,93 @@ export default class CWBatteryCapacity extends Component {
                 });
             };
             setTimeout(batteryCapacity4, 10000);
+
+            //查询电池5
+            db.transaction((tx)=>{
+                tx.executeSql("select id,battery_id,my_timestamp,capacity from battery where battery_id='"+values[0][4]+"' order by my_timestamp desc limit 18", [],(tx,results)=>{
+                    var len = results.rows.length;
+                    for(let i=0; i<len; i++){
+                        var u = results.rows.item(i);
+                        battery5capacityData.push(u.capacity);
+                    }
+                    this.setState({
+                        battery5:battery5capacityData,
+                    })
+                });
+            },(error)=>{
+                console.log(error);
+            });
+
+            const batteryCapacity5 = () => {
+                //查询
+                db.transaction((tx)=>{
+                    tx.executeSql("select id,battery_id,my_timestamp,capacity from battery where battery_id= '"+values[0][4]+"' order by my_timestamp desc limit 1", [],(tx,results)=>{
+                        var len = results.rows.length;
+                        for(let i=0; i<len; i++){
+                            var u = results.rows.item(i);
+                            battery5capacityData.push(u.capacity);
+                        }
+                        if(battery5capacityData.length>18){
+                            battery5capacityData.shift();
+                            this.setState({
+                                battery5:battery5capacityData,
+                            });
+                        }else {
+                            this.setState({
+                                battery5:battery5capacityData,
+                            });
+                        }
+                        battery5Time=setTimeout(batteryCapacity5, 10000);
+                    });
+                },(error)=>{
+                    console.log(error);
+                });
+            };
+            setTimeout(batteryCapacity5, 10000);
+
+
+            //查询电池6
+            db.transaction((tx)=>{
+                tx.executeSql("select id,battery_id,my_timestamp,capacity from battery where battery_id='"+values[0][5]+"' order by my_timestamp desc limit 18", [],(tx,results)=>{
+                    var len = results.rows.length;
+                    for(let i=0; i<len; i++){
+                        var u = results.rows.item(i);
+                        battery6capacityData.push(u.capacity);
+                    }
+                    this.setState({
+                        battery6:battery6capacityData,
+                    })
+                });
+            },(error)=>{
+                console.log(error);
+            });
+
+            const batteryCapacity6 = () => {
+                //查询
+                db.transaction((tx)=>{
+                    tx.executeSql("select id,battery_id,my_timestamp,capacity from battery where battery_id= '"+values[0][5]+"' order by my_timestamp desc limit 1", [],(tx,results)=>{
+                        var len = results.rows.length;
+                        for(let i=0; i<len; i++){
+                            var u = results.rows.item(i);
+                            battery6capacityData.push(u.capacity);
+                        }
+                        if(battery6capacityData.length>18){
+                            battery6capacityData.shift();
+                            this.setState({
+                                battery6:battery6capacityData,
+                            });
+                        }else {
+                            this.setState({
+                                battery6:battery6capacityData,
+                            });
+                        }
+                        battery6Time=setTimeout(batteryCapacity6, 10000);
+                    });
+                },(error)=>{
+                    console.log(error);
+                });
+            };
+            setTimeout(batteryCapacity6, 10000);
         });
     }
     // 查询历史数据
@@ -242,10 +337,14 @@ export default class CWBatteryCapacity extends Component {
         battery2capacityData=[];
         battery3capacityData=[];
         battery4capacityData=[];
+        battery5capacityData=[];
+        battery6capacityData=[];
         clearTimeout(battery1Time);
         clearTimeout(battery2Time);
         clearTimeout(battery3Time);
         clearTimeout(battery4Time);
+        clearTimeout(battery5Time);
+        clearTimeout(battery6Time);
         this.setState({
             isLiked: !this.state.isLiked
         });
@@ -313,6 +412,38 @@ export default class CWBatteryCapacity extends Component {
         },(error)=>{
             console.log(error);
         });
+
+        //查询电池5
+        db.transaction((tx)=>{
+            tx.executeSql("select id,battery_id,my_timestamp,capacity from battery where battery_id='"+promiseValues[0][4]+"' order by my_timestamp desc limit 18", [],(tx,results)=>{
+                var len = results.rows.length;
+                for(let i=0; i<len; i++){
+                    var u = results.rows.item(i);
+                    battery5capacityData.push(u.capacity);
+                }
+                this.setState({
+                    battery5:battery5capacityData,
+                })
+            });
+        },(error)=>{
+            console.log(error);
+        });
+
+        //查询电池6
+        db.transaction((tx)=>{
+            tx.executeSql("select id,battery_id,my_timestamp,capacity from battery where battery_id='"+promiseValues[0][5]+"' order by my_timestamp desc limit 18", [],(tx,results)=>{
+                var len = results.rows.length;
+                for(let i=0; i<len; i++){
+                    var u = results.rows.item(i);
+                    battery6capacityData.push(u.capacity);
+                }
+                this.setState({
+                    battery6:battery6capacityData,
+                })
+            });
+        },(error)=>{
+            console.log(error);
+        });
     }
 
     componentWillUnmount() {
@@ -320,6 +451,8 @@ export default class CWBatteryCapacity extends Component {
         clearTimeout(battery2Time);
         clearTimeout(battery3Time);
         clearTimeout(battery4Time);
+        clearTimeout(battery5Time);
+        clearTimeout(battery6Time);
     }
     render() {
         const option= {
@@ -332,7 +465,7 @@ export default class CWBatteryCapacity extends Component {
                 trigger: 'none',//item,axis,none
             },
             legend: {//可以手动选择现实几个图标
-                data:['电池1','电池2','电池3','电池4',],
+                data:['电池1','电池2','电池3','电池4','电池5','电池6'],
                 y:'bottom',
             },
             toolbox: {//各种表格
@@ -347,7 +480,7 @@ export default class CWBatteryCapacity extends Component {
                     },
                 }
             },
-            color:['rgb(67,205,126)','rgb(249,159,94)','rgb(255,106,106)','rgb(105,89,205)'],//图形的颜色组
+            color:['rgb(67,205,126)','rgb(249,159,94)','rgb(255,106,106)','rgb(105,89,205)','rgb(255, 0, 203)','rgb(0,0,205)'],//图形的颜色组
             xAxis: {
                 splitLine: {
                     show: false,
@@ -392,6 +525,18 @@ export default class CWBatteryCapacity extends Component {
                     type: 'line',
                     smooth:true,
                     data: this.state.battery4,
+                    showSymbol: false,
+                },{
+                    name: '电池5',
+                    type: 'line',
+                    smooth:true,
+                    data: this.state.battery5,
+                    showSymbol: false,
+                },{
+                    name: '电池6',
+                    type: 'line',
+                    smooth:true,
+                    data: this.state.battery6,
                     showSymbol: false,
                 },
                 

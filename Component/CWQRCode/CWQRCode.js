@@ -203,17 +203,7 @@ export default class CWQRCode extends Component {
                             {/**QR覆盖层底部*/}
                             <View style={styles.overlayBottom}/>
                         </View>}
-                    <View style={{flex:1,  height:70, backgroundColor:'rgba(0,0,0,0.7)', width:width, justifyContent:'space-around',flexDirection:'row', alignItems:'center',}}>
-                        {/*{this.state.JudgeBtn===0?*/}
-                            {/*<View style={styles.selected}>*/}
-                                {/*<Image source={require('../../img/BandPitchOn.png')} style={{width:30,height:30,}} />*/}
-                                {/*<Text style={styles.selectedText}>扫码</Text>*/}
-                            {/*</View> :*/}
-                            {/*<TouchableOpacity style={styles.unselected}  onPress={()=>this.battery()}>*/}
-                                {/*<Image source={require('../../img/Band.png')} style={{width:30,height:30,}} />*/}
-                                {/*<Text style={styles.unselectedText}>扫码</Text>*/}
-                            {/*</TouchableOpacity>*/}
-                        {/*}*/}
+                    <View style={{flex:1,zIndex:10,height:70, backgroundColor:'rgba(0,0,0,0.7)', width:width, justifyContent:'space-around',flexDirection:'row', alignItems:'center',position:'absolute',bottom:30}}>
                         {this.state.JudgeBtn===0?
                             <View style={styles.selected}>
                                 <Image source={require('../../img/BandPitchOn.png')} style={{width:30,height:30,}} />
@@ -274,7 +264,7 @@ const styles = StyleSheet.create({
     RechargeBottom:{
         flex:1,
         flexDirection:'row',
-        height: height/3-100,
+        height: height/3,
         width: width,
     },
     Recharge:{
@@ -363,7 +353,7 @@ const styles = StyleSheet.create({
     overlayBottom:{
         flex:1,
         flexDirection:'row',
-        height: height/3-100,
+        height: height/3,   
         width: width,
         backgroundColor: 'rgba(0, 0, 0, 0.6)',
         // justifyContent:'space-around',
