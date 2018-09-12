@@ -7,6 +7,7 @@ import {
     Dimensions,
     ScrollView,
     Image,
+    Alert, 
 } from 'react-native';
 
 import Echarts from 'native-echarts';
@@ -35,7 +36,8 @@ export default class ChargerSvg extends Component {
             chargerTemperature:[],
             chargerCapacity:[],
             chargerTimeData:[],
-            isLiked: false,
+            chargerTime:[],
+            previous:0,
         };
     }
 
@@ -47,7 +49,7 @@ export default class ChargerSvg extends Component {
         chargerCapacityData=[];
         chargerTimeData=[];
         this.setState({
-            isLiked: !this.state.isLiked
+            previous:0,
         });
         //开启数据库
         if(!db){
@@ -65,15 +67,16 @@ export default class ChargerSvg extends Component {
             promiseValues=result;
             //查询
             db.transaction((tx)=>{
-                tx.executeSql("select * from charger where charger_id='"+result[0]+"' order by my_timestamp desc limit 18", [],(tx,results)=>{
+                tx.executeSql("SELECT * FROM (SELECT * FROM charger WHERE charger_id='"+result[0]+"' ORDER BY id DESC LIMIT 18)  AS chargerTab ORDER BY my_timestamp ASC", [],(tx,results)=>{
+                    // SELECT * FROM (SELECT *FROM group_chatmsg_v WHERE ((group_Id=46 AND send_user_id=28 AND receive_user_id=70) OR (group_Id=46 AND receive_user_id=28 AND STATUS=1)) AND is_delete =0 ORDER BY crtime DESC LIMIT 15)  AS chatMsgTable ORDER BY crtime ASC
                     var len = results.rows.length;
                     for(var i=0; i<len; i++){
-                        var u = results.rows.item(i); 
+                        var u = results.rows.item(i);    
                         chargerVoltageData.push(u.voltage);
                         chargerElectricCurrentData.push(u.electric_current);
                         chargerTemperatureData.push(u.chargerTemperature);
                         chargerCapacityData.push(u.capacity);
-                        chargerTimeData.push(commonality.replaceTime(u.my_timestamp));
+                        chargerTimeData.push(u.my_timestamp);    
                     }
                     this.setState({
                         chargerVoltage:chargerVoltageData,
@@ -98,7 +101,7 @@ export default class ChargerSvg extends Component {
                             chargerElectricCurrentData.push(u.electric_current);
                             chargerTemperatureData.push(u.chargerTemperature);
                             chargerCapacityData.push(u.capacity);
-                            chargerTimeData.push(commonality.replaceTime(u.my_timestamp));
+                            chargerTimeData.push(u.my_timestamp); 
                         }
                         if(chargerVoltageData.length>18 && chargerElectricCurrentData.length>18 && chargerTemperatureData.length>18 && chargerCapacityData.length>18){
                             chargerVoltageData.shift();
@@ -124,7 +127,7 @@ export default class ChargerSvg extends Component {
                         }
                         chargerClearTime = setTimeout(chargerFeedback, 60000);
                     });
-                },(error)=>{
+                },(error)=>{ 
                     console.log(error);
                 });
             };
@@ -132,16 +135,28 @@ export default class ChargerSvg extends Component {
         });
     }
 
-    async historyTime(){
+    async historyTime(whether){
         chargerVoltageData = [];
         chargerElectricCurrentData=[];
         chargerTemperatureData=[];
         chargerCapacityData=[];
         chargerTimeData=[];
         clearTimeout(chargerClearTime);
-        this.setState({
-            isLiked: !this.state.isLiked
-        });
+        if(whether===0){
+            this.setState({
+                previous:this.state.previous+18,
+            });
+        }else{
+            if(this.state.previous-18<0){
+                Alert.alert('','sorry，查到最顶部没有数据了！',[{
+                    text:'确定',onPress:()=>{}   
+                }])
+                return;  
+            }
+            this.setState({
+                previous:this.state.previous-18,
+            });
+        }
 
         //开启数据库
         if(!db){
@@ -150,15 +165,22 @@ export default class ChargerSvg extends Component {
 
         //查询
         db.transaction((tx)=>{
-            tx.executeSql("select * from charger where charger_id='"+promiseValues[0]+"' order by my_timestamp desc limit 17 OFFSET 16", [],(tx,results)=>{
+            tx.executeSql("SELECT * FROM (SELECT * FROM charger WHERE charger_id='"+promiseValues[0]+"' ORDER BY id DESC LIMIT '"+this.state.previous+"',18)  AS chargerTab ORDER BY my_timestamp ASC", [],(tx,results)=>{
+                //"SELECT * FROM (SELECT * FROM charger WHERE charger_id='"+promiseValues[0]+"' ORDER BY id DESC LIMIT 18 OFFSET 16)  AS chargerTab ORDER BY my_timestamp ASC"
                 var len = results.rows.length;
+                console.log(this.state.previous,'1');   
+                console.log(len);
+                if(len<18 || len==0){
+                    alert('sorry，没有数据可查了')  
+                    return;
+                }
                 for(var i=0; i<len; i++){
                     var u = results.rows.item(i);
                     chargerVoltageData.push(u.voltage);
                     chargerElectricCurrentData.push(u.electric_current);
                     chargerTemperatureData.push(u.chargerTemperature);
                     chargerCapacityData.push(u.capacity);
-                    chargerTimeData.push(commonality.replaceTime(u.my_timestamp));
+                    chargerTimeData.push(u.my_timestamp);  
                 }
                 this.setState({
                     chargerVoltage:chargerVoltageData,
@@ -190,13 +212,11 @@ export default class ChargerSvg extends Component {
         headerBackImage: (<Image source={require('../../img/leftGoBack.png')} style={{width:18,height:14,marginLeft:15,marginRight:15}}/>),
     };
     render() {
+        // console.log(this.state.chargerTime); 
         const option= {
             title : {
                 text: '充电器数据曲线',
-                // subtext: '数据来自西安兰特水电测控技术有限公司',
                 x: 'center',
-                // align: 'right'
-                // y:'bottom'
             },
             tooltip : { //点击某一个点的数据的时候，显示出悬浮窗
                 trigger: 'none',//item,axis,none
@@ -228,7 +248,14 @@ export default class ChargerSvg extends Component {
                 boundaryGap:false,
                 type : 'category',
                 name : '时间',//时间
-                data: this.state.chargerTime,
+                data: this.state.chargerTime.map(function(item){
+                    return commonality.replaceTime(item); 
+                }),
+                // axisLabel: {
+                //     formatter: function (date, idx) {   
+                //         return idx === 0 ? date.getMonth() : [date.getMonth() + 1, date.getDate()].join('-');
+                //     }
+                // }, 
                 axisLabel:{ 
                     textStyle:{ 
                         fontSize: 9,
@@ -276,37 +303,6 @@ export default class ChargerSvg extends Component {
                     yAxisIndex:1,
                 }
             ],
-            // visualMap: {//值的大小决定曲线的颜色
-            //     top: 10,
-            //     right: 10,
-            //     pieces: [{
-            //         gt: 0,
-            //         lte: 50,
-            //         color: '#096'
-            //     }, {
-            //         gt: 50,
-            //         lte: 100,
-            //         color: '#ffde33'
-            //     }, {
-            //         gt: 100,
-            //         lte: 150,
-            //         color: '#ff9933'
-            //     }, {
-            //         gt: 150,
-            //         lte: 200,
-            //         color: '#cc0033'
-            //     }, {
-            //         gt: 200,
-            //         lte: 300,
-            //         color: '#660099'
-            //     }, {
-            //         gt: 300,
-            //         color: '#7e0023'
-            //     }],
-            //     outOfRange: {
-            //         color: '#999'
-            //     }
-            // },
         };
         return (
             <View style={styles.container}>
@@ -315,22 +311,15 @@ export default class ChargerSvg extends Component {
                     width={Dimensions.get('window').width}
                 />
                 <View style={styles.switching}>
-                    {this.state.isLiked?
-                        <Text style={styles.selected}>
-                            <Text>实时数据</Text>
-                        </Text>:
-                        <TouchableOpacity style={styles.unselected} onPress={()=>this.componentDidMount()}>
-                            <Text>实时数据</Text>
-                        </TouchableOpacity>
-                    }
-                    {this.state.isLiked?
-                        <TouchableOpacity style={styles.unselected}  onPress={()=>this.historyTime()}>
-                            <Text>历史数据</Text>
-                        </TouchableOpacity>:
-                        <Text style={styles.selected}>
-                            <Text>历史数据</Text>
-                        </Text>
-                    }
+                    <TouchableOpacity style={styles.selected} onPress={()=>this.componentDidMount()}>
+                        <Text>实时数据</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.selected}  onPress={()=>this.historyTime(1)}>
+                        <Text>上一页</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.selected}  onPress={()=>this.historyTime(0)}>
+                        <Text>下一页</Text>
+                    </TouchableOpacity>
                 </View>
             </View>
         );
@@ -343,6 +332,7 @@ const styles = StyleSheet.create({
         // justifyContent: 'center',
         // alignItems: 'center',
         marginTop: 30,
+        
     },
     switching:{
         justifyContent: 'space-around',

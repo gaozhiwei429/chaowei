@@ -3,13 +3,12 @@ package com.chaowei;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import cn.qiuxiang.react.baidumap.BaiduMapPackage;
 import com.rnfs.RNFSPackage;
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
-import cn.qiuxiang.react.amap3d.AMap3DPackage;
 import com.polidea.reactnativeble.BlePackage;
 import com.horcrux.svg.SvgPackage;
 import com.learnium.RNDeviceInfo.RNDeviceInfo;
-import it.innove.BleManagerPackage;
 import org.reactnative.camera.RNCameraPackage;
 import org.reactnative.camera.RNCameraPackage;
 import com.facebook.react.ReactNativeHost;
@@ -39,16 +38,15 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
-            new RNFSPackage(),
-            new SplashScreenReactPackage(),
-          new AMap3DPackage(),
+          new BaiduMapPackage(),
+          new RNFSPackage(),
+          new SplashScreenReactPackage(),
           new BlePackage(),
           new SvgPackage(),
           new RNDeviceInfo(),
           /*把视图控制器注册到应用中*/
           new FlashLightPackage(),
           new BleBroadcastPackage(),
-          new BleManagerPackage(),
           new RNCameraPackage(),
           new VectorIconsPackage(),
           new SQLitePluginPackage(),   // register SQLite Plugin here

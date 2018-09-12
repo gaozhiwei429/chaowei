@@ -1,18 +1,16 @@
 rootProject.name = 'chaoWei'
+include ':react-native-baidumap-sdk'
+project(':react-native-baidumap-sdk').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-baidumap-sdk/lib/android')
 include ':react-native-fs'
 project(':react-native-fs').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-fs/android')
 include ':react-native-splash-screen'
 project(':react-native-splash-screen').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-splash-screen/android')
-include ':react-native-amap3d'
-project(':react-native-amap3d').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-amap3d/lib/android')
 include ':react-native-ble-plx'
 project(':react-native-ble-plx').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-ble-plx/android')
 include ':react-native-svg'
 project(':react-native-svg').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-svg/android')
 include ':react-native-device-info'
 project(':react-native-device-info').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-device-info/android')
-include ':react-native-ble-manager'
-project(':react-native-ble-manager').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-ble-manager/android')
 include ':react-native-camera'
 project(':react-native-camera').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-camera/android')
 include ':react-native-camera'

@@ -51,10 +51,9 @@ function bindSingle(){
         bleBroadcast.start(commandList ,endRepair);// BLE广播
     }
     // var con=commandList.concat(equipmentList);//广播的数据
-    // console.log(con);//广播的数据
+    // console.log(con);//广播的数据 
     otherIndex = otherIndex + 1;// otherIndex 自增
 }
-
 export default class CWHome extends Component {
     constructor(){
         super();
@@ -68,6 +67,7 @@ export default class CWHome extends Component {
     } 
 
     componentDidMount() {
+
         /** 是否绑定*/
         storage.get(PHONE_BIND_STORAGE_KEY, (error, result) => {
             if(result == '123' ){
@@ -146,16 +146,18 @@ export default class CWHome extends Component {
             this.deviceMap.clear();
             BluetoothManager.manager.startDeviceScan(null, null, (error, device) => {
                 if (error) {
-                    this.refs.bleScan.open();
+                    if(error.errorCode == 102){
+                        this.refs.bleScan.open();
+                    }
+                    console.log(err);
+                    return;
                 }else{
                     this.deviceMap.set(device.id,device); //使用Map类型保存搜索到的蓝牙设备，确保列表不显示重复的设备
                     BleScan = [...this.deviceMap.values()];
                 }
             })
-
             //向数据库写数据
             this.writeDatabase();
-            // this.abuttons();
         });
     }
     
@@ -229,7 +231,7 @@ export default class CWHome extends Component {
                                         battery.voltage = parseInt((searchBle.slice(22,24).concat(searchBle.slice(20,22))),16)/100;//电压
                                         battery.equilibrium_time = parseInt(searchBle.slice(24,26),16)/100;//平衡时间
                                         battery.electric_current = parseInt(searchBle.slice(26,28),16)/100;//均衡电流
-                                        battery.equilibriumTemperature=parseInt(searchBle.slice(28,30),16);//均衡温度1
+                                        battery.equilibrium_temperature=parseInt(searchBle.slice(28,30),16);//均衡温度1
                                         battery.temperature = parseInt(searchBle.slice(30,32),16);//环境温度
                                         battery.targetCurrent=parseInt((searchBle.slice(34,36).concat(searchBle.slice(32,34))),16)/100;//目标电流2
                                         battery.targetVoltage=parseInt((searchBle.slice(38,40).concat(searchBle.slice(36,38))),16)/10;//目标电压2
@@ -275,7 +277,7 @@ export default class CWHome extends Component {
                         setTimeout(loop, 60000);
                     });
                 };
-                setTimeout(loop, 60000);
+                setTimeout(loop, 1000);
             }
         ),
             (error) => {
@@ -304,7 +306,11 @@ export default class CWHome extends Component {
         this.deviceMap.clear();
         BluetoothManager.manager.startDeviceScan(null, null, (error, device) => {
             if (error) {
-                this.refs.bleScan.open();
+                if(error.errorCode == 102){
+                    this.refs.bleScan.open();
+                }
+                console.log(err);
+                return;
             }else{
                 this.deviceMap.set(device.id,device); //使用Map类型保存搜索到的蓝牙设备，确保列表不显示重复的设备
                 BleScan = [...this.deviceMap.values()];
@@ -386,6 +392,7 @@ export default class CWHome extends Component {
     componentWillUnmount(){
         // bleBroadcast.stop();
         // BluetoothManager.stopScan();
+        BluetoothManager.destroy();  
     }
 
     // 页头
@@ -441,7 +448,7 @@ export default class CWHome extends Component {
         return(
             <View style={styles.container}>
                 <ToastSuccessAndError ref='toast_su' successMsg='绑定完成' errorMsg='请打开蓝牙'/>
-                <ToastSuccessAndError ref='band' successMsg="绑定一个" />
+                <ToastSuccessAndError ref='band' successMsg="绑定一个"/>   
                 <Confirm ref='confirm' leftFunc={() => {this.goQRCode()}} rightFunc={() => {}} btnLeftText='去扫码' btnRightText='取消' title='提示' msg='您还未扫码！'/>
                 {/*进度条*/}
                 <ProgressDialogAlert ref='pmgressbar' title='提示信息' btnText='确定' msg={10}  progress={0.7} width={200} color='red'/>
@@ -477,7 +484,6 @@ export default class CWHome extends Component {
                         <Text>解绑</Text>
                     </TouchableOpacity> 
                 </View>
-
                 {/*顶部电量可行驶里程*/}
                 <Text style={styles.mileageText}>还可以骑行30公里</Text> 
                 {/*进度条*/}

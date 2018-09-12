@@ -10,7 +10,6 @@ import { createBottomTabNavigator, TabBarBottom } from 'react-navigation'; // Ve
 import Homescreen from '../CWHome/CWHome';
 import TABscreen from '../CWSvg/TAB';
 import Buttonscreen from '../CWButton/CWButton';
-// import CWQRCode from '../CWQRCode/CWQRCode';
 
 const tabBarConfig = {
     Home: {

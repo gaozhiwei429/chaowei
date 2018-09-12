@@ -3,8 +3,8 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
     <uses-permission android:name="android.permission.VIBRATE"/>
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />//定位权限
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />//定位权限
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />//网络定位权限
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />//GPS定位权限
     <uses-permission android:name="android.permission.BLUETOOTH"/>
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
     <uses-permission-sdk-23 android:name="android.permission.ACCESS_COARSE_LOCATION"/>
@@ -13,7 +13,7 @@
     <!--支付宝支付-->
     <!--<uses-permission android:name="android.permission.INTERNET" />-->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />//wifi定位权限
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <!--读写文件的权限-->
@@ -50,9 +50,13 @@
             </intent-filter>
         </activity>
         <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
-        <meta-data
-                android:name="com.amap.api.v2.apikey"
-                android:value="2ead7a6d39f697f0b2f27a833a15f771" />
+
+        <!--百度地图-->
+        <meta-data android:name="com.baidu.lbsapi.API_KEY" android:value="7quVZhOC48vxsAWLzf3PYiqIpxn0uwdR" />
+
+        <!--<meta-data android:name="com.amap.api.v2.apikey" android:value="2ead7a6d39f697f0b2f27a833a15f771" />-->
+        <!-- 高德发布版本  6c1378e1794659ddf48e15054d96273e -->
+        <!-- 高德开发版本  2ead7a6d39f697f0b2f27a833a15f771 -->
 
         <!--支付宝支付-->
         <activity

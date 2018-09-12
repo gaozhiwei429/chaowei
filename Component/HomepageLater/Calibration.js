@@ -140,7 +140,6 @@ export default class Calibration extends Component {
         headerTitle:(<Text style={{fontSize:20,flex: 1,textAlign:'center'}}>校准</Text>),
         headerStyle: {
             height: 40,
-            // elevation: null
         },
         // headerLeft:(
         //     <View />
@@ -332,7 +331,6 @@ export default class Calibration extends Component {
                                                 <Text style={styles.InstrumentText}>{isNaN(BatteryVoltager) ? 0: BatteryVoltager}</Text>
                                             </View>
                                         </View>
-
                                         <View style={styles.BtnTouchable}>
                                             <TouchableOpacity onPress={()=>this.searchVoltage()} style={styles.CalibrationBtn}>
                                                 <Text style={{fontSize:20}}>电压校准</Text>

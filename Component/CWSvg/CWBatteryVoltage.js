@@ -5,7 +5,8 @@ import {
     View,
     TouchableOpacity,
     Dimensions,
-    ScrollView
+    ScrollView,
+    Alert
 } from 'react-native';
 
 import Echarts from 'native-echarts';
@@ -13,6 +14,7 @@ import SQLiteText from '../SQLite/sqlite';
 import * as storage from '../../storage';
 // import _ from 'lodash';
 import { BATTERY_BIND_STORAGE_KEY,CHARGER_BIND_STORAGE_KEY } from '../../config';
+import * as commonality from '../../commonality';
 var sqLite = new SQLiteText();
 var db;
 
@@ -20,15 +22,16 @@ var battery1VoltageData= [];
 var battery2VoltageData=[];
 var battery3VoltageData=[];
 var battery4VoltageData=[];
-var battery5VoltageData=[];
-var battery6VoltageData=[];
+var battery5VoltageData = [];
+var battery6VoltageData = [];
+var batteryWriteTime = [];
 var promiseValues;
-var battery1Time;
-var battery2Time;
-var battery3Time;
-var battery4Time;
-var battery5Time;
-var battery6Time;
+var battery1TimeVoltage;
+var battery2TimeVoltage;
+var battery3TimeVoltage;
+var battery4TimeVoltage;
+var battery5TimeVoltage;
+var battery6TimeVoltage;
 export default class CWBatteryVoltage extends Component {
     constructor(props) {
         super(props);
@@ -39,7 +42,8 @@ export default class CWBatteryVoltage extends Component {
             battery4:[],
             battery5:[],
             battery6:[],
-            isLiked: false,
+            previous:18,
+            writeTime:[],
         };
     }
 
@@ -50,8 +54,9 @@ export default class CWBatteryVoltage extends Component {
         battery4VoltageData=[];
         battery5VoltageData=[];
         battery6VoltageData=[];
+        batteryWriteTime = [];
         this.setState({
-            isLiked: !this.state.isLiked
+            previous:0,
         });
         //开启数据库
         if(!db){
@@ -74,15 +79,17 @@ export default class CWBatteryVoltage extends Component {
             promiseValues=values;
             //查询电池1
             db.transaction((tx)=>{
-                tx.executeSql("select id,battery_id,my_timestamp,voltage from battery where battery_id='"+values[0][0]+"' order by my_timestamp desc limit 18", [],(tx,results)=>{
+                tx.executeSql("SELECT id,battery_id,my_timestamp,voltage FROM (SELECT id,battery_id,my_timestamp,voltage FROM battery WHERE battery_id='"+promiseValues[0][0]+"' ORDER BY id DESC LIMIT 18)  AS batteryVoltage ORDER BY my_timestamp ASC", [],(tx,results)=>{
                     var len = results.rows.length;
-                    // alert(len);
                     for(let i=0; i<len; i++){
                         var u = results.rows.item(i);
                         battery1VoltageData.push(u.voltage);
+                        batteryWriteTime.push(u.my_timestamp);
                     }
+                    let writeTime=Array.from(new Set(batteryWriteTime));
                     this.setState({
                         battery1:battery1VoltageData,
+                        writeTime,
                     })
                 });
             },(error)=>{
@@ -97,35 +104,43 @@ export default class CWBatteryVoltage extends Component {
                         for(let i=0; i<len; i++){
                             var u = results.rows.item(i);
                             battery1VoltageData.push(u.voltage);
+                            batteryWriteTime.push(u.my_timestamp);
                         }
-                        if(battery1VoltageData.length>18){
+                        let writeTime=Array.from(new Set(batteryWriteTime));
+                        if(battery1VoltageData.length>18 && writeTime.length>18){
                             battery1VoltageData.shift();
+                            writeTime.shift();
                             this.setState({
                                 battery1:battery1VoltageData,
+                                writeTime,
                             });
                         }else {
                             this.setState({
                                 battery1:battery1VoltageData,
+                                writeTime,
                             });
                         }
-                        battery1Time=setTimeout(batteryVoltage1, 10000);
+                        battery1TimeVoltage=setTimeout(batteryVoltage1, 60000);
                     });
                 },(error)=>{
                     console.log(error);
                 });
             };
-            setTimeout(batteryVoltage1, 10000);
+            setTimeout(batteryVoltage1, 60000);
 
             //查询电池2
             db.transaction((tx)=>{
-                tx.executeSql("select id,battery_id,my_timestamp,voltage from battery where battery_id='"+values[0][1]+"' order by my_timestamp desc limit 18", [],(tx,results)=>{
+                tx.executeSql("SELECT id,battery_id,my_timestamp,voltage FROM (SELECT id,battery_id,my_timestamp,voltage FROM battery WHERE battery_id='"+promiseValues[0][1]+"' ORDER BY id DESC LIMIT 18)  AS batteryVoltage ORDER BY my_timestamp ASC", [],(tx,results)=>{
                     var len = results.rows.length;
                     for(let i=0; i<len; i++){
                         var u = results.rows.item(i);
                         battery2VoltageData.push(u.voltage);
+                        batteryWriteTime.push(u.my_timestamp);
                     }
+                    let writeTime=Array.from(new Set(batteryWriteTime));
                     this.setState({
                         battery2:battery2VoltageData,
+                        writeTime,
                     })
                 });
             },(error)=>{
@@ -140,35 +155,43 @@ export default class CWBatteryVoltage extends Component {
                         for(let i=0; i<len; i++){
                             var u = results.rows.item(i);
                             battery2VoltageData.push(u.voltage);
+                            batteryWriteTime.push(u.my_timestamp);
                         }
-                        if(battery2VoltageData.length>18){
+                        let writeTime=Array.from(new Set(batteryWriteTime));
+                        if(battery2VoltageData.length>18&& writeTime.length>18){
                             battery2VoltageData.shift();
+                            writeTime.shift();
                             this.setState({
                                 battery2:battery2VoltageData,
+                                writeTime,
                             });
                         }else {
                             this.setState({
                                 battery2:battery2VoltageData,
+                                writeTime,
                             });
                         }
-                        battery2Time=setTimeout(batteryVoltage2, 10000);
+                        battery2TimeVoltage=setTimeout(batteryVoltage2, 60000);
                     });
                 },(error)=>{
                     console.log(error);
                 });
             };
-            setTimeout(batteryVoltage2, 10000);
+            setTimeout(batteryVoltage2, 60000);
 
             //查询电池3
             db.transaction((tx)=>{
-                tx.executeSql("select id,battery_id,my_timestamp,voltage from battery where battery_id='"+values[0][2]+"' order by my_timestamp desc limit 18", [],(tx,results)=>{
+                tx.executeSql("SELECT id,battery_id,my_timestamp,voltage FROM (SELECT id,battery_id,my_timestamp,voltage FROM battery WHERE battery_id='"+promiseValues[0][2]+"' ORDER BY id DESC LIMIT 18)  AS batteryVoltage ORDER BY my_timestamp ASC", [],(tx,results)=>{
                     var len = results.rows.length;
                     for(let i=0; i<len; i++){
                         var u = results.rows.item(i);
                         battery3VoltageData.push(u.voltage);
+                        batteryWriteTime.push(u.my_timestamp);
                     }
+                    let writeTime=Array.from(new Set(batteryWriteTime));
                     this.setState({
                         battery3:battery3VoltageData,
+                        writeTime,
                     })
                 });
             },(error)=>{
@@ -183,35 +206,43 @@ export default class CWBatteryVoltage extends Component {
                         for(let i=0; i<len; i++){
                             var u = results.rows.item(i);
                             battery3VoltageData.push(u.voltage);
+                            batteryWriteTime.push(u.my_timestamp);
                         }
-                        if(battery3VoltageData.length>18){
+                        let writeTime=Array.from(new Set(batteryWriteTime));
+                        if(battery3VoltageData.length>18 && writeTime.length>18){
                             battery3VoltageData.shift();
+                            writeTime.shift();
                             this.setState({
                                 battery3:battery3VoltageData,
+                                writeTime,
                             });
                         }else {
                             this.setState({
                                 battery3:battery3VoltageData,
+                                writeTime,
                             });
                         }
-                        battery3Time=setTimeout(batteryVoltage3, 10000);
+                        battery3TimeVoltage=setTimeout(batteryVoltage3, 60000);
                     });
                 },(error)=>{
                     console.log(error);
                 });
             };
-            setTimeout(batteryVoltage3, 10000);
+            setTimeout(batteryVoltage3, 60000);
 
             //查询电池4
             db.transaction((tx)=>{
-                tx.executeSql("select id,battery_id,my_timestamp,voltage from battery where battery_id='"+values[0][3]+"' order by my_timestamp desc limit 18", [],(tx,results)=>{
+                tx.executeSql("SELECT id,battery_id,my_timestamp,voltage FROM (SELECT id,battery_id,my_timestamp,voltage FROM battery WHERE battery_id='"+promiseValues[0][3]+"' ORDER BY id DESC LIMIT 18)  AS batteryVoltage ORDER BY my_timestamp ASC", [],(tx,results)=>{
                     var len = results.rows.length;
                     for(let i=0; i<len; i++){
                         var u = results.rows.item(i);
                         battery4VoltageData.push(u.voltage);
+                        batteryWriteTime.push(u.my_timestamp);
                     }
+                    let writeTime=Array.from(new Set(batteryWriteTime));
                     this.setState({
                         battery4:battery4VoltageData,
+                        writeTime,
                     })
                 });
             },(error)=>{
@@ -226,35 +257,43 @@ export default class CWBatteryVoltage extends Component {
                         for(let i=0; i<len; i++){
                             var u = results.rows.item(i);
                             battery4VoltageData.push(u.voltage);
+                            batteryWriteTime.push(u.my_timestamp);
                         }
-                        if(battery4VoltageData.length>18){
+                        let writeTime=Array.from(new Set(batteryWriteTime));
+                        if(battery4VoltageData.length>18&&writeTime.length>18){
                             battery4VoltageData.shift();
+                            writeTime.shift();
                             this.setState({
                                 battery4:battery4VoltageData,
+                                writeTime,
                             });
                         }else {
                             this.setState({
                                 battery4:battery4VoltageData,
+                                writeTime,
                             });
                         }
-                        battery4Time=setTimeout(batteryVoltage4, 10000);
+                        battery4TimeVoltage=setTimeout(batteryVoltage4, 60000);
                     });
                 },(error)=>{
                     console.log(error);
                 });
             };
-            setTimeout(batteryVoltage4, 10000);
+            setTimeout(batteryVoltage4, 60000);
 
             //查询电池5
             db.transaction((tx)=>{
-                tx.executeSql("select id,battery_id,my_timestamp,voltage from battery where battery_id='"+values[0][4]+"' order by my_timestamp desc limit 18", [],(tx,results)=>{
+                tx.executeSql("SELECT id,battery_id,my_timestamp,voltage FROM (SELECT id,battery_id,my_timestamp,voltage FROM battery WHERE battery_id='"+promiseValues[0][4]+"' ORDER BY id DESC LIMIT 18)  AS batteryVoltage ORDER BY my_timestamp ASC", [],(tx,results)=>{
                     var len = results.rows.length;
                     for(let i=0; i<len; i++){
                         var u = results.rows.item(i);
                         battery5VoltageData.push(u.voltage);
+                        batteryWriteTime.push(u.my_timestamp);
                     }
+                    let writeTime=Array.from(new Set(batteryWriteTime));
                     this.setState({
                         battery5:battery5VoltageData,
+                        writeTime,
                     })
                 });
             },(error)=>{
@@ -269,35 +308,43 @@ export default class CWBatteryVoltage extends Component {
                         for(let i=0; i<len; i++){
                             var u = results.rows.item(i);
                             battery5VoltageData.push(u.voltage);
+                            batteryWriteTime.push(u.my_timestamp);
                         }
-                        if(battery5VoltageData.length>18){
+                        let writeTime=Array.from(new Set(batteryWriteTime));
+                        if(battery5VoltageData.length>18&&writeTime.length>18){
                             battery5VoltageData.shift();
+                            batteryWriteTime.shift();
                             this.setState({
                                 battery5:battery5VoltageData,
+                                writeTime,
                             });
                         }else {
                             this.setState({
                                 battery5:battery5VoltageData,
+                                writeTime,
                             });
                         }
-                        battery5Time=setTimeout(batteryVoltage5, 10000);
+                        battery5TimeVoltage=setTimeout(batteryVoltage5, 60000);
                     });
                 },(error)=>{
                     console.log(error);
                 });
             };
-            setTimeout(batteryVoltage5, 10000);
+            setTimeout(batteryVoltage5, 60000);
 
             //查询电池5
             db.transaction((tx)=>{
-                tx.executeSql("select id,battery_id,my_timestamp,voltage from battery where battery_id='"+values[0][5]+"' order by my_timestamp desc limit 18", [],(tx,results)=>{
+                tx.executeSql("SELECT id,battery_id,my_timestamp,voltage FROM (SELECT id,battery_id,my_timestamp,voltage FROM battery WHERE battery_id='"+promiseValues[0][5]+"' ORDER BY id DESC LIMIT 18)  AS batteryVoltage ORDER BY my_timestamp ASC", [],(tx,results)=>{
                     var len = results.rows.length;
                     for(let i=0; i<len; i++){
                         var u = results.rows.item(i);
                         battery6VoltageData.push(u.voltage);
+                        batteryWriteTime.push(u.my_timestamp);
                     }
+                    let writeTime=Array.from(new Set(batteryWriteTime));
                     this.setState({
                         battery6:battery6VoltageData,
+                        writeTime,
                     })
                 });
             },(error)=>{
@@ -312,54 +359,75 @@ export default class CWBatteryVoltage extends Component {
                         for(let i=0; i<len; i++){
                             var u = results.rows.item(i);
                             battery6VoltageData.push(u.voltage);
+                            batteryWriteTime.push(u.my_timestamp);
                         }
-                        if(battery6VoltageData.length>18){
+                        let writeTime=Array.from(new Set(batteryWriteTime));
+                        if(battery6VoltageData.length>18&&writeTime.length>18){
                             battery6VoltageData.shift();
+                            writeTime.shift();
                             this.setState({
                                 battery6:battery6VoltageData,
+                                writeTime,
                             });
                         }else {
                             this.setState({
                                 battery6:battery6VoltageData,
+                                writeTime,
                             });
                         }
-                        battery6Time=setTimeout(batteryVoltage6, 10000);
+                        battery6TimeVoltage=setTimeout(batteryVoltage6, 60000);
                     });
                 },(error)=>{
                     console.log(error);
-                });
+                });  
             };
-            setTimeout(batteryVoltage6, 10000);
+            setTimeout(batteryVoltage6, 60000);
         });
     }
 
-    historyTime(){
+    historyTime(whether){
         battery1VoltageData=[];
         battery2VoltageData=[];
         battery3VoltageData=[];
         battery4VoltageData=[];
         battery5VoltageData=[];
         battery6VoltageData=[];
-        clearTimeout(battery1Time);
-        clearTimeout(battery2Time);
-        clearTimeout(battery3Time);
-        clearTimeout(battery4Time);
-        clearTimeout(battery5Time);
-        clearTimeout(battery6Time);
-        this.setState({
-            isLiked: !this.state.isLiked
-        });
+        batteryWriteTime = [];
+        clearInterval(battery1TimeVoltage);
+        clearInterval(battery2TimeVoltage);
+        clearInterval(battery3TimeVoltage);
+        clearInterval(battery4TimeVoltage);
+        clearInterval(battery5TimeVoltage);
+        clearInterval(battery6TimeVoltage);
+        if(whether===0){
+            this.setState({
+                previous:this.state.previous+18,
+            });
+        }else{
+            if(this.state.previous-18<0){
+                Alert.alert('','sorry，查到最顶部没有数据了！',[{
+                    text:'确定',onPress:()=>{}   
+                }])
+                return;  
+            }
+            this.setState({
+                previous:this.state.previous-18,
+            });
+        }
 
         //查询电池1
         db.transaction((tx)=>{
-            tx.executeSql("select id,battery_id,my_timestamp,voltage from battery where battery_id='"+promiseValues[0][0]+"' order by my_timestamp desc limit 18", [],(tx,results)=>{
+            tx.executeSql("SELECT id,battery_id,my_timestamp,voltage FROM (SELECT id,battery_id,my_timestamp,voltage FROM battery WHERE battery_id='"+promiseValues[0][0]+"' ORDER BY id DESC LIMIT '"+this.state.previous+"',18)  AS batteryVoltage ORDER BY my_timestamp ASC", [],(tx,results)=>{
                 var len = results.rows.length;
                 for(let i=0; i<len; i++){
                     var u = results.rows.item(i);
                     battery1VoltageData.push(u.voltage);
+                    batteryWriteTime.push(u.my_timestamp);
                 }
+                let writeTime=Array.from(new Set(batteryWriteTime));
                 this.setState({
                     battery1:battery1VoltageData,
+                    writeTime,
                 })
             });
         },(error)=>{
@@ -368,14 +436,17 @@ export default class CWBatteryVoltage extends Component {
 
         //查询电池2
         db.transaction((tx)=>{
-            tx.executeSql("select id,battery_id,my_timestamp,voltage from battery where battery_id='"+promiseValues[0][1]+"' order by my_timestamp desc limit 18", [],(tx,results)=>{
+            tx.executeSql("SELECT id,battery_id,my_timestamp,voltage FROM (SELECT id,battery_id,my_timestamp,voltage FROM battery WHERE battery_id='"+promiseValues[0][1]+"' ORDER BY id DESC LIMIT '"+this.state.previous+"',18)  AS batteryVoltage ORDER BY my_timestamp ASC", [],(tx,results)=>{
                 var len = results.rows.length;
                 for(let i=0; i<len; i++){
                     var u = results.rows.item(i);
                     battery2VoltageData.push(u.voltage);
+                    batteryWriteTime.push(u.my_timestamp);
                 }
+                let writeTime=Array.from(new Set(batteryWriteTime));
                 this.setState({
                     battery2:battery2VoltageData,
+                    writeTime,
                 })
             });
         },(error)=>{
@@ -384,14 +455,17 @@ export default class CWBatteryVoltage extends Component {
 
         //查询电池3
         db.transaction((tx)=>{
-            tx.executeSql("select id,battery_id,my_timestamp,voltage from battery where battery_id='"+promiseValues[0][2]+"' order by my_timestamp desc limit 18", [],(tx,results)=>{
+            tx.executeSql("SELECT id,battery_id,my_timestamp,voltage FROM (SELECT id,battery_id,my_timestamp,voltage FROM battery WHERE battery_id='"+promiseValues[0][2]+"' ORDER BY id DESC LIMIT '"+this.state.previous+"',18)  AS batteryVoltage ORDER BY my_timestamp ASC", [],(tx,results)=>{
                 var len = results.rows.length;
                 for(let i=0; i<len; i++){
                     var u = results.rows.item(i);
                     battery3VoltageData.push(u.voltage);
+                    batteryWriteTime.push(u.my_timestamp);
                 }
+                let writeTime=Array.from(new Set(batteryWriteTime));
                 this.setState({
                     battery3:battery3VoltageData,
+                    writeTime,
                 })
             });
         },(error)=>{
@@ -400,14 +474,17 @@ export default class CWBatteryVoltage extends Component {
 
         //查询电池4
         db.transaction((tx)=>{
-            tx.executeSql("select id,battery_id,my_timestamp,voltage from battery where battery_id='"+promiseValues[0][3]+"' order by my_timestamp desc limit 18", [],(tx,results)=>{
+            tx.executeSql("SELECT id,battery_id,my_timestamp,voltage FROM (SELECT id,battery_id,my_timestamp,voltage FROM battery WHERE battery_id='"+promiseValues[0][3]+"' ORDER BY id DESC LIMIT '"+this.state.previous+"',18)  AS batteryVoltage ORDER BY my_timestamp ASC", [],(tx,results)=>{
                 var len = results.rows.length;
                 for(let i=0; i<len; i++){
                     var u = results.rows.item(i);
                     battery4VoltageData.push(u.voltage);
+                    batteryWriteTime.push(u.my_timestamp);
                 }
+                let writeTime=Array.from(new Set(batteryWriteTime));
                 this.setState({
                     battery4:battery4VoltageData,
+                    writeTime,
                 })
             });
         },(error)=>{
@@ -416,14 +493,17 @@ export default class CWBatteryVoltage extends Component {
 
         //查询电池5
         db.transaction((tx)=>{
-            tx.executeSql("select id,battery_id,my_timestamp,voltage from battery where battery_id='"+promiseValues[0][4]+"' order by my_timestamp desc limit 18", [],(tx,results)=>{
+            tx.executeSql("SELECT id,battery_id,my_timestamp,voltage FROM (SELECT id,battery_id,my_timestamp,voltage FROM battery WHERE battery_id='"+promiseValues[0][4]+"' ORDER BY id DESC LIMIT '"+this.state.previous+"',18)  AS batteryVoltage ORDER BY my_timestamp ASC", [],(tx,results)=>{
                 var len = results.rows.length;
                 for(let i=0; i<len; i++){
                     var u = results.rows.item(i);
                     battery5VoltageData.push(u.voltage);
+                    batteryWriteTime.push(u.my_timestamp);
                 }
+                let writeTime=Array.from(new Set(batteryWriteTime));
                 this.setState({
                     battery5:battery5VoltageData,
+                    writeTime,
                 })
             });
         },(error)=>{
@@ -432,15 +512,19 @@ export default class CWBatteryVoltage extends Component {
 
         //查询电池6
         db.transaction((tx)=>{
-            tx.executeSql("select id,battery_id,my_timestamp,voltage from battery where battery_id='"+promiseValues[0][5]+"' order by my_timestamp desc limit 18", [],(tx,results)=>{
+            tx.executeSql("SELECT id,battery_id,my_timestamp,voltage FROM (SELECT id,battery_id,my_timestamp,voltage FROM battery WHERE battery_id='"+promiseValues[0][5]+"' ORDER BY id DESC LIMIT '"+this.state.previous+"',18)  AS batteryVoltage ORDER BY my_timestamp ASC", [],(tx,results)=>{
+                //"SELECT id,battery_id,my_timestamp,voltage FROM (SELECT id,battery_id,my_timestamp,voltage FROM battery WHERE battery_id='"+promiseValues[0][0]+"' ORDER BY id DESC LIMIT 18)  AS batteryVoltage ORDER BY my_timestamp ASC"
                 var len = results.rows.length;
                 for(let i=0; i<len; i++){
                     var u = results.rows.item(i);
                     battery6VoltageData.push(u.voltage);
+                    batteryWriteTime.push(u.my_timestamp);
                 }
+                let writeTime=Array.from(new Set(batteryWriteTime));
                 this.setState({
                     battery6:battery6VoltageData,
-                })
+                    writeTime
+                })  
             });
         },(error)=>{
             console.log(error);
@@ -453,10 +537,11 @@ export default class CWBatteryVoltage extends Component {
         clearTimeout(battery3Time);
         clearTimeout(battery4Time);
         clearTimeout(battery5Time);
-        clearTimeout(battery6Time);
+        clearTimeout(battery6Time);   
     }
     render() {
-        const option= {
+        console.log(this.state.writeTime)
+        const option= { 
             title: {
                 text: '电池电压',
                 x:'center',
@@ -486,10 +571,13 @@ export default class CWBatteryVoltage extends Component {
                     show: false,
                 },
                 //就是一月份这个显示为一个线段，而不是数轴那种一个点点
-                boundaryGap:false,
+                boundaryGap:false, 
                 type : 'category',
                 name : '时间',//时间
-                data: [0,1, 2, 3, 4, 5, 6,7, 8, 9, 10, 11, 12,13, 14, 15, 16, 17,],
+                data: this.state.writeTime.map(function(item){
+                    console.log(item); 
+                    return commonality.replaceTime(item);  
+                }),       
                 axisLabel:{ 
                     textStyle:{ 
                         fontSize: 9,
@@ -550,22 +638,15 @@ export default class CWBatteryVoltage extends Component {
                     width={Dimensions.get('window').width}
                 />
                 <View style={styles.switching}>
-                    {this.state.isLiked?
-                        <Text style={styles.selected}>
-                            <Text>实时数据</Text>
-                        </Text>:
-                        <TouchableOpacity style={styles.unselected} onPress={()=>this.componentDidMount()}>
-                            <Text>实时数据</Text>
-                        </TouchableOpacity>
-                    }
-                    {this.state.isLiked?
-                        <TouchableOpacity style={styles.unselected}  onPress={()=>this.historyTime()}>
-                            <Text>历史数据</Text>
-                        </TouchableOpacity>:
-                        <Text style={styles.selected}>
-                            <Text>历史数据</Text>
-                        </Text>
-                    }
+                    <TouchableOpacity style={styles.selected} onPress={()=>this.componentDidMount()}>
+                        <Text>实时数据</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.selected}  onPress={()=>this.historyTime(1)}>
+                        <Text>上一页</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.selected}  onPress={()=>this.historyTime(0)}>
+                        <Text>下一页</Text>
+                    </TouchableOpacity>
                 </View>
             </View>
         );
