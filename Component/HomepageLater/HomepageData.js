@@ -54,29 +54,25 @@ export default class BatteryData extends Component {
                                 <Text style={styles.BtnText}>绑定</Text>
                                 <Image style={styles.BtnImg} source={require('../../img/next.png')}/>
                             </TouchableOpacity>
-                            <TouchableOpacity style={styles.Btn} onPress={() => this.props.navigation.navigate('ChargerSvg')
+                            {/* <TouchableOpacity style={styles.Btn} onPress={() => this.props.navigation.navigate('ChargerSvg')
                             }>
                                 <Text style={styles.BtnText}>充电器数据曲线</Text>
                                 <Image style={styles.BtnImg} source={require('../../img/next.png')}/>
-                            </TouchableOpacity>
+                            </TouchableOpacity> */}
 
-                            <TouchableOpacity style={styles.Btn} onPress={() => this.props.navigation.navigate('Charging',//{chargerImg:0}
-                            )
-                            }>
+                            <TouchableOpacity style={styles.Btn} onPress={() => this.props.navigation.navigate('Charging')}>
                                 <Text style={styles.BtnText}>启动/停止充电</Text>
                                 <Image style={styles.BtnImg} source={require('../../img/next.png')}/>
                             </TouchableOpacity>
 
-                            <TouchableOpacity style={styles.Btn} onPress={() => this.props.navigation.navigate('Calibration',{chargerImg:0})
-                            }>
+                            <TouchableOpacity style={styles.Btn} onPress={() => this.props.navigation.navigate('Calibration',{chargerImg:0})}>
                                 <Text style={styles.BtnText}>校准</Text>
                                 <Image style={styles.BtnImg} source={require('../../img/next.png')}/>
                             </TouchableOpacity>
                         </View>
                         :index===0 ?
                         <View>
-                            <TouchableOpacity style={styles.Btn} onPress={() => this.props.navigation.navigate('CWScanning',{ index: 0 })
-                            }>
+                            <TouchableOpacity style={styles.Btn} onPress={() => this.props.navigation.navigate('CWScanning',{ index: 0 })}>
                                 <Text style={styles.BtnText}>绑定</Text>
                                 <Image style={styles.BtnImg} source={require('../../img/next.png')}/>
                             </TouchableOpacity>

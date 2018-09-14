@@ -25,12 +25,12 @@ var battery5capacityData=[];
 var battery6capacityData=[];
 var batteryWriteTime = [];
 var promiseValues;
-var battery1Time;
-var battery2Time;
-var battery3Time;
-var battery4Time;
-var battery5Time;
-var battery6Time;
+// var battery1Time;
+// var battery2Time;
+// var battery3Time;
+// var battery4Time;
+// var battery5Time;
+// var battery6Time;
 export default class CWBatteryCapacity extends Component {
 
     constructor(props) {
@@ -119,7 +119,7 @@ export default class CWBatteryCapacity extends Component {
                                 writeTime,
                             });
                         }
-                        battery1Time=setTimeout(batteryCapacity1, 60000);
+                        this.battery1Time=setTimeout(batteryCapacity1, 60000);
                     });
                 },(error)=>{
                     console.log(error);
@@ -170,7 +170,7 @@ export default class CWBatteryCapacity extends Component {
                                 writeTime,
                             });
                         }
-                        battery2Time=setTimeout(batteryCapacity2, 60000);
+                        this.battery2Time=setTimeout(batteryCapacity2, 60000);
                     });
                 },(error)=>{
                     console.log(error);
@@ -221,7 +221,7 @@ export default class CWBatteryCapacity extends Component {
                                 writeTime,
                             });
                         }
-                        battery3Time=setTimeout(batteryCapacity3, 60000);
+                        this.battery3Time=setTimeout(batteryCapacity3, 60000);
                     });
                 },(error)=>{
                     console.log(error);
@@ -272,7 +272,7 @@ export default class CWBatteryCapacity extends Component {
                                 writeTime,
                             });
                         }
-                        battery4Time=setTimeout(batteryCapacity4, 60000);
+                        this.battery4Time=setTimeout(batteryCapacity4, 60000);
                     });
                 },(error)=>{
                     console.log(error);
@@ -323,7 +323,7 @@ export default class CWBatteryCapacity extends Component {
                                 writeTime,
                             });
                         }
-                        battery5Time=setTimeout(batteryCapacity5, 60000);
+                        this.battery5Time=setTimeout(batteryCapacity5, 60000);
                     });
                 },(error)=>{
                     console.log(error);
@@ -375,7 +375,7 @@ export default class CWBatteryCapacity extends Component {
                                 writeTime,
                             });
                         }
-                        battery6Time=setTimeout(batteryCapacity6, 60000);
+                        this.battery6Time=setTimeout(batteryCapacity6, 60000);
                     });
                 },(error)=>{
                     console.log(error);
@@ -389,16 +389,16 @@ export default class CWBatteryCapacity extends Component {
         battery1capacityData = [];
         battery2capacityData=[];
         battery3capacityData=[];
-        battery4capacityData=[];
+        battery4capacityData=[]; 
         battery5capacityData=[];
         battery6capacityData=[];
         batteryWriteTime = [];
-        clearInterval(battery1Time);
-        clearInterval(battery2Time);
-        clearInterval(battery3Time);
-        clearInterval(battery4Time);
-        clearInterval(battery5Time);
-        clearInterval(battery6Time);
+        this.battery1Time && clearTimeout(this.battery1Time);
+        this.battery2Time && clearTimeout(this.battery2Time);
+        this.battery3Time && clearTimeout(this.battery3Time);
+        this.battery4Time && clearTimeout(this.battery4Time);
+        this.battery5Time && clearTimeout(this.battery5Time);
+        this.battery6Time && clearTimeout(this.battery6Time);
         if(whether===0){
             this.setState({
                 previous:this.state.previous+18,
@@ -533,12 +533,12 @@ export default class CWBatteryCapacity extends Component {
     }
 
     componentWillUnmount() {
-        clearTimeout(battery1Time);
-        clearTimeout(battery2Time);
-        clearTimeout(battery3Time);
-        clearTimeout(battery4Time);
-        clearTimeout(battery5Time);
-        clearTimeout(battery6Time);
+        this.battery1Time && clearTimeout(this.battery1Time);
+        this.battery2Time && clearTimeout(this.battery2Time);
+        this.battery3Time && clearTimeout(this.battery3Time);
+        this.battery4Time && clearTimeout(this.battery4Time);
+        this.battery5Time && clearTimeout(this.battery5Time);
+        this.battery6Time && clearTimeout(this.battery6Time);
     }
     render() {    
         const option= {

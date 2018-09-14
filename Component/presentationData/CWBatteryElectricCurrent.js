@@ -6,32 +6,33 @@ import {
     TouchableOpacity,
     Dimensions,
     ScrollView,
-    Alert,
+    Alert
 } from 'react-native';
 
 import Echarts from 'native-echarts';
 import SQLiteText from '../SQLite/sqlite';
 import * as storage from '../../storage';
+// import _ from 'lodash';
 import { BATTERY_BIND_STORAGE_KEY,CHARGER_BIND_STORAGE_KEY } from '../../config';
 import * as commonality from '../../commonality';
 var sqLite = new SQLiteText();
 var db;
 
-var battery1TemperatureData= [];
-var battery2TemperatureData= [];
-var battery3TemperatureData= [];
-var battery4TemperatureData= [];
-var battery5TemperatureData= [];
-var battery6TemperatureData= [];
+var battery1electric_currentData= [];
+var battery2electric_currentData=[];
+var battery3electric_currentData=[];
+var battery4electric_currentData=[];
+var battery5electric_currentData=[];
+var battery6electric_currentData=[];
 var batteryWriteTime = [];
 var promiseValues;
-var battery1Time;
-var battery2Time;
-var battery3Time;
-var battery4Time;
-var battery5Time;
-var battery6Time;
-export default class CWBatteryTemperature extends Component {
+// var battery1Time;
+// var battery2Time;
+// var battery3Time;
+// var battery4Time;
+// var battery5Time;
+// var battery6Time;
+export default class CWBatteryElectricCurrent extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -45,15 +46,15 @@ export default class CWBatteryTemperature extends Component {
             writeTime:[],
         };
     }
-
+    
     async componentDidMount(){
-        battery1TemperatureData= [];
-        battery2TemperatureData=[];
-        battery3TemperatureData=[];
-        battery4TemperatureData=[];
-        battery5TemperatureData=[];
-        battery6TemperatureData=[];
-        batteryWriteTime = []; 
+        battery1electric_currentData=[];
+        battery2electric_currentData=[];
+        battery3electric_currentData=[];
+        battery4electric_currentData=[];
+        battery5electric_currentData=[];
+        battery6electric_currentData=[];
+        batteryWriteTime=[];
         this.setState({
             previous:0,
         });
@@ -74,20 +75,20 @@ export default class CWBatteryTemperature extends Component {
                 resolve(result);
             })}
         );
-        Promise.all([promise2]).then((values)=>{
+        Promise.all([promise2]).then((values) => {
             promiseValues=values;
             //查询电池1
             db.transaction((tx)=>{
-                tx.executeSql("SELECT id,battery_id,my_timestamp,temperature FROM (SELECT id,battery_id,my_timestamp,temperature FROM battery WHERE battery_id='"+promiseValues[0][0]+"' ORDER BY id DESC LIMIT 18)  AS batteryTemperature ORDER BY my_timestamp ASC", [],(tx,results)=>{
-                    var len = results.rows.length;
+                tx.executeSql("SELECT id,battery_id,my_timestamp,electric_current FROM (SELECT id,battery_id,my_timestamp,electric_current FROM battery WHERE battery_id='"+promiseValues[0][0]+"' ORDER BY id DESC LIMIT 18)  AS batteryTab ORDER BY my_timestamp ASC", [],(tx,results)=>{
+                    var len = results.rows.length; 
                     for(let i=0; i<len; i++){
                         var u = results.rows.item(i);
-                        battery1TemperatureData.push(u.temperature);
+                        battery1electric_currentData.push(u.electric_current);
                         batteryWriteTime.push(u.my_timestamp);
                     }
-                    let writeTime=Array.from(new Set(batteryWriteTime));
+                    let writeTime = Array.from(new Set(batteryWriteTime));
                     this.setState({
-                        battery1:battery1TemperatureData,
+                        battery1:battery1electric_currentData,
                         writeTime,
                     })
                 });
@@ -95,101 +96,101 @@ export default class CWBatteryTemperature extends Component {
                 console.log(error);
             });
 
-            const batteryTemperature1 = () => {
+            const batteryelectric_current1 = () => {
                 //查询
                 db.transaction((tx)=>{
-                    tx.executeSql("select id,battery_id,my_timestamp,temperature from battery where battery_id= '"+values[0][0]+"' order by my_timestamp desc limit 1", [],(tx,results)=>{
+                    tx.executeSql("select id,battery_id,my_timestamp,electric_current from battery where battery_id= '"+values[0][0]+"' order by my_timestamp desc limit 1", [],(tx,results)=>{
                         var len = results.rows.length;
                         for(let i=0; i<len; i++){
                             var u = results.rows.item(i);
-                            battery1TemperatureData.push(u.temperature);
+                            battery1electric_currentData.push(u.electric_current);
                             batteryWriteTime.push(u.my_timestamp);
                         }
-                        let writeTime=Array.from(new Set(batteryWriteTime));
-                        if(battery1TemperatureData.length>18&&writeTime.length>18){
-                            battery1TemperatureData.shift();
-                            writeTime.shift();
+                        let writeTime = Array.from(new Set(batteryWriteTime));
+                        if(battery1electric_currentData.length>18 && writeTime.length>18){
+                            battery1electric_currentData.shift();
+                            batteryWriteTime.shift();
                             this.setState({
-                                battery1:battery1TemperatureData,
+                                battery1:battery1electric_currentData,
                                 writeTime,
                             });
                         }else {
                             this.setState({
-                                battery1:battery1TemperatureData,
-                                writeTime
+                                battery1:battery1electric_currentData,
+                                writeTime,
                             });
                         }
-                        battery1Time=setTimeout(batteryTemperature1, 60000);
+                        this.battery1Time=setTimeout(batteryelectric_current1, 60000);
                     });
                 },(error)=>{
                     console.log(error);
                 });
             };
-            setTimeout(batteryTemperature1, 60000);
+            setTimeout(batteryelectric_current1, 60000);
 
             //查询电池2
             db.transaction((tx)=>{
-                tx.executeSql("SELECT id,battery_id,my_timestamp,temperature FROM (SELECT id,battery_id,my_timestamp,temperature FROM battery WHERE battery_id='"+promiseValues[0][1]+"' ORDER BY id DESC LIMIT 18)  AS batteryTemperature ORDER BY my_timestamp ASC", [],(tx,results)=>{
+                tx.executeSql("SELECT id,battery_id,my_timestamp,electric_current FROM (SELECT id,battery_id,my_timestamp,electric_current FROM battery WHERE battery_id='"+promiseValues[0][1]+"' ORDER BY id DESC LIMIT 18)  AS batteryTab ORDER BY my_timestamp ASC", [],(tx,results)=>{
                     var len = results.rows.length;
                     for(let i=0; i<len; i++){
                         var u = results.rows.item(i);
-                        battery2TemperatureData.push(u.temperature);
+                        battery2electric_currentData.push(u.electric_current);
                         batteryWriteTime.push(u.my_timestamp);
                     }
-                    let writeTime=Array.from(new Set(batteryWriteTime));
+                    let writeTime = Array.from(new Set(batteryWriteTime));
                     this.setState({
-                        battery2:battery2TemperatureData,
-                        writeTime
+                        battery2:battery2electric_currentData,
+                        writeTime,
                     })
                 });
             },(error)=>{
                 console.log(error);
             });
 
-            const batteryTemperature2 = () => {
+            const batteryelectric_current2 = () => {
                 //查询
                 db.transaction((tx)=>{
-                    tx.executeSql("select id,battery_id,my_timestamp,temperature from battery where battery_id= '"+values[0][1]+"' order by my_timestamp desc limit 1", [],(tx,results)=>{
+                    tx.executeSql("select id,battery_id,my_timestamp,electric_current from battery where battery_id= '"+values[0][1]+"' order by my_timestamp desc limit 1", [],(tx,results)=>{
                         var len = results.rows.length;
                         for(let i=0; i<len; i++){
                             var u = results.rows.item(i);
-                            battery2TemperatureData.push(u.temperature);
+                            battery2electric_currentData.push(u.electric_current);
                             batteryWriteTime.push(u.my_timestamp);
                         }
-                        let writeTime=Array.from(new Set(batteryWriteTime))
-                        if(battery2TemperatureData.length>18&&writeTime.length>18){
-                            battery2TemperatureData.shift();
+                        let writeTime = Array.from(new Set(batteryWriteTime));
+                        if(battery2electric_currentData.length>18 && writeTime.length>18){
+                            battery2electric_currentData.shift();
                             writeTime.shift();
                             this.setState({
-                                battery2:battery2TemperatureData,
+                                battery2:battery2electric_currentData,
                                 writeTime,
                             });
                         }else {
                             this.setState({
-                                battery2:battery2TemperatureData,
+                                battery2:battery2electric_currentData,
                                 writeTime,
                             });
                         }
-                        battery2Time=setTimeout(batteryTemperature2, 10000);
+                        this.battery2Time=setTimeout(batteryelectric_current2, 60000);
                     });
                 },(error)=>{
                     console.log(error);
                 });
             };
-            setTimeout(batteryTemperature2, 60000);
+            setTimeout(batteryelectric_current2, 60000);
 
             //查询电池3
             db.transaction((tx)=>{
-                tx.executeSql("SELECT id,battery_id,my_timestamp,temperature FROM (SELECT id,battery_id,my_timestamp,temperature FROM battery WHERE battery_id='"+promiseValues[0][2]+"' ORDER BY id DESC LIMIT 18)  AS batteryTemperature ORDER BY my_timestamp ASC", [],(tx,results)=>{
+                tx.executeSql("SELECT id,battery_id,my_timestamp,electric_current FROM (SELECT id,battery_id,my_timestamp,electric_current FROM battery WHERE battery_id='"+promiseValues[0][2]+"' ORDER BY id DESC LIMIT 18)  AS batteryTab ORDER BY my_timestamp ASC", [],(tx,results)=>{
                     var len = results.rows.length;
                     for(let i=0; i<len; i++){
                         var u = results.rows.item(i);
-                        battery3TemperatureData.push(u.temperature);
+                        battery3electric_currentData.push(u.electric_current);
                         batteryWriteTime.push(u.my_timestamp);
                     }
-                    let writeTime=Array.from(new Set(batteryWriteTime));
+                    let writeTime = Array.from(new Set(batteryWriteTime));
                     this.setState({
-                        battery3:battery3TemperatureData,
+                        battery3:battery3electric_currentData,
                         writeTime,
                     })
                 });
@@ -197,101 +198,100 @@ export default class CWBatteryTemperature extends Component {
                 console.log(error);
             });
 
-            const batteryTemperature3 = () => {
+            const batteryelectric_current3 = () => {
                 //查询
                 db.transaction((tx)=>{
-                    tx.executeSql("select id,battery_id,my_timestamp,temperature from battery where battery_id= '"+values[0][2]+"' order by my_timestamp desc limit 1", [],(tx,results)=>{
+                    tx.executeSql("select id,battery_id,my_timestamp,electric_current from battery where battery_id= '"+values[0][2]+"' order by my_timestamp desc limit 1", [],(tx,results)=>{
                         var len = results.rows.length;
                         for(let i=0; i<len; i++){
                             var u = results.rows.item(i);
-                            battery3TemperatureData.push(u.temperature);
+                            battery3electric_currentData.push(u.electric_current);
                             batteryWriteTime.push(u.my_timestamp);
                         }
-                        let writeTime=Array.from(new Set(batteryWriteTime))
-                        if(battery3TemperatureData.length>18){
-                            battery3TemperatureData.shift();
-                            writeTime.shift();
+                        let writeTime = Array.from(new Set(batteryWriteTime));
+                        if(battery3electric_currentData.length>18){
+                            battery3electric_currentData.shift();
                             this.setState({
-                                battery3:battery3TemperatureData,
-                                writeTime
+                                battery3:battery3electric_currentData,
+                                writeTime,
                             });
                         }else {
                             this.setState({
-                                battery3:battery3TemperatureData,
-                                writeTime
+                                battery3:battery3electric_currentData,
+                                writeTime,
                             });
                         }
-                        battery3Time=setTimeout(batteryTemperature3, 10000);
+                        this.battery3Time=setTimeout(batteryelectric_current3, 60000);
                     });
                 },(error)=>{
                     console.log(error);
                 });
             };
-            setTimeout(batteryTemperature3, 60000);
+            setTimeout(batteryelectric_current3, 60000);
 
             //查询电池4
             db.transaction((tx)=>{
-                tx.executeSql("SELECT id,battery_id,my_timestamp,temperature FROM (SELECT id,battery_id,my_timestamp,temperature FROM battery WHERE battery_id='"+promiseValues[0][3]+"' ORDER BY id DESC LIMIT 18)  AS batteryTemperature ORDER BY my_timestamp ASC", [],(tx,results)=>{
+                tx.executeSql("SELECT id,battery_id,my_timestamp,electric_current FROM (SELECT id,battery_id,my_timestamp,electric_current FROM battery WHERE battery_id='"+promiseValues[0][3]+"' ORDER BY id DESC LIMIT 18)  AS batteryTab ORDER BY my_timestamp ASC", [],(tx,results)=>{
                     var len = results.rows.length;
                     for(let i=0; i<len; i++){
                         var u = results.rows.item(i);
-                        battery4TemperatureData.push(u.temperature);
+                        battery4electric_currentData.push(u.electric_current);
                         batteryWriteTime.push(u.my_timestamp);
                     }
                     let writeTime = Array.from(new Set(batteryWriteTime));
                     this.setState({
-                        battery4:battery4TemperatureData,
-                        writeTime
+                        battery4:battery4electric_currentData,
+                        writeTime,
                     })
                 });
             },(error)=>{
                 console.log(error);
             });
 
-            const batteryTemperature4 = () => {
+            const batteryelectric_current4 = () => {
                 //查询
                 db.transaction((tx)=>{
-                    tx.executeSql("select id,battery_id,my_timestamp,temperature from battery where battery_id= '"+values[0][3]+"' order by my_timestamp desc limit 1", [],(tx,results)=>{
+                    tx.executeSql("select id,battery_id,my_timestamp,electric_current from battery where battery_id= '"+values[0][3]+"' order by my_timestamp desc limit 1", [],(tx,results)=>{
                         var len = results.rows.length;
                         for(let i=0; i<len; i++){
                             var u = results.rows.item(i);
-                            battery4TemperatureData.push(u.temperature);
+                            battery4electric_currentData.push(u.electric_current);
                             batteryWriteTime.push(u.my_timestamp);
                         }
                         let writeTime = Array.from(new Set(batteryWriteTime));
-                        if(battery4TemperatureData.length>18 && writeTime.length>18){
-                            battery4TemperatureData.shift();
+                        if(battery4electric_currentData.length>18 && writeTime.length>18){
+                            battery4electric_currentData.shift();
                             writeTime.shift();
                             this.setState({
-                                battery4:battery4TemperatureData,
+                                battery4:battery4electric_currentData,
                                 writeTime,
                             });
                         }else {
                             this.setState({
-                                battery4:battery4TemperatureData,
+                                battery4:battery4electric_currentData,
                                 writeTime,
                             });
                         }
-                        battery4Time=setTimeout(batteryTemperature4, 10000);
+                        this.battery4Time=setTimeout(batteryelectric_current4, 60000);
                     });
                 },(error)=>{
                     console.log(error);
                 });
             };
-            setTimeout(batteryTemperature4, 60000);
+            setTimeout(batteryelectric_current4, 60000);
 
             //查询电池5
             db.transaction((tx)=>{
-                tx.executeSql("SELECT id,battery_id,my_timestamp,temperature FROM (SELECT id,battery_id,my_timestamp,temperature FROM battery WHERE battery_id='"+promiseValues[0][4]+"' ORDER BY id DESC LIMIT 18)  AS batteryTemperature ORDER BY my_timestamp ASC", [],(tx,results)=>{
+                tx.executeSql("SELECT id,battery_id,my_timestamp,electric_current FROM (SELECT id,battery_id,my_timestamp,electric_current FROM battery WHERE battery_id='"+promiseValues[0][4]+"' ORDER BY id DESC LIMIT 18)  AS batteryTab ORDER BY my_timestamp ASC", [],(tx,results)=>{
                     var len = results.rows.length;
                     for(let i=0; i<len; i++){
                         var u = results.rows.item(i);
-                        battery5TemperatureData.push(u.temperature);
+                        battery5electric_currentData.push(u.electric_current);
                         batteryWriteTime.push(u.my_timestamp);
                     }
                     let writeTime = Array.from(new Set(batteryWriteTime));
                     this.setState({
-                        battery5:battery5TemperatureData,
+                        battery5:battery5electric_currentData,
                         writeTime,
                     })
                 });
@@ -299,50 +299,50 @@ export default class CWBatteryTemperature extends Component {
                 console.log(error);
             });
 
-            const batteryTemperature5 = () => {
+            const batteryelectric_current5 = () => {
                 //查询
                 db.transaction((tx)=>{
-                    tx.executeSql("select id,battery_id,my_timestamp,temperature from battery where battery_id= '"+values[0][4]+"' order by my_timestamp desc limit 1", [],(tx,results)=>{
+                    tx.executeSql("select id,battery_id,my_timestamp,electric_current from battery where battery_id= '"+values[0][4]+"' order by my_timestamp desc limit 1", [],(tx,results)=>{
                         var len = results.rows.length;
                         for(let i=0; i<len; i++){
                             var u = results.rows.item(i);
-                            battery5TemperatureData.push(u.temperature);
+                            battery5electric_currentData.push(u.electric_current);
                             batteryWriteTime.push(u.my_timestamp);
                         }
                         let writeTime = Array.from(new Set(batteryWriteTime));
-                        if(battery5TemperatureData.length>18 && writeTime.length>18){
-                            battery5TemperatureData.shift();
+                        if(battery5electric_currentData.length>18 && writeTime.length>18){
+                            battery5electric_currentData.shift();
                             writeTime.shift();
                             this.setState({
-                                battery5:battery5TemperatureData,
+                                battery5:battery5electric_currentData,
                                 writeTime,
                             });
                         }else {
                             this.setState({
-                                battery5:battery5TemperatureData,
+                                battery5:battery5electric_currentData,
                                 writeTime,
                             });
                         }
-                        battery5Time=setTimeout(batteryTemperature5, 60000);
+                        this.battery5Time=setTimeout(batteryelectric_current5, 60000);
                     });
                 },(error)=>{
                     console.log(error);
                 });
             };
-            setTimeout(batteryTemperature5, 60000);
+            setTimeout(batteryelectric_current5, 60000);
 
             //查询电池6
             db.transaction((tx)=>{
-                tx.executeSql("SELECT id,battery_id,my_timestamp,temperature FROM (SELECT id,battery_id,my_timestamp,temperature FROM battery WHERE battery_id='"+promiseValues[0][5]+"' ORDER BY id DESC LIMIT 18)  AS batteryTemperature ORDER BY my_timestamp ASC", [],(tx,results)=>{
+                tx.executeSql("SELECT id,battery_id,my_timestamp,electric_current FROM (SELECT id,battery_id,my_timestamp,electric_current FROM battery WHERE battery_id='"+promiseValues[0][5]+"' ORDER BY id DESC LIMIT 18)  AS batteryTab ORDER BY my_timestamp ASC", [],(tx,results)=>{
                     var len = results.rows.length;
                     for(let i=0; i<len; i++){
                         var u = results.rows.item(i);
-                        battery6TemperatureData.push(u.temperature);
+                        battery6electric_currentData.push(u.electric_current);
                         batteryWriteTime.push(u.my_timestamp);
                     }
                     let writeTime = Array.from(new Set(batteryWriteTime));
                     this.setState({
-                        battery6:battery6TemperatureData,
+                        battery6:battery6electric_currentData,
                         writeTime,
                     })
                 });
@@ -350,55 +350,55 @@ export default class CWBatteryTemperature extends Component {
                 console.log(error);
             });
 
-            const batteryTemperature6 = () => {
+            const batteryelectric_current6 = () => {
                 //查询
                 db.transaction((tx)=>{
-                    tx.executeSql("select id,battery_id,my_timestamp,temperature from battery where battery_id= '"+values[0][5]+"' order by my_timestamp desc limit 1", [],(tx,results)=>{
+                    tx.executeSql("select id,battery_id,my_timestamp,electric_current from battery where battery_id= '"+values[0][5]+"' order by my_timestamp desc limit 1", [],(tx,results)=>{
                         var len = results.rows.length;
                         for(let i=0; i<len; i++){
                             var u = results.rows.item(i);
-                            battery6TemperatureData.push(u.temperature);
+                            battery6electric_currentData.push(u.electric_current);
                             batteryWriteTime.push(u.my_timestamp);
                         }
                         let writeTime = Array.from(new Set(batteryWriteTime));
-                        if(battery6TemperatureData.length>18 && writeTime.length>18){
-                            battery6TemperatureData.shift();
+                        if(battery6electric_currentData.length>18 && writeTime.length>18){
+                            battery6electric_currentData.shift();
                             writeTime.shift();
                             this.setState({
-                                battery6:battery6TemperatureData,
+                                battery6:battery6electric_currentData,
                                 writeTime,
                             });
                         }else {
                             this.setState({
-                                battery6:battery6TemperatureData,
+                                battery6:battery6electric_currentData,
                                 writeTime,
                             });
                         }
-                        battery6Time=setTimeout(batteryTemperature6, 60000);
+                        this.battery6Time=setTimeout(batteryelectric_current6, 60000);
                     });
                 },(error)=>{
                     console.log(error);
                 });
             };
-            setTimeout(batteryTemperature6, 60000);
+            setTimeout(batteryelectric_current6, 60000);
         });
     }
 
     historyTime(whether){
-        battery1TemperatureData= [];
-        battery2TemperatureData=[];
-        battery3TemperatureData=[];
-        battery4TemperatureData=[];
-        battery5TemperatureData=[];
-        battery6TemperatureData=[];
-        batteryWriteTime = [];
-        clearInterval(battery1Time);
-        clearInterval(battery2Time);
-        clearInterval(battery3Time);
-        clearInterval(battery4Time);
-        clearInterval(battery5Time);
-        clearInterval(battery6Time);
-        if(whether===0){
+        battery1electric_currentData=[];
+        battery2electric_currentData=[];
+        battery3electric_currentData=[];
+        battery4electric_currentData=[];
+        battery5electric_currentData=[];
+        battery5electric_currentData=[];
+        batteryWriteTime=[];
+        this.battery1Time && clearTimeout(this.battery1Time);
+        this.battery2Time && clearTimeout(this.battery2Time);
+        this.battery3Time && clearTimeout(this.battery3Time);
+        this.battery4Time && clearTimeout(this.battery4Time);
+        this.battery5Time && clearTimeout(this.battery5Time);
+        this.battery6Time && clearTimeout(this.battery6Time);
+        if(whether===0){  
             this.setState({
                 previous:this.state.previous+18,
             });
@@ -413,18 +413,19 @@ export default class CWBatteryTemperature extends Component {
                 previous:this.state.previous-18,
             });
         }
+
         //查询电池1
         db.transaction((tx)=>{
-            tx.executeSql("SELECT id,battery_id,my_timestamp,temperature FROM (SELECT id,battery_id,my_timestamp,temperature FROM battery WHERE battery_id='"+promiseValues[0][0]+"' ORDER BY id DESC LIMIT '"+this.state.previous+"',18)  AS batteryTemperature ORDER BY my_timestamp ASC", [],(tx,results)=>{
+            tx.executeSql("SELECT id,battery_id,my_timestamp,electric_current FROM (SELECT id,battery_id,my_timestamp,electric_current FROM battery WHERE battery_id='"+promiseValues[0][0]+"' ORDER BY id DESC LIMIT '"+this.state.previous+"',18)  AS batteryTab ORDER BY my_timestamp ASC", [],(tx,results)=>{
                 var len = results.rows.length;
                 for(let i=0; i<len; i++){
                     var u = results.rows.item(i);
-                    battery1TemperatureData.push(u.temperature);
+                    battery1electric_currentData.push(u.electric_current);
                     batteryWriteTime.push(u.my_timestamp);
                 }
                 let writeTime = Array.from(new Set(batteryWriteTime));
                 this.setState({
-                    battery1:battery1TemperatureData,
+                    battery1:battery1electric_currentData,
                     writeTime,
                 })
             });
@@ -434,16 +435,16 @@ export default class CWBatteryTemperature extends Component {
 
         //查询电池2
         db.transaction((tx)=>{
-            tx.executeSql("SELECT id,battery_id,my_timestamp,temperature FROM (SELECT id,battery_id,my_timestamp,temperature FROM battery WHERE battery_id='"+promiseValues[0][1]+"' ORDER BY id DESC LIMIT '"+this.state.previous+"',18)  AS batteryTemperature ORDER BY my_timestamp ASC", [],(tx,results)=>{
+            tx.executeSql("SELECT id,battery_id,my_timestamp,electric_current FROM (SELECT id,battery_id,my_timestamp,electric_current FROM battery WHERE battery_id='"+promiseValues[0][1]+"' ORDER BY id DESC LIMIT '"+this.state.previous+"',18)  AS batteryTab ORDER BY my_timestamp ASC", [],(tx,results)=>{
                 var len = results.rows.length;
                 for(let i=0; i<len; i++){
                     var u = results.rows.item(i);
-                    battery2TemperatureData.push(u.temperature);
+                    battery2electric_currentData.push(u.electric_current);
                     batteryWriteTime.push(u.my_timestamp);
                 }
                 let writeTime = Array.from(new Set(batteryWriteTime));
                 this.setState({
-                    battery2:battery2TemperatureData,
+                    battery2:battery2electric_currentData,
                     writeTime,
                 })
             });
@@ -453,17 +454,18 @@ export default class CWBatteryTemperature extends Component {
 
         //查询电池3
         db.transaction((tx)=>{
-            tx.executeSql("SELECT id,battery_id,my_timestamp,temperature FROM (SELECT id,battery_id,my_timestamp,temperature FROM battery WHERE battery_id='"+promiseValues[0][2]+"' ORDER BY id DESC LIMIT '"+this.state.previous+"',18)  AS batteryTemperature ORDER BY my_timestamp ASC", [],(tx,results)=>{
+            tx.executeSql("SELECT id,battery_id,my_timestamp,electric_current FROM (SELECT id,battery_id,my_timestamp,electric_current FROM battery WHERE battery_id='"+promiseValues[0][2]+"' ORDER BY id DESC LIMIT '"+this.state.previous+"',18)  AS batteryTab ORDER BY my_timestamp ASC", [],(tx,results)=>{
                 var len = results.rows.length;
                 for(let i=0; i<len; i++){
                     var u = results.rows.item(i);
-                    battery3TemperatureData.push(u.temperature);
+                    battery3electric_currentData.push(u.electric_current);
                     batteryWriteTime.push(u.my_timestamp);
                 }
                 let writeTime = Array.from(new Set(batteryWriteTime));
                 this.setState({
-                    battery3:battery3TemperatureData,
+                    battery3:battery3electric_currentData,
                     writeTime,
+
                 })
             });
         },(error)=>{
@@ -472,16 +474,16 @@ export default class CWBatteryTemperature extends Component {
 
         //查询电池4
         db.transaction((tx)=>{
-            tx.executeSql("SELECT id,battery_id,my_timestamp,temperature FROM (SELECT id,battery_id,my_timestamp,temperature FROM battery WHERE battery_id='"+promiseValues[0][3]+"' ORDER BY id DESC LIMIT '"+this.state.previous+"',18)  AS batteryTemperature ORDER BY my_timestamp ASC", [],(tx,results)=>{
+            tx.executeSql("SELECT id,battery_id,my_timestamp,electric_current FROM (SELECT id,battery_id,my_timestamp,electric_current FROM battery WHERE battery_id='"+promiseValues[0][3]+"' ORDER BY id DESC LIMIT '"+this.state.previous+"',18)  AS batteryTab ORDER BY my_timestamp ASC", [],(tx,results)=>{
                 var len = results.rows.length;
                 for(let i=0; i<len; i++){
                     var u = results.rows.item(i);
-                    battery4TemperatureData.push(u.temperature);
+                    battery4electric_currentData.push(u.electric_current);
                     batteryWriteTime.push(u.my_timestamp);
                 }
                 let writeTime = Array.from(new Set(batteryWriteTime));
                 this.setState({
-                    battery4:battery4TemperatureData,
+                    battery4:battery4electric_currentData,
                     writeTime,
                 })
             });
@@ -491,17 +493,17 @@ export default class CWBatteryTemperature extends Component {
 
         //查询电池5
         db.transaction((tx)=>{
-            tx.executeSql("SELECT id,battery_id,my_timestamp,temperature FROM (SELECT id,battery_id,my_timestamp,temperature FROM battery WHERE battery_id='"+promiseValues[0][4]+"' ORDER BY id DESC LIMIT '"+this.state.previous+"',18)  AS batteryTemperature ORDER BY my_timestamp ASC", [],(tx,results)=>{
+            tx.executeSql("SELECT id,battery_id,my_timestamp,electric_current FROM (SELECT id,battery_id,my_timestamp,electric_current FROM battery WHERE battery_id='"+promiseValues[0][4]+"' ORDER BY id DESC LIMIT '"+this.state.previous+"',18)  AS batteryTab ORDER BY my_timestamp ASC", [],(tx,results)=>{
                 var len = results.rows.length;
                 for(let i=0; i<len; i++){
                     var u = results.rows.item(i);
-                    battery5TemperatureData.push(u.temperature);
+                    battery5electric_currentData.push(u.electric_current);
                     batteryWriteTime.push(u.my_timestamp);
                 }
                 let writeTime = Array.from(new Set(batteryWriteTime));
                 this.setState({
-                    battery5:battery5TemperatureData,
-                    writeTime
+                    battery5:battery5electric_currentData,
+                    writeTime,
                 })
             });
         },(error)=>{
@@ -510,36 +512,38 @@ export default class CWBatteryTemperature extends Component {
 
         //查询电池6
         db.transaction((tx)=>{
-            tx.executeSql("SELECT id,battery_id,my_timestamp,temperature FROM (SELECT id,battery_id,my_timestamp,temperature FROM battery WHERE battery_id='"+promiseValues[0][5]+"' ORDER BY id DESC LIMIT '"+this.state.previous+"',18)  AS batteryTemperature ORDER BY my_timestamp ASC", [],(tx,results)=>{
-                //"SELECT id,battery_id,my_timestamp,temperature FROM (SELECT id,battery_id,my_timestamp,temperature FROM battery WHERE battery_id='"+promiseValues[0][0]+"' ORDER BY id DESC LIMIT 18)  AS batteryTemperature ORDER BY my_timestamp ASC"
+            tx.executeSql("SELECT id,battery_id,my_timestamp,electric_current FROM (SELECT id,battery_id,my_timestamp,electric_current FROM battery WHERE battery_id='"+promiseValues[0][5]+"' ORDER BY id DESC LIMIT '"+this.state.previous+"',18)  AS batteryTab ORDER BY my_timestamp ASC", [],(tx,results)=>{
+                //"SELECT id,battery_id,my_timestamp,electric_current FROM (SELECT id,battery_id,my_timestamp,electric_current FROM battery WHERE battery_id='"+promiseValues[0][0]+"' ORDER BY id DESC LIMIT 18)  AS batteryTab ORDER BY my_timestamp ASC"
                 var len = results.rows.length;
                 for(let i=0; i<len; i++){
                     var u = results.rows.item(i);
-                    battery6TemperatureData.push(u.temperature);
+                    battery6electric_currentData.push(u.electric_current);
                     batteryWriteTime.push(u.my_timestamp);
                 }
                 let writeTime = Array.from(new Set(batteryWriteTime));
                 this.setState({
-                    battery6:battery6TemperatureData,
+                    battery6:battery6electric_currentData,
                     writeTime,
                 })
             });
         },(error)=>{
             console.log(error);
         });
+
     }
+
     componentWillUnmount() {
-        clearTimeout(battery1Time);
-        clearTimeout(battery2Time);
-        clearTimeout(battery3Time);
-        clearTimeout(battery4Time);
-        clearTimeout(battery5Time);
-        clearTimeout(battery6Time);
+        this.battery1Time && clearTimeout(this.battery1Time);
+        this.battery2Time && clearTimeout(this.battery2Time);
+        this.battery3Time && clearTimeout(this.battery3Time);
+        this.battery4Time && clearTimeout(this.battery4Time);
+        this.battery5Time && clearTimeout(this.battery5Time);
+        this.battery6Time && clearTimeout(this.battery6Time);
     }
     render() {
         const option= {
             title: {
-                text: '温度',
+                text: '电池电流',
                 x:'center'
             },
             tooltip : { //点击某一个点的数据的时候，显示出悬浮窗
@@ -548,19 +552,28 @@ export default class CWBatteryTemperature extends Component {
             legend: {//可以手动选择现实几个图标
                 data:['电池1','电池2','电池3','电池4','电池5','电池6'],
                 y:'bottom',
-                type: 'legendToggleSelect',
             },
             toolbox: {//各种表格
                 orient: 'vertical',//改变icon的布局朝向
                 show : true,
-                showTitle:true,
+                showTitle : true,
                 feature : {
-                    dataView : {show: true, readOnly: true},//show是否显示表格，readOnly是否只读
+                    dataView : {
+                        show: true,
+                        readOnly: true,
+                        emphasis:{
+                            iconStyle:{
+                                shadowColor: 'rgba(0, 0, 0, 0.5)',
+                                shadowBlur: 10,
+                                borderWidth:1,
+                            }
+                        }
+                    },//show是否显示表格，readOnly是否只读
                     magicType : {
                         //折线图  柱形图    总数统计 分开平铺
-                        //type: ['line'],//'line', 'bar','stack' ,'tiled'
+                        // type: ['line', 'bar','stack' ,'tiled'],//'line', 'bar','stack' ,'tiled'
                     },
-                },
+                }
             },
             color:['rgb(67,205,126)','rgb(249,159,94)','rgb(255,106,106)','rgb(105,89,205)','rgb(255, 0, 203)','rgb(0,0,205)'],//图形的颜色组
             xAxis: {
@@ -582,7 +595,7 @@ export default class CWBatteryTemperature extends Component {
             },
             yAxis: {
                 type:'value',
-                name : '温度(℃)'
+                name : '电流(A)'
             },
             series: [
                 {
@@ -610,17 +623,19 @@ export default class CWBatteryTemperature extends Component {
                     smooth:true,
                     data: this.state.battery4,
                     showSymbol: false,
-                },{
+                },
+                {
                     name: '电池5',
                     type: 'line',
                     smooth:true,
-                    data: this.state.battery5,
+                    data: this.state.battery5,  
                     showSymbol: false,
-                },{
+                },
+                {
                     name: '电池6',
                     type: 'line',
-                    smooth:true,    
-                    data: this.state.battery6,
+                    smooth:true,
+                    data: this.state.battery6,  
                     showSymbol: false,
                 }
             ],

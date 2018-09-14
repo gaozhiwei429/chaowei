@@ -502,7 +502,7 @@ export default class CWHome extends Component {
                             <Image style={{width:Dimensions.get('window').width/3,height:Dimensions.get('window').width/2}} source={require('../../img/QRCCharger.png')}/>
                         </TouchableOpacity>}
                     {/*右侧电池按钮*/}
-                    <View style={styles.viewRightImage} >
+                    <View style={styles.viewRightImage}>
                         {this.state.batteryStorage===1||this.state.batteryStorage===2||this.state.batteryStorage===3||this.state.batteryStorage===4||this.state.batteryStorage===5||this.state.batteryStorage===6?
                             <TouchableOpacity
                                 activeOpacity={0.5}

@@ -25,14 +25,13 @@ import CWMain from './Component/CWMain/CWMain';  //Navigator
 import CWHome from './Component/CWHome/CWHome';  //首页
 import CWButton from './Component/CWButton/CWButton';//更多BTN
 import CWQRCode from './Component/CWQRCode/CWQRCode';//二维码
-import TAB from './Component/CWSvg/TAB';//
 import RemainingBattery from './Component/CWRemainingBattery/CWRemainingBattery';//剩余电量模块
 import CWScanning from './Component/CWScanning/CWScanning';//页面绑定
-import CWBatteryTemperature from './Component/CWSvg/CWBatteryTemperature';//温度折线图
-import CWBatteryVoltage from './Component/CWSvg/CWBatteryVoltage';//电压折线图
-import CWBatteryElectricCurrent from './Component/CWSvg/CWBatteryElectricCurrent';//电流折线图
-import CWBatteryCapacity from './Component/CWSvg/CWBatteryCapacity';//容量
-import ChargerSvg from './Component/HomepageLater/ChargerSvg';//充电器折线图
+import CWBatteryTemperature from './Component/presentationData/CWBatteryTemperature';//温度折线图
+import CWBatteryVoltage from './Component/presentationData/CWBatteryVoltage';//电压折线图
+import CWBatteryElectricCurrent from './Component/presentationData/CWBatteryElectricCurrent';//电流折线图
+import CWBatteryCapacity from './Component/presentationData/CWBatteryCapacity';//容量
+import ChargerSvg from './Component/presentationData/ChargerSvg';//充电器折线图
 import HomepageData from './Component/HomepageLater/HomepageData';//蓄电池Next
 import Calibration from './Component/HomepageLater/Calibration';//校准
 import RechargeRecord from './Component/RechargeRecord/RechargeRecord';//充电记录
@@ -46,6 +45,10 @@ import WXPay from './Component/Pay/WXPay';//微信支付
 import PaymentPage from './Component/Pay/PaymentPage';//支付宝支付
 import Filesystem from './Component/Filesystem/Filesystem';//写文件
 import AboutUs from './Component/AboutUs/AboutUs';//关于我们
+import CWBleConnect from './Component/CWBleSearch/CWBleConnect';//连接读取数据
+import PresentationData from './Component/presentationData/PresentationData';//数据
+import TAB from './Component/presentationData/TAB';//蓄电池数据
+import Shopping from './Component/Shopping/Shopping';//商城
 
 //测试
 import ListView from './Component/ListView/ListView'
@@ -82,6 +85,9 @@ const RootStack = createStackNavigator({
         PaymentPage:{screen:PaymentPage},
         Filesystem:{screen:Filesystem},
         AboutUs:{screen:AboutUs},
+        CWBleConnect:{screen:CWBleConnect},
+        PresentationData:{screen:PresentationData},
+        Shopping:{screen:Shopping},
 
         //测试
         ListView:{screen:ListView},
@@ -93,7 +99,7 @@ const RootStack = createStackNavigator({
     },
     {
         initialRouteName: 'CWGLaunchlmage',
-    }
+    }    
 );
 
 export default class App extends Component {

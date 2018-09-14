@@ -26,7 +26,7 @@ var chargerTemperatureData=[];
 var chargerCapacityData=[];
 var chargerTimeData=[];
 var promiseValues;
-var chargerClearTime;
+// var chargerClearTime;
 export default class ChargerSvg extends Component {
     constructor(props) {
         super(props);
@@ -125,7 +125,7 @@ export default class ChargerSvg extends Component {
                                 chargerTime:chargerTimeData,
                             });
                         }
-                        chargerClearTime = setTimeout(chargerFeedback, 60000);
+                        this.chargerClearTime = setTimeout(chargerFeedback, 60000);
                     });
                 },(error)=>{ 
                     console.log(error);
@@ -140,9 +140,10 @@ export default class ChargerSvg extends Component {
         chargerElectricCurrentData=[];
         chargerTemperatureData=[];
         chargerCapacityData=[];
-        chargerTimeData=[];
-        clearTimeout(chargerClearTime);
-        if(whether===0){
+        chargerTimeData=[]; 
+        this.chargerClearTime && clearTimeout(this.chargerClearTime);
+        if(whether===0){ 
+            console.log(this.state.previous);
             this.setState({
                 previous:this.state.previous+18,
             });
@@ -152,10 +153,11 @@ export default class ChargerSvg extends Component {
                     text:'确定',onPress:()=>{}   
                 }])
                 return;  
+            }else{
+                this.setState({
+                    previous:this.state.previous-18,
+                });
             }
-            this.setState({
-                previous:this.state.previous-18,
-            });
         }
 
         //开启数据库
@@ -168,10 +170,13 @@ export default class ChargerSvg extends Component {
             tx.executeSql("SELECT * FROM (SELECT * FROM charger WHERE charger_id='"+promiseValues[0]+"' ORDER BY id DESC LIMIT '"+this.state.previous+"',18)  AS chargerTab ORDER BY my_timestamp ASC", [],(tx,results)=>{
                 //"SELECT * FROM (SELECT * FROM charger WHERE charger_id='"+promiseValues[0]+"' ORDER BY id DESC LIMIT 18 OFFSET 16)  AS chargerTab ORDER BY my_timestamp ASC"
                 var len = results.rows.length;
-                console.log(this.state.previous,'1');   
-                console.log(len);
-                if(len<18 || len==0){
-                    alert('sorry，没有数据可查了')  
+                if(len<1){
+                    Alert.alert('','sorry，数据查完了！',[{
+                        text:'确定',onPress:()=>{}  
+                    }])
+                    this.setState({
+                        previous:this.state.previous-18,
+                    })
                     return;
                 }
                 for(var i=0; i<len; i++){
@@ -197,7 +202,7 @@ export default class ChargerSvg extends Component {
     }
 
     componentWillUnmount() {
-        clearTimeout(chargerClearTime);
+        this.chargerClearTime && clearTimeout(this.chargerClearTime);
     }
 
     static navigationOptions = {
@@ -212,7 +217,6 @@ export default class ChargerSvg extends Component {
         headerBackImage: (<Image source={require('../../img/leftGoBack.png')} style={{width:18,height:14,marginLeft:15,marginRight:15}}/>),
     };
     render() {
-        // console.log(this.state.chargerTime); 
         const option= {
             title : {
                 text: '充电器数据曲线',
@@ -251,16 +255,6 @@ export default class ChargerSvg extends Component {
                 data: this.state.chargerTime.map(function(item){
                     return commonality.replaceTime(item); 
                 }),
-                // axisLabel: {
-                //     formatter: function (date, idx) {   
-                //         return idx === 0 ? date.getMonth() : [date.getMonth() + 1, date.getDate()].join('-');
-                //     }
-                // }, 
-                axisLabel:{ 
-                    textStyle:{ 
-                        fontSize: 9,
-                    }
-                }
             },
             yAxis: [  
                 {
@@ -272,6 +266,24 @@ export default class ChargerSvg extends Component {
                     type:'value',
                     name : '电流/容量',//   V /A /℃ /C
                 },
+            ],
+            dataZoom: [
+                {
+                    // id: 'dataZoomX',
+                    type: 'slider',
+                    xAxisIndex: [0],
+                    filterMode: 'filter', // 设定为 'filter' 从而 X 的窗口变化会影响 Y 的范围。
+                    start: 0,
+                    end: 100
+                },
+                // {
+                //     id: 'dataZoomY',
+                //     type: 'slider',
+                //     yAxisIndex: [0],
+                //     filterMode: 'empty',
+                //     start: 20,
+                //     end: 80
+                // }
             ],
             series: [
                 {

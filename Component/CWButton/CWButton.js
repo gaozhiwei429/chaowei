@@ -8,8 +8,6 @@ import {
     ScrollView,
 } from 'react-native';
 
-import RemainingBattery from '../CWRemainingBattery/CWRemainingBattery';
-
 class CWBtnCell extends Component {
     render() {
         return (
@@ -26,11 +24,9 @@ export default class CWButton extends Component {
         headerTitle:(<Text style={{fontSize:20,flex: 1, textAlign: 'center'}}>更多</Text>),
         headerStyle: {
             height: 40,
-            // backgroundColor: 'red',
-            // elevation: null
         },
         // headerLeft:(
-        //     <View style={{height: 44,width: 55,justifyContent: 'center',paddingRight:15} }/>
+        //     <View/>
         // ),
         headerRight: (
             <View style={{height: 44,width: 55,justifyContent: 'center',paddingRight:15} }/>
@@ -42,6 +38,10 @@ export default class CWButton extends Component {
     render() {
         return (
             <ScrollView style={styles.Binding}>
+                <CWBtnCell
+                    title='BLEl连接读数据'
+                    onPress={() => this.props.navigation.navigate('CWBleConnect')}
+                />
                 <CWBtnCell
                     title='确认支付'
                     onPress={() => this.props.navigation.navigate('PaymentPage')}

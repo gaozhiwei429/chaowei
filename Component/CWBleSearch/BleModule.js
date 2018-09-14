@@ -22,11 +22,10 @@ export default class BleModule{
                     resolve(device);                        
                 }              
             })
-
         });
     }
     
-    /**
+    /**      
      * 停止搜索蓝牙
      * */
     stopScan(){

@@ -305,37 +305,6 @@ class CWBatteryCapacity extends Component {
                     showSymbol: false,
                 }
             ],
-            // visualMap: {//值的大小决定曲线的颜色
-            //     top: 10,
-            //     right: 10,
-            //     pieces: [{
-            //         gt: 0,
-            //         lte: 50,
-            //         color: '#096'
-            //     }, {
-            //         gt: 50,
-            //         lte: 100,
-            //         color: '#ffde33'
-            //     }, {
-            //         gt: 100,
-            //         lte: 150,
-            //         color: '#ff9933'
-            //     }, {
-            //         gt: 150,
-            //         lte: 200,
-            //         color: '#cc0033'
-            //     }, {
-            //         gt: 200,
-            //         lte: 300,
-            //         color: '#660099'
-            //     }, {
-            //         gt: 300,
-            //         color: '#7e0023'
-            //     }],
-            //     outOfRange: {
-            //         color: '#999'
-            //     }
-            // },
         };
         return (
             <View>

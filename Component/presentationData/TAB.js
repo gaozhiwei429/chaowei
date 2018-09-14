@@ -1,6 +1,8 @@
 import React from 'react';
 import {
-
+    Text,
+    View,
+    Image,  
 } from 'react-native';
 import { createMaterialTopTabNavigator,TabNavigator } from 'react-navigation'
 
@@ -67,12 +69,18 @@ const Tabs = TabNavigator({
 });
 
 Tabs.navigationOptions = {
-    title:'曲线图',
+    headerTitle:(<Text style={{fontSize:20,flex: 1, textAlign: 'center'}}>蓄电池曲线图</Text>),
     headerStyle:{
         height:40,
-        // backgroundColor: 'red',
-        // elevation: null
     },
+    // headerLeft:(
+    //     <View/>
+    // ),
+    headerRight: (
+        <View style={{height: 44,width: 55,justifyContent: 'center',paddingRight:15} }/>
+    ),
+    headerPressColorAndroid:'gray',
+    headerBackImage: (<Image source={require('../../img/leftGoBack.png')} style={{width:18,height:14,marginLeft:15,marginRight:15}}/>),
 
     // header:  /* Your custom header */
     //     <View

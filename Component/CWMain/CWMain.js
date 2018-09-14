@@ -8,8 +8,9 @@ import {
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { createBottomTabNavigator, TabBarBottom } from 'react-navigation'; // Version can be specified in package.json
 import Homescreen from '../CWHome/CWHome';
-import TABscreen from '../CWSvg/TAB';
-import Buttonscreen from '../CWButton/CWButton';
+// import TABscreen from '../CWSvg/TAB';
+import PresentationDatascreen from '../presentationData/PresentationData';//数据
+import Buttonscreen from '../CWButton/CWButton';  
 
 const tabBarConfig = {
     Home: {
@@ -29,7 +30,7 @@ const tabBarConfig = {
 const Tabs = createBottomTabNavigator(
     {
         Home: { screen: Homescreen },
-        Tab: {screen:TABscreen},
+        Tab: {screen:PresentationDatascreen},  
         More: { screen: Buttonscreen },
     },
     {
