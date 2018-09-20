@@ -114,6 +114,36 @@ export default class SQLite extends Component {
         });
     }
 
+    //创建充电器检测仪表
+    createChargerDetectorTable() {
+        return new Promise((resolve, reject) => {
+            db.transaction((tx)=> {
+                tx.executeSql('CREATE TABLE IF NOT EXISTS ChargerDetector(' +
+                    'id INTEGER PRIMARY KEY  AUTOINCREMENT,' +
+                    'ChargerDetector_id varchar,'+
+                    'my_timestamp VARCHAR,' +
+                    'voltage VARCHAR,' +
+                    'electric_current VARCHAR,' +
+                    'capacity VARCHAR,' +
+                    'BoardTemperature VARCHAR,'+//add
+                    'AmbientTemperature VARCHAR)'
+                    , [], ()=> {
+                        this._successCB('executeSql');
+                        resolve();
+                    }, (err)=> {
+                        this._errorCB('executeSql', err);
+                        reject(err);
+                    });
+            }, (err)=> {//所有的 transaction都应该有错误的回调方法，在方法里面打印异常信息，不然你可能不会知道哪里出错了。
+                this._errorCB('transaction', err);
+                reject(err);
+            }, ()=> {
+                this._successCB('transaction');
+            })
+        });
+    }
+
+    //创建数据库表
     async createTable(){
         if (!db) {
             db = await this.open();
@@ -122,6 +152,7 @@ export default class SQLite extends Component {
         await Promise.all([
             await this.createBatteryTable(),
             await this.createChargerTable(),
+            await this.createChargerDetectorTable(),
         ]);
     }
 
@@ -264,6 +295,69 @@ export default class SQLite extends Component {
             this._successCB('transaction insert data');
         });
     }
+
+    //删除充电器检测仪数据
+    async deleteChargerDetectorData(){
+        if (!db) {
+            db = await this.open();
+        }
+        db.transaction((tx)=>{
+            tx.executeSql('delete from ChargerDetector',[],()=>{
+
+            });
+        });
+    }
+
+    //删除充电器检测仪表格
+    dropChargerDetectorTable(){
+        db.transaction((tx)=>{
+            tx.executeSql('drop table ChargerDetector',[],()=>{
+
+            });
+        },(err)=>{
+            this._errorCB('transaction', err);
+        },()=>{
+            this._successCB('transaction');
+        });
+    }
+
+    //写充电器检测仪数据  createChargerDetectorTable
+    async insertChargerDetectorData(ChargerDetectorData, callback){
+        let len = ChargerDetectorData.length;
+        if (!db) {
+            db = await this.open();
+        }
+        this.createTable();
+        //删除充电器数据、表
+        // this.deleteChargerData();
+        // this.dropChargerTable();
+
+        db.transaction((tx)=>{
+            for(let i=0; i<len; i++){
+                var ChargerDetector = ChargerDetectorData[i];
+                let ChargerDetector_id= ChargerDetector.ChargerDetector_id;
+                let my_timestamp = ChargerDetector.my_timestamp;
+                let voltage = ChargerDetector.voltage;
+                let electric_current = ChargerDetector.electric_current;
+                let capacity = ChargerDetector.capacity;
+                let BoardTemperature=ChargerDetector.BoardTemperature;//add
+                let AmbientTemperature=ChargerDetector.AmbientTemperature;//add
+                let sql = "INSERT INTO ChargerDetector(ChargerDetector_id,my_timestamp,voltage,electric_current,capacity,BoardTemperature,AmbientTemperature)"+
+                    "values(?,?,?,?,?,?,?)"; 
+                tx.executeSql(sql,[ChargerDetector_id,my_timestamp,voltage,electric_current,capacity,BoardTemperature,AmbientTemperature],()=>{
+                        callback();
+                    },(err)=>{
+                        console.log(err);
+                    }
+                );
+            }
+        },(error)=>{
+            this._errorCB('transaction', error);
+        },()=>{
+            this._successCB('transaction insert data');
+        });
+    }
+
     //结束
     close(){
         if(db){
@@ -275,10 +369,12 @@ export default class SQLite extends Component {
         db = null;
     }
 
+    //成功
     _successCB(name){
         console.log("SQLiteStorage "+name+" success");
     }
 
+    //失败
     _errorCB(name, err){
         console.log("SQLiteStorage "+name);
         console.log(err);

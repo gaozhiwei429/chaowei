@@ -14,7 +14,7 @@ import {
 
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import * as storage from '../../storage';
-import { BATTERY_BIND_STORAGE_KEY,CHARGER_BIND_STORAGE_KEY } from '../../config';
+import { BATTERY_BIND_STORAGE_KEY,CHARGER_BIND_STORAGE_KEY,LOGGER_STORAGE_KEY } from '../../config';
 import EasyToast, {DURATION} from 'react-native-easy-toast';
 // 引入手电筒模块
 // let FlashLight = NativeModules.FlashLight;
@@ -24,67 +24,93 @@ export default class CWQRCode extends Component {
     constructor(){
         super();
         this.state = {
-            // dataBattery:[],//电池
-            // dataCharger:[],//充电器
             JudgeBtn:0,
+            phone:true,
         };
     }
     
     onBarCodeRead(e) {
         //将返回的结果转为对象
-        let QRCdata = e.data;
-        let value =QRCdata.toLowerCase();
-
-        if(this.state.JudgeBtn===0){
-            if(value.slice(10,12)=='00'){
-                storage.get(CHARGER_BIND_STORAGE_KEY, (error, result) => {//扫码存储充电器
-                    const set = new Set(result);
-                    if(set.has(value)!==true){
-                        result= (result || []).concat(value);
-                        if(result.length<2){
-                            storage.save(CHARGER_BIND_STORAGE_KEY, result, () => {
-                                // console.log(result.length,'charger'); 
-                                DeviceEventEmitter.emit('charger', result.length)
-                                // this.setState({ dataCharger: value});
-                            });
-                            this.refs.toast.show('扫码成功!',1200);
+        let ScanData = e.data;
+        if(ScanData.indexOf("?")!=-1){
+            let markLen = ScanData.lastIndexOf('?');
+            var URL = ScanData.slice(0,markLen);
+            var value = ScanData.slice(markLen+3).toLowerCase();//大写转小写
+        }else{
+            var value = ScanData.toLowerCase()
+        } 
+        // alert(value);  
+        if(this.state.phone){
+            if(this.state.JudgeBtn===0){
+                if(value.slice(10,12)=='00'){
+                    storage.get(CHARGER_BIND_STORAGE_KEY, (error, result) => {//扫码存储充电器
+                        const set = new Set(result);
+                        if(set.has(value)!==true){
+                            result= (result || []).concat(value);
+                            if(result.length<2){
+                                storage.save(CHARGER_BIND_STORAGE_KEY, result, () => {
+                                    // console.log(result.length,'charger'); 
+                                    DeviceEventEmitter.emit('charger', result.length)
+                                });
+                                this.refs.toast.show('扫码成功!',1200);
+                            }else {
+                                this.refs.toast.show('目前只支持扫一个充电器!',1200);
+                            }
                         }else {
-                            this.refs.toast.show('目前只支持扫一个充电器!',1200);
+                            this.refs.toast.show('此块充电器已存在!',1200);
                         }
-                    }else {
-                        this.refs.toast.show('此块充电器已存在!',1200);
-                    }
-                });
-            }else if(value.slice(10,12)=='01'){
-                storage.get(BATTERY_BIND_STORAGE_KEY, (error, result) => {//扫码存储电池
-                    const set = new Set(result);
-                    if(set.has(value) !== true){
-                        result = (result || []).concat(value);
-                        if(result.length<7){
-                            storage.save(BATTERY_BIND_STORAGE_KEY, result, () => {
-                                // console.log(result.length,'battery'); 
-                                DeviceEventEmitter.emit('battery', result.length)
-                                // this.setState({ dataBattery: value});
-                            });
-                            this.refs.toast.show('扫码成功!',1200);
+                    });
+                }else if(value.slice(10,12)=='01'){
+                    storage.get(BATTERY_BIND_STORAGE_KEY, (error, result) => {//扫码存储电池
+                        const set = new Set(result);
+                        if(set.has(value) !== true){
+                            result = (result || []).concat(value);
+                            if(result.length<7){
+                                storage.save(BATTERY_BIND_STORAGE_KEY, result, () => {
+                                    // console.log(result.length,'battery'); 
+                                    DeviceEventEmitter.emit('battery', result.length)
+                                });
+                                this.refs.toast.show('扫码成功!',1200);
+                            }else{
+                                this.refs.toast.show('目前最多支持绑定6块电池!',1200);
+                            }
                         }else{
-                            this.refs.toast.show('目前最多支持绑定6块电池!',1200);
+                            this.refs.toast.show('此块蓄电池已存在!',1200);
                         }
-                    }else{
-                        this.refs.toast.show('此块蓄电池已存在!',1200);
-                    }
-                });
-            }else {
-                this.refs.toast.show('这不是我们的产品!',1200);
+                    });
+                }else if(value.slice(10,12)=='03'){
+                    storage.get(LOGGER_STORAGE_KEY, (error, result) => {//扫码存储充电器
+                        const set = new Set(result);
+                        if(set.has(value)!==true){
+                            result= (result || []).concat(value);
+                            if(result.length<2){
+                                storage.save(LOGGER_STORAGE_KEY, result, () => {
+                                    DeviceEventEmitter.emit('charger', result.length)
+                                });
+                                this.refs.toast.show('扫码成功!',1200);
+                            }else {
+                                this.refs.toast.show('主人，目前只支持扫一个记录仪!',1200);
+                            }
+                        }else {
+                            this.refs.toast.show('主人，我已存在!',1200);
+                        }
+                    });
+                }else{
+                    this.refs.toast.show('这不是我们的产品!',1200);
+                }
             }
-        }
-
-        if(this.state.JudgeBtn===1){//扫码充电
-            if(value.slice(10,12)=='aa'){
-                this.props.navigation.replace('PaymentPage',{AliPay:value})
-            }else {
-                this.refs.toast.show('您扫的不是我们充电桩二维码!',1200)
+    
+            if(this.state.JudgeBtn===1){//扫码充电
+                if(value.slice(10,12)=='aa'){
+                    this.props.navigation.replace('PaymentPage',{AliPay:value})
+                }else {
+                    this.refs.toast.show('您扫的不是我们充电桩二维码!',1200)
+                }
             }
+        }else{
+            Linking
+                .openURL(URL)
+                    .catch(err => console.error('An error occured', err));
         }
     }
 
@@ -208,7 +234,7 @@ export default class CWQRCode extends Component {
                             {/**QR覆盖层底部*/}
                             <View style={styles.overlayBottom}/>
                         </View>}
-                    <View style={{flex:1,  height:height/7, backgroundColor:'rgba(0,0,0,0.7)', width:width, justifyContent:'space-around',flexDirection:'row', alignItems:'center',}}>
+                    <View style={{height:height/7, backgroundColor:'rgba(0,0,0,0.7)', width:width, justifyContent:'space-around',flexDirection:'row', alignItems:'center',}}>
                         {this.state.JudgeBtn===0?
                             <View style={styles.selected}>
                                 <Image source={require('../../img/BandPitchOn.png')} style={{width:30,height:30,}} />
@@ -355,12 +381,9 @@ const styles = StyleSheet.create({
     },
     overlayBottom:{
         flex:1,
-        // flexDirection:'row',
         height: height/3-height/7,
         width: width,
         backgroundColor: 'rgba(0, 0, 0, 0.6)',
-        // justifyContent:'space-around',
-        // alignItems:'center',
     },
     overlayTop:{
         flex:1,
@@ -392,11 +415,10 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     camera: {
-        backgroundColor: '#000',
-        height: height
+        height: height,
     },
     overlay: {
         position: 'absolute',
-        flex:1
+        flex:1,
     },
 });

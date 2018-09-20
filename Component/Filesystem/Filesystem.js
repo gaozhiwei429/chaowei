@@ -11,7 +11,7 @@ import RNFS from 'react-native-fs';
 import SQLiteText from '../SQLite/sqlite';
 import AlertProgress from '../Alert/AlertProgress';
 import EasyToast, {DURATION} from 'react-native-easy-toast';
-import OpenFolder from '../OpenFolder/Openfolder'
+import OpenFolder from '../OpenFolder/Openfolder';
 var sqLite = new SQLiteText();
 var db;
 var batterypath = RNFS.ExternalDirectoryPath  + '/电池数据.csv'; // 文件路径
@@ -206,10 +206,10 @@ export default class Filesystem extends Component {
                 <TouchableOpacity onPress={()=>this.deleteFile()}>
                     <Text style={{margin:20,fontSize:20}}>删除文件</Text>
                 </TouchableOpacity>
-                {/* <TouchableOpacity onPress={()=>OpenFolder.open()}>
+                <TouchableOpacity onPress={()=>OpenFolder.open()}>
                     <Text style={{margin:20,fontSize:20}}>打开文件夹</Text>
-                </TouchableOpacity> */}
-                <Text style={{width:_width/2}}>注：导出文件在安卓手机文件管理系统下的 Android/data/com.chaowei/files/文件夹下</Text>
+                </TouchableOpacity>
+                <Text style={{width:_width/2}}>注：{'\n'}①打开文件夹功能此功能需借助——ES文件浏览器 软件;{'\n'}②导出的文件在安卓手机文件管理系统下的 Android/data/com.chaowei/files/文件夹下</Text>
                 <EasyToast
                     ref="toast"
                     style={ {backgroundColor:'rgba(0,0,0,0.5)',padding:12}}

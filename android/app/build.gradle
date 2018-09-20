@@ -157,6 +157,7 @@ android {
 }
 
 dependencies {
+    compile project(':react-native-linear-gradient')
     compile project(':react-native-baidumap-sdk')
     compile project(':react-native-fs')
     compile project(':react-native-splash-screen')

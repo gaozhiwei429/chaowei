@@ -18,6 +18,7 @@ import {BATTERY_BIND_STORAGE_KEY,
 } from '../../config';
 import bleBroadcast from '../CWBleBroadcast/CWBleBroadcast';//蓝牙广播模块
 import * as commonality from '../../commonality';
+import AlertS from '../Alert/Alert';
 
 export default class Calibration extends Component {
     //构造函数
@@ -61,7 +62,11 @@ export default class Calibration extends Component {
         this.deviceMap.clear();
         BluetoothManager.manager.startDeviceScan(null, null, (error, device) => {
             if (error) {
-                alert('请打开手机蓝牙后再搜索');
+                if(error.errorCode == 102){
+                    this.refs.bleScan.open();
+                }
+                console.log(error);
+                return;
             }else{
                 this.deviceMap.set(device.id,device); //使用Map类型保存搜索到的蓝牙设备，确保列表不显示重复的设备
                 let data1 = [...this.deviceMap.values()];
@@ -154,13 +159,14 @@ export default class Calibration extends Component {
     render() {
         const { params } = this.props.navigation.state;
         const { index,chargerImg } = params;
-        var ChargerVoltage = parseInt((this.state.ChargerCalibration.slice(22,24)).concat(this.state.ChargerCalibration.slice(20,22)),16)/100;// 充电器电压
-
+        var ChargerVoltage = parseInt((this.state.ChargerCalibration.slice(22,24)).concat(this.state.ChargerCalibration.slice(20,22)),16)/10;// 充电器电压
+ 
         var ChargerElectricity =  parseInt((this.state.ChargerCalibration.slice(26,28)).concat(this.state.ChargerCalibration.slice(24,26)),16)/10;// 充电器电流
 
         var BatteryVoltager = parseInt(this.state.BatteryVoltage.slice(22,24).concat(this.state.BatteryVoltage.slice(20,22)),16)/100;// 电池电压
         return (
             <View style={styles.Banding}>
+            <AlertS ref='bleScan' title='提示' btnText='确定' msg='请先打开蓝牙再进行校准！' />
                 {
                 chargerImg===0?
                     <View style={styles.Calibration}>

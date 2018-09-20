@@ -32,7 +32,7 @@ export default class PresentationData extends Component {
             <View style={styles.container}>
                 <View style={styles.presentaionPart}>
                     <View style={styles.PresentationTitle}>
-                        <Text>数据显示</Text>
+                        <Text style={styles.TitleStyle}>数据</Text>
                     </View>
                     <View style={styles.presentaionDetails}>
                         <TouchableOpacity
@@ -40,14 +40,14 @@ export default class PresentationData extends Component {
                             onPress={()=>this.props.navigation.navigate('ChargerSvg') } >
                             <Text>充电器数据</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity 
+                        <TouchableOpacity
                             style={styles.PresentationBtn}   
-                            onPress={ ()=>this.props.navigation.navigate('TAB') } >
-                            <Text>蓄电池数据</Text>
+                            onPress={ ()=>this.props.navigation.navigate('BatteryDataSvg') } >
+                            <Text>蓄电池数据</Text>  
                         </TouchableOpacity>
                         <TouchableOpacity 
                             style={styles.PresentationBtn} 
-                            onPress={ ()=>this.props.navigation.navigate('TAB') } >
+                            onPress={ ()=>this.props.navigation.navigate('ChargerDetector') } >
                             <Text>记录仪数据</Text>
                         </TouchableOpacity>
                     </View>
@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
         height:width/8,  
     },
     TitleStyle:{
-        fontSize:18,
+        fontSize:15,
         color:'#5C5A62', 
     },
     shopping:{

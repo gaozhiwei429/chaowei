@@ -6,15 +6,10 @@ import {
 } from 'react-native';
 import { createMaterialTopTabNavigator,TabNavigator } from 'react-navigation'
 
-// import CWSvgBatteryOne from './CWSvgBatteryOne';
-// import CWSvgBatterTwo from './CWSvgBatteryTwo';
-// import CWSvgBatteryThree from './CWSvgBatteryThree';
-// import CWSvgBatteryFour from './CWSvgBatteryFour';
-
-import CWBatteryTemperature from './CWBatteryTemperature';//温度
-import CWBatteryVoltage from './CWBatteryVoltage';//电压
-import CWBatteryElectricCurrent from './CWBatteryElectricCurrent';//电流
-import CWBatteryCapacity from './CWBatteryCapacity';//容量
+import CWBatteryTemperature from '../CWSvg/CWBatteryTemperature';//温度
+import CWBatteryVoltage from '../CWSvg/CWBatteryVoltage';//电压
+import CWBatteryElectricCurrent from '../CWSvg/CWBatteryElectricCurrent';//电流
+import CWBatteryCapacity from '../CWSvg/CWBatteryCapacity';//容量
 
 const Tabs = TabNavigator({
     BatteryVoltage: {

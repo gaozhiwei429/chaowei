@@ -14,8 +14,11 @@ export const CALIBRATION_CHARGER_VOLTAGE_VALUE_STORAGE_KEY = 'calibration_charge
 export const CALIBRATION_CHARGER_ELECTRICITY_VALUE_STORAGE_KEY = 'calibration_charger_electricity';
 
 
-//校准  充电器电压key
+//校准  电池电压key
 export const CALIBRATION_BATTERY_VOLTAGE_VALUE_STORAGE_KEY = 'calibration_battery_voltage';
 
-//校准  充电器电流key
+//校准  电池电流key
 export const CALIBRATION_BATTERY_ELECTRICITY_VALUE_STORAGE_KEY = 'calibration_battery_electricity';
+
+//充电器检测仪
+export const LOGGER_STORAGE_KEY = 'loggerValue';

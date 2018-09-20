@@ -29,13 +29,13 @@ export default class PresentationData extends Component {
     };
 
     MallUrl(){
-        Linking.canOpenURL('taobao://item.taobao.com/item.htm?spm=a217f.8051907.312171.29.3cb53308tPtvL3&id=565661790983').then(supported => {
+        Linking.canOpenURL('taobao://chilwee.tmall.com/search.htm?spm=a220m.1000858.1000725.3.fdfd5794S1P1NT&user_number_id=2255962027&rn=36ee4db5ea220af50a76c6305cf9fd97&keyword=%B3%AC%CD%FE').then(supported => {
             if (supported) {
-                Linking.openURL('taobao://item.taobao.com/item.htm?spm=a217f.8051907.312171.29.3cb53308tPtvL3&id=565661790983'); 
-            } else { 
+                Linking.openURL('taobao://chilwee.tmall.com/search.htm?spm=a220m.1000858.1000725.3.fdfd5794S1P1NT&user_number_id=2255962027&rn=36ee4db5ea220af50a76c6305cf9fd97&keyword=%B3%AC%CD%FE'); 
+            } else {
                 alert('请先安装淘宝APP');  
             }
-        });      
+        });
     }
 
     render() {

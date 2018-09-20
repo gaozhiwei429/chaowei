@@ -9,14 +9,15 @@ import {
     Dimensions,
     AsyncStorage,
     DeviceEventEmitter,
+    ImageBackground,
 } from 'react-native';
 
 import bleBroadcast from '../CWBleBroadcast/CWBleBroadcast';//蓝牙广播模块
+import LinearGradient from 'react-native-linear-gradient';//颜色渐变
 import * as storage from '../../storage';
-import { BATTERY_BIND_STORAGE_KEY,CHARGER_BIND_STORAGE_KEY,PHONE_BIND_STORAGE_KEY } from '../../config';
+import { BATTERY_BIND_STORAGE_KEY,CHARGER_BIND_STORAGE_KEY,PHONE_BIND_STORAGE_KEY,LOGGER_STORAGE_KEY } from '../../config';
 import SQLite from '../SQLite/sqlite';
 import ToastSuccessAndError from '../Alert/ToastSuccessAndError';
-import Confirm from '../Alert/Confirm';
 import ProgressDialogAlert from '../Alert/ProgressDialogAlert';
 import AlertS from '../Alert/Alert';
 import * as commonality from '../../commonality';
@@ -34,6 +35,7 @@ var others;                               //其他的电池
 var Identifier = '382687921502'; //识别码固定值
 var chargerIdentifier = '0289382687921502'; //充电器识别固定码
 var batteryIdentifier = '0388382687921502'; //蓄电池识别固定码
+var chargerDetectorIdentifier = '048a382687921502';//充电器检测仪识别固定码
 var BleScan;
 var BroadcastJudgment;
 
@@ -149,8 +151,8 @@ export default class CWHome extends Component {
                     if(error.errorCode == 102){
                         this.refs.bleScan.open();
                     }
-                    console.log(err);
-                    return;
+                    console.log(error);
+                    return;  
                 }else{
                     this.deviceMap.set(device.id,device); //使用Map类型保存搜索到的蓝牙设备，确保列表不显示重复的设备
                     BleScan = [...this.deviceMap.values()];
@@ -184,112 +186,166 @@ export default class CWHome extends Component {
         //建表
         sqLite.createTable();
         //删除充电器表、数据
-        // sqLite.dropTable();
+        // sqLite.dropTable(); 
         // sqLite.deleteData();
+        // sqLite.dropChargerDetectorTable(); 
+        // sqLite.deleteChargerDetectorData();
 
         // sqLite.deleteChargerData();
         // sqLite.dropChargerTable();
 
-        /** 获取地理位置（经纬度） */
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                const positionData = position.coords;
-                /**  经度：positionData.longitude*/
-                /** 纬度：positionData.latitude*/
-                const loop = () => {
-                    var date = new Date();
-                    var y = date.getFullYear();
-                    var m = date.getMonth()+1;
-                    var d = date.getDate();
-                    var h = date.getHours();
-                    var mm = date.getMinutes();
-                    var s = date.getSeconds();
-                    var time=  y+'-'+commonality.padding(m, 2)+'-'+commonality.padding(d, 2)+' '+commonality.padding(h, 2)+':'+commonality.padding(mm, 2)+':'+commonality.padding(s, 2);
-                    var actionsBattery = [];
-                    var actionsCharger = [];
-                    if(BleScan !== undefined){
-                        for (var i = 0;i<BleScan.length;i++){
-                            var searchBle = commonality.CharToHex(commonality.base64decode(BleScan[i].manufacturerData)).replace(/\\x/g, '').replace(/\s+/g, '');
-                            var batteryArrayID = BleScan[i].id.replace(/\:/g, "");
-                            var batteryArrayID1 = batteryArrayID.slice(0, 2);
-                            var batteryArrayID2 = batteryArrayID.slice(2, 4);
-                            var batteryArrayID3 = batteryArrayID.slice(4, 6);
-                            var batteryArrayID4 = batteryArrayID.slice(6, 8);
-                            var batteryArrayID5 = batteryArrayID.slice(8, 10);
-                            var batteryArrayID6 = batteryArrayID.slice(10, 12);
-                            var equipmentID = batteryArrayID6.concat(batteryArrayID5, batteryArrayID4, batteryArrayID3, batteryArrayID2, batteryArrayID1).toLowerCase();
-                            let BleScanRssi=BleScan[i].rssi;//BLE信号强度
-                            if (batteryArray !== undefined && BleScanRssi > -80) {  
-                                for (var r=0;r<batteryArray.length;r++){
-                                    var scanIdentifier = searchBle.slice(0, 16);//搜索到的电池识别码与ID   
-                                    if(scanIdentifier == batteryIdentifier && batteryArray[r] == equipmentID){//判断电池识别码与ID
-                                        // 电池数据
-                                        var batteryData = [];
-                                        var battery = {};
-                                        battery.battery_id = equipmentID;//设备id
-                                        battery.my_timestamp = time;//当前时间
-                                        battery.voltage = parseInt((searchBle.slice(22,24).concat(searchBle.slice(20,22))),16)/100;//电压
-                                        battery.equilibrium_time = parseInt(searchBle.slice(24,26),16)/100;//平衡时间
-                                        battery.electric_current = parseInt(searchBle.slice(26,28),16)/100;//均衡电流
-                                        battery.equilibrium_temperature=parseInt(searchBle.slice(28,30),16);//均衡温度1
-                                        battery.temperature = parseInt(searchBle.slice(30,32),16);//环境温度
-                                        battery.targetCurrent=parseInt((searchBle.slice(34,36).concat(searchBle.slice(32,34))),16)/100;//目标电流2
-                                        battery.targetVoltage=parseInt((searchBle.slice(38,40).concat(searchBle.slice(36,38))),16)/10;//目标电压2
-                                        battery.capacity = parseInt((searchBle.slice(42,44).concat(searchBle.slice(40,42))),16)/100;//容量
-                                        battery.balanceVoltage=parseInt((searchBle.slice(46,48).concat(searchBle.slice(44,46))),16)/10;//均衡电压2
-                                        battery.bindingState = parseInt(searchBle.slice(48,50),16);//绑定状态1
-                                        battery.equilibriumState = parseInt(searchBle.slice(50,52),16);//均衡状态1
-                                        battery.P_longitude=positionData.longitude;
-                                        battery.P_latitude=positionData.latitude;
-                                        batteryData.push(battery);
-                                        //写入电池数据库
-                                        var actionBattery = sqLite.insertbatteryData(batteryData, () => {});
-                                        actionsBattery.push(actionBattery);
-                                    }else if(scanIdentifier == chargerIdentifier && batteryArray[r] == equipmentID){
-                                        // 充电器数据
-                                        var chargerData = [];
-                                        var charger = {};
-                                        charger.charger_id = equipmentID;//设备id
-                                        charger.my_timestamp = time;//当前时间
-                                        charger.voltage = parseInt((searchBle.slice(22,24).concat(searchBle.slice(20,22))),16)/10;//电压
-                                        charger.electric_current =parseInt((searchBle.slice(26,28).concat(searchBle.slice(24,26))),16)/100;//电流
-                                        charger.chargerTemperature=parseInt(searchBle.slice(28,30),16);//充电器温度1
-                                        charger.batteryTemperature = parseInt(searchBle.slice(30,32),16);//电池温度
-                                        charger.targetCurrent = parseInt((searchBle.slice(34,36).concat(searchBle.slice(32,34))),16)/100;//目标电流2
-                                        charger.targetVoltage = parseInt((searchBle.slice(38,40).concat(searchBle.slice(36,38))),16)/10;//目标电压2
-                                        charger.capacity = parseInt((searchBle.slice(42,44).concat(searchBle.slice(40,42))),16)/100;//容量
-                                        charger.balanceVoltage = parseInt((searchBle.slice(46,48).concat(searchBle.slice(44,46))),16)/10;//均衡电压2
-                                        charger.bindingState = parseInt(searchBle.slice(48,50),16);//绑定状态1
-                                        charger.chargingState = parseInt(searchBle.slice(50,52),16);//充电状态1
-                                        charger.ambientTemperature = parseInt(searchBle.slice(52,54),16);//环境温度1
-                                        charger.P_longitude=positionData.longitude;
-                                        charger.P_latitude=positionData.latitude;
-                                        chargerData.push(charger);
-                                        //写入充电器数据库
-                                        var actionCharger = sqLite.insertchargerData(chargerData,()=>{});
-                                        actionsCharger.push(actionCharger)
-                                    }
+        //获取充电器记录仪本地存储
+        let ChargerDetectorStorage=new Promise(function (resolve, reject) {
+            return storage.get(LOGGER_STORAGE_KEY, (error, result) => {
+                if (error) {
+                    reject(error);
+                    return;
+                }
+                resolve(result);    
+            })}
+        );
+
+         /** 获取地理位置（经纬度） */
+        let positionData= new Promise(function(resolve,reject){
+            return navigator.geolocation.getCurrentPosition((position) => {
+                    const positionData = position.coords;
+                    /**  经度：positionData.longitude*/
+                    /** 纬度：positionData.latitude*/
+                    resolve(positionData);
+                }
+            ),
+                (error) => {
+                    console.warn('失败：' + JSON.stringify(error.message))
+                }, {
+                // 提高精确度，但是获取的速度会慢一点
+                enableHighAccuracy: true,
+                // 设置获取超时的时间60秒
+                timeout: 60000,
+                // 示应用程序的缓存时间，每次请求都是立即去获取一个全新的对象内容
+                maximumAge: 1000,
+            };
+        })
+
+        Promise.all([ChargerDetectorStorage,positionData]).then((value)=>{
+            const loop = () => {   
+                var date = new Date();
+                var y = date.getFullYear();
+                var m = date.getMonth()+1;
+                var d = date.getDate();
+                var h = date.getHours();
+                var mm = date.getMinutes();
+                var s = date.getSeconds();
+                var time=  y+'-'+commonality.padding(m, 2)+'-'+commonality.padding(d, 2)+' '+commonality.padding(h, 2)+':'+commonality.padding(mm, 2)+':'+commonality.padding(s, 2);
+                var actionsBattery = [];
+                var actionsCharger = [];
+                var actionsChargerDetector = [];
+                if(BleScan !== undefined){
+                    for (var i = 0;i<BleScan.length;i++){
+                        var searchBle = commonality.CharToHex(commonality.base64decode(BleScan[i].manufacturerData)).replace(/\\x/g, '').replace(/\s+/g, '');
+                        var batteryArrayID = BleScan[i].id.replace(/\:/g, "");
+                        var batteryArrayID1 = batteryArrayID.slice(0, 2);
+                        var batteryArrayID2 = batteryArrayID.slice(2, 4);
+                        var batteryArrayID3 = batteryArrayID.slice(4, 6);
+                        var batteryArrayID4 = batteryArrayID.slice(6, 8);
+                        var batteryArrayID5 = batteryArrayID.slice(8, 10);
+                        var batteryArrayID6 = batteryArrayID.slice(10, 12);
+                        var equipmentID = batteryArrayID6.concat(batteryArrayID5, batteryArrayID4, batteryArrayID3, batteryArrayID2, batteryArrayID1).toLowerCase();
+                        let BleScanRssi=BleScan[i].rssi;//BLE信号强度
+                        if (batteryArray !== undefined && BleScanRssi > -80) {  
+                            for (var r=0;r<batteryArray.length;r++){
+                                var scanIdentifier = searchBle.slice(0, 16);//搜索到的电池识别码与ID   
+                                if(scanIdentifier == batteryIdentifier && batteryArray[r] == equipmentID){//判断电池识别码与ID
+                                    // 电池数据
+                                    var batteryData = [];
+                                    var battery = {};
+                                    battery.battery_id = equipmentID;//设备id
+                                    battery.my_timestamp = time;//当前时间
+                                    battery.voltage = parseInt((searchBle.slice(22,24).concat(searchBle.slice(20,22))),16)/100;//电压
+                                    battery.equilibrium_time = parseInt(searchBle.slice(24,26),16)/100;//平衡时间
+                                    battery.electric_current = parseInt(searchBle.slice(26,28),16)/100;//均衡电流
+                                    battery.equilibrium_temperature=parseInt(searchBle.slice(28,30),16);//均衡温度1
+                                    battery.temperature = parseInt(searchBle.slice(30,32),16);//环境温度
+                                    battery.targetCurrent=parseInt((searchBle.slice(34,36).concat(searchBle.slice(32,34))),16)/100;//目标电流2
+                                    battery.targetVoltage=parseInt((searchBle.slice(38,40).concat(searchBle.slice(36,38))),16)/10;//目标电压2
+                                    battery.capacity = parseInt((searchBle.slice(42,44).concat(searchBle.slice(40,42))),16)/100;//容量
+                                    battery.balanceVoltage=parseInt((searchBle.slice(46,48).concat(searchBle.slice(44,46))),16)/10;//均衡电压2
+                                    battery.bindingState = parseInt(searchBle.slice(48,50),16);//绑定状态1
+                                    battery.equilibriumState = parseInt(searchBle.slice(50,52),16);//均衡状态1
+                                    battery.P_longitude=value[1].longitude;
+                                    battery.P_latitude=value[1].latitude;
+                                    batteryData.push(battery);
+                                    //写入电池数据库
+                                    var actionBattery = sqLite.insertbatteryData(batteryData, () => {});
+                                    actionsBattery.push(actionBattery);
+                                }else if(scanIdentifier == chargerIdentifier && batteryArray[r] == equipmentID){
+                                    // 充电器数据
+                                    var chargerData = [];
+                                    var charger = {};
+                                    charger.charger_id = equipmentID;//设备id
+                                    charger.my_timestamp = time;//当前时间
+                                    charger.voltage = parseInt((searchBle.slice(22,24).concat(searchBle.slice(20,22))),16)/10;//电压
+                                    charger.electric_current =parseInt((searchBle.slice(26,28).concat(searchBle.slice(24,26))),16)/100;//电流
+                                    charger.chargerTemperature=parseInt(searchBle.slice(28,30),16);//充电器温度1
+                                    charger.batteryTemperature = parseInt(searchBle.slice(30,32),16);//电池温度
+                                    charger.targetCurrent = parseInt((searchBle.slice(34,36).concat(searchBle.slice(32,34))),16)/100;//目标电流2
+                                    charger.targetVoltage = parseInt((searchBle.slice(38,40).concat(searchBle.slice(36,38))),16)/10;//目标电压2
+                                    charger.capacity = parseInt((searchBle.slice(42,44).concat(searchBle.slice(40,42))),16)/100;//容量
+                                    charger.balanceVoltage = parseInt((searchBle.slice(46,48).concat(searchBle.slice(44,46))),16)/10;//均衡电压2
+                                    charger.bindingState = parseInt(searchBle.slice(48,50),16);//绑定状态1
+                                    charger.chargingState = parseInt(searchBle.slice(50,52),16);//充电状态1
+                                    charger.ambientTemperature = parseInt(searchBle.slice(52,54),16);//环境温度1
+                                    charger.P_longitude=value[1].longitude;
+                                    charger.P_latitude=value[1].latitude;
+                                    chargerData.push(charger);
+                                    //写入充电器数据库
+                                    var actionCharger = sqLite.insertchargerData(chargerData,()=>{});
+                                    actionsCharger.push(actionCharger)
+    
+                                    var ChargerDetectorData=[];
+                                    var ChargerDetector = {};
+                                    ChargerDetector.ChargerDetector_id=equipmentID;//设备id
+                                    ChargerDetector.my_timestamp = time;//时间
+                                    ChargerDetector.voltage = parseInt((searchBle.slice(22,24).concat(searchBle.slice(20,22))),16)/10;//电压
+                                    ChargerDetector.electric_current =parseInt((searchBle.slice(26,28).concat(searchBle.slice(24,26))),16)/100;//电流
+                                    ChargerDetector.capacity = parseInt((searchBle.slice(30,32).concat(searchBle.slice(28,30))),16)/100;//容量
+                                    ChargerDetector.BoardTemperature= parseInt(searchBle.slice(34,36),16);//电路板温度
+                                    ChargerDetector.AmbientTemperature= parseInt(searchBle.slice(36,38),16);//环境温度
+                                    ChargerDetectorData.push(ChargerDetector); 
+                                    //写入充电器检测仪数据库
+                                    var actionChargerDetector = sqLite.insertChargerDetectorData(ChargerDetectorData,()=>{});
+                                    actionsChargerDetector.push(actionChargerDetector);
+                                }else if(chargerDetectorIdentifier == scanIdentifier && value[0][0] == equipmentID){
+                                    //充电器检测仪数据
+                                    var ChargerDetectorData=[];
+                                    var ChargerDetector = {};
+                                    ChargerDetector.ChargerDetector_id=equipmentID;//设备id
+                                    ChargerDetector.my_timestamp = time;//时间
+                                    ChargerDetector.voltage = parseInt((searchBle.slice(22,24).concat(searchBle.slice(20,22))),16)/10;//电压
+                                    ChargerDetector.electric_current =parseInt((searchBle.slice(26,28).concat(searchBle.slice(24,26))),16)/100;//电流
+                                    ChargerDetector.capacity = parseInt((searchBle.slice(30,32).concat(searchBle.slice(28,30))),16)/100;//容量
+                                    ChargerDetector.BoardTemperature= parseInt(searchBle.slice(34,36),16);//电路板温度
+                                    ChargerDetector.AmbientTemperature= parseInt(searchBle.slice(36,38),16);//环境温度
+                                    ChargerDetectorData.push(ChargerDetector); 
+                                    //写入充电器检测仪数据库
+                                    var actionChargerDetector = sqLite.insertChargerDetectorData(ChargerDetectorData,()=>{});
+                                    actionsChargerDetector.push(actionChargerDetector);
                                 }
                             }
                         }
                     }
-                    Promise.all([actionsBattery],[actionsCharger]).then(function () {
-                        setTimeout(loop, 60000);
-                    });
-                };
-                setTimeout(loop, 1000);
-            }
-        ),
-            (error) => {
-                console.warn('失败：' + JSON.stringify(error.message))
-            }, {
-            // 提高精确度，但是获取的速度会慢一点
-            enableHighAccuracy: true,
-            // 设置获取超时的时间20秒
-            timeout: 20000,
-            // 示应用程序的缓存时间，每次请求都是立即去获取一个全新的对象内容
-            maximumAge: 1000,
-        };
+                }
+                Promise.all([actionsBattery],[actionsCharger]).then(function () {
+                    setTimeout(loop, 60000);
+                });
+            };
+            setTimeout(loop, 1000);
+        })
+
+        
+
+
+        return;
+        
     }
 
     /**绑定*/
@@ -362,46 +418,12 @@ export default class CWHome extends Component {
         });
     }
 
-    goQRCode(){
-        this.props.navigation.navigate('CWQRCode')
-    }
-
-    abbc(){
-        return new Promise((resolve, reject)=>{
-            /**蓝牙扫描绑定*/
-            this.deviceMap.clear();
-            BluetoothManager.manager.startDeviceScan(null, null, (error, device) => {
-                if (error) {
-                    this.refs.bleScan.open();
-                    reject(error)
-                }else{
-                    this.deviceMap.set(device.id,device); //使用Map类型保存搜索到的蓝牙设备，确保列表不显示重复的设备
-                    var BleS = [...this.deviceMap.values()];
-                    resolve(BleS);
-                }
-            });
-        })
-    }
-
-    async abuttons(){
-        var resff =await this.abbc();
-        console.log(resff);
-    }
-
     // 蓝牙广播结束
     componentWillUnmount(){
         // bleBroadcast.stop();
         // BluetoothManager.stopScan();
         BluetoothManager.destroy();  
     }
-
-    // 页头
-    static navigationOptions = {
-        headerTitle: '首页',
-        headerStyle: {
-            height:40,
-        },
-    };
 
     //电池1
     banding1(){
@@ -431,10 +453,11 @@ export default class CWHome extends Component {
     banding7(){
         bleBroadcast.start('0101' ,'382687921502000001f0ffffff00');// 蓝牙广播开始
     }
-
+    //BLE stop
     aaaa(){  
         bleBroadcast.stop();    
     };  
+    //绑定 解绑
     bbbb(){
         AsyncStorage.removeItem(PHONE_BIND_STORAGE_KEY,(error)=>{
             if (error == null) {
@@ -444,18 +467,24 @@ export default class CWHome extends Component {
             };    
     })
     }     
+    // 页头
+    static navigationOptions = {
+        headerTitle: '首页',
+        headerStyle: {
+            height:40,
+        },
+    };
     render(){
         return(
             <View style={styles.container}>
                 <ToastSuccessAndError ref='toast_su' successMsg='绑定完成' errorMsg='请打开蓝牙'/>
                 <ToastSuccessAndError ref='band' successMsg="绑定一个"/>   
-                <Confirm ref='confirm' leftFunc={() => {this.goQRCode()}} rightFunc={() => {}} btnLeftText='去扫码' btnRightText='取消' title='提示' msg='您还未扫码！'/>
                 {/*进度条*/}
                 <ProgressDialogAlert ref='pmgressbar' title='提示信息' btnText='确定' msg={10}  progress={0.7} width={200} color='red'/>
                 <AlertS ref='bleScan' title='提示' btnText='确定' msg='请先打开蓝牙开关！' />
 
                 {/*测试*/}
-                <View style={{justifyContent:'space-around',flexDirection:'row'}}>
+                {/* <View style={{justifyContent:'space-around',flexDirection:'row'}}>
                     <TouchableOpacity style={{width:35,height:35,backgroundColor:'#0fa'}} onPress={()=>this.banding1()}>
                         <Text>电池1-01</Text>
                     </TouchableOpacity>
@@ -483,9 +512,17 @@ export default class CWHome extends Component {
                     <TouchableOpacity style={{width:35,height:35,backgroundColor:'#0fa'}} onPress={()=>this.bbbb()}>
                         <Text>解绑</Text>
                     </TouchableOpacity> 
-                </View>
+                </View> */}
                 {/*顶部电量可行驶里程*/}
-                <Text style={styles.mileageText}>还可以骑行30公里</Text> 
+                <LinearGradient
+                    start={{x: 0, y: 0}}  
+                    end={{x: 1, y: 1}}
+                    colors={['#F082BA', '#6099DA']}
+                    style={{flexDirection:'row'}}
+                > 
+                    <Text style={styles.mileageText}>可骑行30公里</Text>
+                    <Text style={styles.electricQuantity}>电量30%</Text>
+                </LinearGradient>
                 {/*进度条*/}
                 <ProgressBarAndroid  styleAttr="Horizontal" color="red" indeterminate={false} progress={0.7} />
                 {/*电源、电池按钮*/}
@@ -633,10 +670,19 @@ const styles = StyleSheet.create({
         flex:1,
         backgroundColor:'#fff',
     },
-    mileageText:{
+    electricQuantity:{
+        flex:1,  
         fontSize:20,
         textAlign:'center',
-        backgroundColor:'#527FE4',
+        // backgroundColor:'#ff1', 
+        color:'#fff',
+        lineHeight:50,
+    },
+    mileageText:{
+        flex:1,  
+        fontSize:20,
+        textAlign:'center',
+        // backgroundColor:'#527FE4',
         color:'#fff',
         lineHeight:50,
     },

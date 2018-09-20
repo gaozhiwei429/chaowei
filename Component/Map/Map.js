@@ -9,6 +9,7 @@ import {
     Dimensions,
 } from 'react-native';
 import { MapView,Location,Marker } from 'react-native-baidumap-sdk';  
+import MapLinking from 'react-native-map-linking';//调用第三方地图导航
 import geolib from 'geolib';
 
 const {width,height}=Dimensions.get('window');
@@ -39,6 +40,8 @@ export default class Map extends Component {
             logs: {},   
             distance:'', 
             distanceIs:false,
+            iconLat:undefined,
+            iconLon:undefined,
         };
     }
     // 打开页面获取位置数据
@@ -56,7 +59,13 @@ export default class Map extends Component {
         this.listener.remove();
     }
     // 定位到当前位置
-    location = () => { 
+    location = () => {
+        Location.setOptions({ gps: true ,distanceFilter:1});
+        Location.addLocationListener(location => {
+            this.setState({ location })
+        });
+        Location.start();
+
         this.mapView.setStatus({ 
             center: this.state.location,
             zoomLevel:18 
@@ -86,6 +95,8 @@ export default class Map extends Component {
     onStatusChange=()=>{
         this.setState({
             distanceIs:false,
+            iconLat:undefined,
+            iconLon:undefined,
         })
     }
 
@@ -93,6 +104,8 @@ export default class Map extends Component {
     onClick=()=>{
         this.setState({
             distanceIs:false,
+            iconLat:undefined,
+            iconLon:undefined,  
         })
     }
 
@@ -103,25 +116,38 @@ export default class Map extends Component {
         );
         this.setState({
             distance ,
-            distanceIs:true
+            distanceIs:true,
+            iconLat:latitude,
+            iconLon:longitude,
         })
         // console.log(latitude,longitude,'图标位置');
         // console.log(this.state.location.latitude,this.state.location.longitude,'当前位置');
     }
+    openMap(){
+        MapLinking.planRoute(
+            {lat:this.state.location.latitude, lng: this.state.location.longitude, title: '当前位置'}, 
+            {lat:this.state.iconLat, lng: this.state.iconLon, title: '充电桩'},
+        'walk');    
+    }
+
     render() {
         return (
             <View style={{ flex: 1,}}> 
                 {this.state.distanceIs?
                 <View style={{justifyContent:'center'}}>
                     <View style={styles.geolib}>
-                        <View style={{flex:1,alignItems:'center',}}>
-                            <Text style={styles.disabled}>距离</Text>
-                            <Text style={{fontSize:25,color:'#111'}}>{this.state.distance}米</Text>
+                        <View style={styles.geolibModal}>
+                            <Text style={styles.disabled}>距离</Text> 
+                            <Text style={{fontSize:25,color:'#808080'}}>{this.state.distance}米</Text>
                         </View>
                         {/* <View style={{flex:1,alignItems:'center',}}>
                             <Text>可步行</Text>
                             <Text>{this.state.distance}米</Text>
                         </View> */}
+                        <TouchableOpacity style={{flex:1,alignItems:'center'}} onPress={()=>this.openMap()}>
+                            <Text style={{fontSize:25,color:'#808080'}}>点击导航</Text>
+                            {/* <Text style={{fontSize:25,color:'#111'}}>{this.state.distance}米</Text> */}
+                        </TouchableOpacity>
                     </View>
                 </View>:<View/>
                 }
@@ -136,33 +162,26 @@ export default class Map extends Component {
                     locationEnabled //是否显示定位图层    
                     zoomControlsDisabled//是否禁用缩放按钮
                     overlookDisabled//是否禁用倾斜手势 
-                    onClick={this.onClick}    
+                    onClick={this.onClick}
                     onStatusChange={this.onStatusChange}
                 >
-                    {/* <MapView.Marker
-                        title="充电桩"
-                        coordinate={this._coordinates[0]}
-                        onPress={
-                            ()=>this.markerClick(this._coordinates[0].latitude,this._coordinates[0].longitude)
-                        }
-                    /> */}
-
-                    {this._coordinates.map((item,key) => <MapView.Marker
-                        key={key}
-                        title="充电桩" 
-                        coordinate={{
-                            latitude: item.latitude,
-                            longitude: item.longitude,
-                        }}  
-                        onPress={
-                            ()=>this.markerClick(item.latitude,item.longitude)
-                        }
+                    {this._coordinates.map((item,key) => 
+                        <MapView.Marker
+                            key={key}
+                            title="充电桩" 
+                            coordinate={{
+                                latitude: item.latitude,
+                                longitude: item.longitude,
+                            }}
+                            onPress={
+                                ()=>this.markerClick(item.latitude,item.longitude)
+                            }
                         />
                     )}
                 </MapView>      
 
                 <TouchableOpacity style={styles.locationButton} onPress={this.location}>
-                    <Image style={{width:20,height:20,margin: 5,tintColor: '#616161',}}  source={require('../../img/locationButton.png')}/>
+                    <Image style={styles.locationIcon}  source={require('../../img/locationButton.png')}/>
                 </TouchableOpacity>
                 
             </View>
@@ -171,13 +190,25 @@ export default class Map extends Component {
 }
 
 const styles = StyleSheet.create({
+    geolibModal:{
+        flex:1,
+        alignItems:'center',
+        borderRightWidth:1,
+        borderColor:'#f5f5f5',
+    },
+    locationIcon:{
+        width:20,
+        height:20,
+        margin: 5,
+        tintColor: '#616161',
+    },
     distance:{
         fontSize:16,
         color:'#111',
     },
     geolib:{
         flex:1,
-        elevation:2,
+        zIndex:2, 
         position:'absolute',
         top: 8,
         backgroundColor:'#fff',
@@ -188,6 +219,9 @@ const styles = StyleSheet.create({
         // justifyContent:'space-around',  
         marginLeft:8,
         marginRight:8,
+        borderWidth:1,
+        borderColor:'#e8e8e8',
+        borderRadius:5,
     },
     locationButton:{
         position:'absolute',

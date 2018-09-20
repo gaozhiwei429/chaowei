@@ -8,16 +8,7 @@ import {
     ScrollView,
 } from 'react-native';
 
-class CWBtnCell extends Component {
-    render() {
-        return (
-            <TouchableOpacity style={styles.Btn} onPress={this.props.onPress} activeOpacity={0.5}>
-                <Text style={styles.BtnText}>{this.props.title}</Text>
-                <Image style={styles.BtnImg} source={require('../../img/next.png')}/>
-            </TouchableOpacity>
-        )
-    }
-}
+import CWBtnCell from './CWBtnCell';
 
 export default class CWButton extends Component {
     static navigationOptions = {
@@ -39,8 +30,12 @@ export default class CWButton extends Component {
         return (
             <ScrollView style={styles.Binding}>
                 <CWBtnCell
-                    title='BLEl连接读数据'
+                    title='BLE连接读数据'
                     onPress={() => this.props.navigation.navigate('CWBleConnect')}
+                />
+                <CWBtnCell
+                    title='RSSI'
+                    onPress={() => this.props.navigation.navigate('CWBatteryVoltage')}
                 />
                 <CWBtnCell
                     title='确认支付'
@@ -124,23 +119,5 @@ const styles = StyleSheet.create({
         // justifyContent: 'center',
         // alignItems: 'center',
         backgroundColor:'#fff'
-    },
-    BtnImg:{
-        width:15,
-        height:15,
-        position:'absolute',
-        right:20,
-    },
-    Btn:{
-        borderBottomColor:'#f5f5f5',
-        borderBottomWidth:1,
-        justifyContent: 'center',
-        // alignItems: 'center',
-        marginLeft:15,
-    },
-    BtnText:{
-        fontSize:19,
-        paddingTop:10,
-        paddingBottom:10,
-    },
+    }, 
 });
