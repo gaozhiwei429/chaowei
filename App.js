@@ -52,6 +52,7 @@ import TAB from './Component/presentationData/TAB';//蓄电池数据(滑动)
 import BatteryDataSvg from './Component/presentationData/BatteryDataSvg';//蓄电池数据(单)
 import Shopping from './Component/Shopping/Shopping';//商城 
 import RSSI from './Component/CWBleSearch/RSSI';//RSSI
+import ChargerRecorder from "./Component/presentationData/ChargerRecorder";//充电器检测仪
 
 //测试
 import ListView from './Component/ListView/ListView'
@@ -62,38 +63,39 @@ import CWEchart from './Component/CWSvg/CWEchart';
 import ListViewText from './Component/ListView/ListViewText';
 
 const RootStack = createStackNavigator({
-        CWGLaunchlmage:{screen:CWGLaunchlmage},
-        CWMain: { screen:CWMain },
-        Home: { screen: CWHome },
-        Button: { screen: CWButton },
-        CWQRCode: { screen: CWQRCode },
-        RemainingBattery:{ screen:RemainingBattery },
-        CWScanning:{ screen:CWScanning },
-        TAB:{screen:TAB},
-        CWBatteryTemperature:{screen:CWBatteryTemperature},//温度
-        CWBatteryVoltage:{screen:CWBatteryVoltage},//电压
-        CWBatteryElectricCurrent:{screen:CWBatteryElectricCurrent},//电流
-        CWBatteryCapacity:{screen:CWBatteryCapacity},//容量
-        ChargerSvg:{screen:ChargerSvg},
-        HomepageData:{screen:HomepageData},
-        Calibration:{screen:Calibration},
-        RechargeRecord:{screen:RechargeRecord},
-        Charging:{screen:Charging},
-        Map:{screen:Map},
-        PileJonining:{screen:PileJonining},
-        Help:{screen:Help},
-        PeakValley:{screen:PeakValley},
-        RepairJoining:{screen:RepairJoining},
-        WXPay:{screen:WXPay},
-        PaymentPage:{screen:PaymentPage},
-        Filesystem:{screen:Filesystem},
-        AboutUs:{screen:AboutUs},
-        CWBleConnect:{screen:CWBleConnect},
-        PresentationData:{screen:PresentationData},
-        BatteryDataSvg:{screen:BatteryDataSvg}, 
-        Shopping:{screen:Shopping},
-        RSSI:{screen:RSSI},
-        ChargerDetector:{screen:ChargerDetector},
+        CWGLaunchlmage : { screen : CWGLaunchlmage },
+        CWMain : { screen:CWMain },
+        Home : { screen: CWHome },
+        Button : { screen: CWButton },
+        CWQRCode : { screen: CWQRCode },
+        RemainingBattery : { screen:RemainingBattery },
+        CWScanning : { screen:CWScanning },
+        TAB : { screen : TAB },
+        CWBatteryTemperature : { screen: CWBatteryTemperature },//温度
+        CWBatteryVoltage: { screen : CWBatteryVoltage },//电压
+        CWBatteryElectricCurrent : { screen : CWBatteryElectricCurrent },//电流
+        CWBatteryCapacity : { screen : CWBatteryCapacity },//容量
+        ChargerSvg : { screen : ChargerSvg },
+        HomepageData : { screen : HomepageData },
+        Calibration : { screen : Calibration },
+        RechargeRecord : { screen : RechargeRecord },
+        Charging : { screen : Charging },
+        Map : { screen : Map },
+        PileJonining : { screen : PileJonining },
+        Help : { screen : Help },
+        PeakValley : { screen : PeakValley },
+        RepairJoining : { screen : RepairJoining },
+        WXPay : { screen : WXPay } ,
+        PaymentPage : { screen : PaymentPage } ,
+        Filesystem : { screen : Filesystem } ,
+        AboutUs : { screen : AboutUs } ,
+        CWBleConnect : { screen : CWBleConnect } ,
+        PresentationData : { screen : PresentationData } ,
+        BatteryDataSvg : { screen : BatteryDataSvg } , 
+        Shopping : { screen : Shopping } ,
+        RSSI : { screen : RSSI } ,
+        ChargerDetector : { screen : ChargerDetector } ,
+        ChargerRecorder : { screen : ChargerRecorder } ,
 
         //测试
         ListView:{screen:ListView},

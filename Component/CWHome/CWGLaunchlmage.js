@@ -5,6 +5,7 @@ import {
     View,
     Image,
     TouchableOpacity,
+    StatusBar,
 } from 'react-native';
 
 export default class CWGLaunchlmage extends Component {
@@ -21,6 +22,12 @@ export default class CWGLaunchlmage extends Component {
     render() {
         return (
             <View style={styles.launchImageStyle}>
+                {/* <StatusBar
+                    // backgroundColor='#ff0000'
+                    translucent={true}
+                    hidden={true}
+                    animated={true}      
+                /> */}
                 <TouchableOpacity
                     style={styles.skipBtn}
                     onPress={()=>this.props.navigation.replace('CWMain')}

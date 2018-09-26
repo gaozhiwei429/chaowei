@@ -78,7 +78,7 @@ export default class CWQRCode extends Component {
                             this.refs.toast.show('此块蓄电池已存在!',1200);
                         }
                     });
-                }else if(value.slice(10,12)=='03'){
+                }else if(value.slice(10,12)=='66'){
                     storage.get(LOGGER_STORAGE_KEY, (error, result) => {//扫码存储充电器
                         const set = new Set(result);
                         if(set.has(value)!==true){

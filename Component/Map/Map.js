@@ -7,11 +7,13 @@ import {
     View ,
     Image,
     Dimensions,
+    Linking,
 } from 'react-native';
 import { MapView,Location,Marker } from 'react-native-baidumap-sdk';  
-import MapLinking from 'react-native-map-linking';//调用第三方地图导航
 import geolib from 'geolib';
-
+import MapLinking from './MapLinking';
+import ActionSheet from 'react-native-actionsheet';
+ 
 const {width,height}=Dimensions.get('window');
 export default class Map extends Component {
     static navigationOptions = {
@@ -42,6 +44,7 @@ export default class Map extends Component {
             distanceIs:false,
             iconLat:undefined,
             iconLon:undefined,
+            actionSheetConfig: [],
         };
     }
     // 打开页面获取位置数据
@@ -123,48 +126,103 @@ export default class Map extends Component {
         // console.log(latitude,longitude,'图标位置');
         // console.log(this.state.location.latitude,this.state.location.longitude,'当前位置');
     }
-    openMap(){
+    async openMap(){
+        this.ActionSheet.show();
+        const { location, iconLat, iconLon } = this.state;
+
+        const urls = [
+            {
+                text: '使用高德地图导航',
+                downloadText: '下载高德地图',
+                downloadUrl: 'http://wap.amap.com',
+                openUrl: `androidamap://route?sourceApplication=com.chaowei&slat=${location.latitude}&slon=${location.longitude}&sname=当前位置&dlat=${iconLat}&dlon=${iconLon}&dname=充电桩&dev=1&m=0&t=4`,
+            },
+            {
+                text: '使用百度地图导航',
+                downloadText: '下载百度地图',
+                downloadUrl: 'https://map.baidu.com/zt/client/index/',
+                openUrl: `bdapp://map/direction?origin=${location.latitude + ',' + location.longitude}&destination=${iconLat},${iconLon}&mode=walking&coord_type=wgs84&src=com.chaowei`,
+            },
+        ];
+
+        const actions = urls.map(item => Linking.canOpenURL(item.openUrl));
+        const results = await Promise.all(actions);
+        
+        const actionSheetConfig = results.map((result, i) => {
+            return {
+                text: result ? urls[i].text : urls[i].downloadText,
+                url: result ? urls[i].openUrl : urls[i].downloadUrl,
+                isInstalled: result,
+            };
+        });
+
+        this.setState({
+            actionSheetConfig,
+        });
+
+        return
         MapLinking.planRoute(
             {lat:this.state.location.latitude, lng: this.state.location.longitude, title: '当前位置'}, 
             {lat:this.state.iconLat, lng: this.state.iconLon, title: '充电桩'},
-        'walk');    
+        'walk');
+    }
+
+    handleActionSheetClick = (index) => {
+        const { actionSheetConfig } = this.state;
+        const item = actionSheetConfig[index];
+        if (item) {
+            Linking.openURL(item.url);
+        }
     }
 
     render() {
+        const actionSheetText = [
+            ...this.state.actionSheetConfig.map(item => item.text),
+            '取消',
+        ];
         return (
             <View style={{ flex: 1,}}> 
+            <ActionSheet
+                ref={o => this.ActionSheet = o}
+                // title={''}
+                options={actionSheetText}
+                cancelButtonIndex={actionSheetText.length - 1}
+                // destructiveButtonIndex={1}
+                onPress={this.handleActionSheetClick}
+                />
                 {this.state.distanceIs?
-                <View style={{justifyContent:'center'}}>
-                    <View style={styles.geolib}>
-                        <View style={styles.geolibModal}>
-                            <Text style={styles.disabled}>距离</Text> 
-                            <Text style={{fontSize:25,color:'#808080'}}>{this.state.distance}米</Text>
+                    <View style={{justifyContent:'center'}}>
+                        <View style={styles.geolib}>
+                            <View style={styles.geolibModal}>
+                                <Text style={styles.disabled}>距离</Text> 
+                                <Text style={{fontSize:25,color:'#808080'}}>{this.state.distance}米</Text>
+                            </View>
+                            {/* <View style={{flex:1,alignItems:'center',}}>
+                                <Text>可步行</Text>
+                                <Text>{this.state.distance}米</Text>
+                            </View> */}
+                            <TouchableOpacity style={{flex:1,alignItems:'center'}} onPress={()=>this.openMap()}>
+                                <Text style={{fontSize:25,color:'#808080'}}>点击导航</Text>
+                                {/* <Text style={{fontSize:25,color:'#111'}}>{this.state.distance}米</Text> */}
+                            </TouchableOpacity>
                         </View>
-                        {/* <View style={{flex:1,alignItems:'center',}}>
-                            <Text>可步行</Text>
-                            <Text>{this.state.distance}米</Text>
-                        </View> */}
-                        <TouchableOpacity style={{flex:1,alignItems:'center'}} onPress={()=>this.openMap()}>
-                            <Text style={{fontSize:25,color:'#808080'}}>点击导航</Text>
-                            {/* <Text style={{fontSize:25,color:'#111'}}>{this.state.distance}米</Text> */}
-                        </TouchableOpacity>
-                    </View>
-                </View>:<View/>
+                    </View>:<View/>
                 }
                 <MapView
                     ref={ref => this.mapView = ref}
                     style={{ flex: 1 }}  
                     location={this.state.location}
                     locationMode='follow'    
-                    overlook={0}//倾斜角度，取值范围 [-45, 0]
-                    rotation={0}//选择角度，取值范围 [0, 360] 
                     zoomLevel={18}//缩放级别，取值范围 [3, 21]
                     locationEnabled //是否显示定位图层    
                     zoomControlsDisabled//是否禁用缩放按钮
                     overlookDisabled//是否禁用倾斜手势 
                     onClick={this.onClick}
                     onStatusChange={this.onStatusChange}
+                    rotateDisabled//
+                    buildingsDisabled//禁用3D建筑
                 >
+                    
                     {this._coordinates.map((item,key) => 
                         <MapView.Marker
                             key={key}

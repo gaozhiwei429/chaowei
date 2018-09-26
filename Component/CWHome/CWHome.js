@@ -9,7 +9,7 @@ import {
     Dimensions,
     AsyncStorage,
     DeviceEventEmitter,
-    ImageBackground,
+    StatusBar,
 } from 'react-native';
 
 import bleBroadcast from '../CWBleBroadcast/CWBleBroadcast';//蓝牙广播模块
@@ -35,9 +35,10 @@ var others;                               //其他的电池
 var Identifier = '382687921502'; //识别码固定值
 var chargerIdentifier = '0289382687921502'; //充电器识别固定码
 var batteryIdentifier = '0388382687921502'; //蓄电池识别固定码
-var chargerDetectorIdentifier = '048a382687921502';//充电器检测仪识别固定码
+var chargerDetectorIdentifier = '0189382687921502';//充电器检测仪识别固定码  048a382687921502
 var BleScan;
 var BroadcastJudgment;
+var detector;
 
 function bindSingle(){
     others = batteryArray.filter(x => x !== batteryArray[currentIndex]); // 其他的电池
@@ -56,6 +57,7 @@ function bindSingle(){
     // console.log(con);//广播的数据 
     otherIndex = otherIndex + 1;// otherIndex 自增
 }
+
 export default class CWHome extends Component {
     constructor(){
         super();
@@ -140,10 +142,22 @@ export default class CWHome extends Component {
             })}
         );
 
+        let LOGGER=new Promise(function(resolve,reject){//获取充电器记录仪本地存储
+            return  storage.get(LOGGER_STORAGE_KEY, (error, result) => {
+                if (error) {
+                    reject(error);
+                    return;
+                }
+                resolve(result);
+            })
+        })
+
         /** 电池充电器数据广播*/
-        Promise.all([promise1,promise2]).then((values) => {
-            batteryArray=[].concat.apply([],values);//绑定电池与充电器合并后的数组
-            // console.log(batteryArray);
+        Promise.all([promise1,promise2,LOGGER]).then((values) => {
+            // console.log(values); 
+            batteryArray=[].concat(values[0],values[1]);//绑定电池与充电器合并后的数组
+            detector=values[2]
+            // console.log(batteryArray);    
             /**蓝牙扫描绑定*/
             this.deviceMap.clear();
             BluetoothManager.manager.startDeviceScan(null, null, (error, device) => {
@@ -188,45 +202,17 @@ export default class CWHome extends Component {
         //删除充电器表、数据
         // sqLite.dropTable(); 
         // sqLite.deleteData();
-        // sqLite.dropChargerDetectorTable(); 
+        // sqLite.dropChargerDetectorTable();
         // sqLite.deleteChargerDetectorData();
 
         // sqLite.deleteChargerData();
         // sqLite.dropChargerTable();
 
-        //获取充电器记录仪本地存储
-        let ChargerDetectorStorage=new Promise(function (resolve, reject) {
-            return storage.get(LOGGER_STORAGE_KEY, (error, result) => {
-                if (error) {
-                    reject(error);
-                    return;
-                }
-                resolve(result);    
-            })}
-        );
-
          /** 获取地理位置（经纬度） */
-        let positionData= new Promise(function(resolve,reject){
-            return navigator.geolocation.getCurrentPosition((position) => {
-                    const positionData = position.coords;
-                    /**  经度：positionData.longitude*/
-                    /** 纬度：positionData.latitude*/
-                    resolve(positionData);
-                }
-            ),
-                (error) => {
-                    console.warn('失败：' + JSON.stringify(error.message))
-                }, {
-                // 提高精确度，但是获取的速度会慢一点
-                enableHighAccuracy: true,
-                // 设置获取超时的时间60秒
-                timeout: 60000,
-                // 示应用程序的缓存时间，每次请求都是立即去获取一个全新的对象内容
-                maximumAge: 1000,
-            };
-        })
-
-        Promise.all([ChargerDetectorStorage,positionData]).then((value)=>{
+         navigator.geolocation.getCurrentPosition((position) => {
+            const positionData = position.coords;
+            /**  经度：positionData.longitude*/
+            /** 纬度：positionData.latitude*/
             const loop = () => {   
                 var date = new Date();
                 var y = date.getFullYear();
@@ -271,8 +257,8 @@ export default class CWHome extends Component {
                                     battery.balanceVoltage=parseInt((searchBle.slice(46,48).concat(searchBle.slice(44,46))),16)/10;//均衡电压2
                                     battery.bindingState = parseInt(searchBle.slice(48,50),16);//绑定状态1
                                     battery.equilibriumState = parseInt(searchBle.slice(50,52),16);//均衡状态1
-                                    battery.P_longitude=value[1].longitude;
-                                    battery.P_latitude=value[1].latitude;
+                                    battery.P_longitude=positionData.longitude;
+                                    battery.P_latitude=positionData.latitude;
                                     batteryData.push(battery);
                                     //写入电池数据库
                                     var actionBattery = sqLite.insertbatteryData(batteryData, () => {});
@@ -294,27 +280,14 @@ export default class CWHome extends Component {
                                     charger.bindingState = parseInt(searchBle.slice(48,50),16);//绑定状态1
                                     charger.chargingState = parseInt(searchBle.slice(50,52),16);//充电状态1
                                     charger.ambientTemperature = parseInt(searchBle.slice(52,54),16);//环境温度1
-                                    charger.P_longitude=value[1].longitude;
-                                    charger.P_latitude=value[1].latitude;
+                                    charger.P_longitude=positionData.longitude;
+                                    charger.P_latitude=positionData.latitude;
                                     chargerData.push(charger);
                                     //写入充电器数据库
                                     var actionCharger = sqLite.insertchargerData(chargerData,()=>{});
                                     actionsCharger.push(actionCharger)
-    
-                                    var ChargerDetectorData=[];
-                                    var ChargerDetector = {};
-                                    ChargerDetector.ChargerDetector_id=equipmentID;//设备id
-                                    ChargerDetector.my_timestamp = time;//时间
-                                    ChargerDetector.voltage = parseInt((searchBle.slice(22,24).concat(searchBle.slice(20,22))),16)/10;//电压
-                                    ChargerDetector.electric_current =parseInt((searchBle.slice(26,28).concat(searchBle.slice(24,26))),16)/100;//电流
-                                    ChargerDetector.capacity = parseInt((searchBle.slice(30,32).concat(searchBle.slice(28,30))),16)/100;//容量
-                                    ChargerDetector.BoardTemperature= parseInt(searchBle.slice(34,36),16);//电路板温度
-                                    ChargerDetector.AmbientTemperature= parseInt(searchBle.slice(36,38),16);//环境温度
-                                    ChargerDetectorData.push(ChargerDetector); 
-                                    //写入充电器检测仪数据库
-                                    var actionChargerDetector = sqLite.insertChargerDetectorData(ChargerDetectorData,()=>{});
-                                    actionsChargerDetector.push(actionChargerDetector);
-                                }else if(chargerDetectorIdentifier == scanIdentifier && value[0][0] == equipmentID){
+
+                                }else if(chargerDetectorIdentifier == scanIdentifier && detector[0] == equipmentID){
                                     //充电器检测仪数据
                                     var ChargerDetectorData=[];
                                     var ChargerDetector = {};
@@ -327,22 +300,31 @@ export default class CWHome extends Component {
                                     ChargerDetector.AmbientTemperature= parseInt(searchBle.slice(36,38),16);//环境温度
                                     ChargerDetectorData.push(ChargerDetector); 
                                     //写入充电器检测仪数据库
-                                    var actionChargerDetector = sqLite.insertChargerDetectorData(ChargerDetectorData,()=>{});
+                                    var actionChargerDetector = sqLite.insertChargerDetectorData(ChargerDetectorData);
                                     actionsChargerDetector.push(actionChargerDetector);
                                 }
                             }
                         }
                     }
                 }
-                Promise.all([actionsBattery],[actionsCharger]).then(function () {
-                    setTimeout(loop, 60000);
+                
+                Promise.all([actionsBattery],[actionsCharger],[actionsChargerDetector]).then(function () {
+                    this.storageTime=setTimeout(loop, 60000);
                 });
             };
             setTimeout(loop, 1000);
-        })
-
-        
-
+            }
+        ),
+            (error) => {
+                console.warn('失败：' + JSON.stringify(error.message))
+            }, {
+            // 提高精确度，但是获取的速度会慢一点
+            enableHighAccuracy: true,
+            // 设置获取超时的时间60秒
+            timeout: 60000,
+            // 示应用程序的缓存时间，每次请求都是立即去获取一个全新的对象内容
+            maximumAge: 1000,
+        };
 
         return;
         
@@ -423,6 +405,7 @@ export default class CWHome extends Component {
         // bleBroadcast.stop();
         // BluetoothManager.stopScan();
         BluetoothManager.destroy();  
+        clearTimeout(this.storageTime);
     }
 
     //电池1
@@ -459,7 +442,7 @@ export default class CWHome extends Component {
     };  
     //绑定 解绑
     bbbb(){
-        AsyncStorage.removeItem(PHONE_BIND_STORAGE_KEY,(error)=>{
+        AsyncStorage.removeItem(LOGGER_STORAGE_KEY,(error)=>{//LOGGER_STORAGE_KEY    PHONE_BIND_STORAGE_KEY
             if (error == null) {
                 alert('解绑成功');
             } else {
@@ -477,6 +460,14 @@ export default class CWHome extends Component {
     render(){
         return(
             <View style={styles.container}>
+                <StatusBar
+                    // backgroundColor='#ff0000'
+                    // translucent={true}
+                    // hidden={true}
+                    animated={true}     
+                    // androidbackgroundColor='#fff'
+                    androidtranslucent = {true}
+                />
                 <ToastSuccessAndError ref='toast_su' successMsg='绑定完成' errorMsg='请打开蓝牙'/>
                 <ToastSuccessAndError ref='band' successMsg="绑定一个"/>   
                 {/*进度条*/}
@@ -484,7 +475,7 @@ export default class CWHome extends Component {
                 <AlertS ref='bleScan' title='提示' btnText='确定' msg='请先打开蓝牙开关！' />
 
                 {/*测试*/}
-                {/* <View style={{justifyContent:'space-around',flexDirection:'row'}}>
+                <View style={{justifyContent:'space-around',flexDirection:'row'}}>
                     <TouchableOpacity style={{width:35,height:35,backgroundColor:'#0fa'}} onPress={()=>this.banding1()}>
                         <Text>电池1-01</Text>
                     </TouchableOpacity>
@@ -512,7 +503,7 @@ export default class CWHome extends Component {
                     <TouchableOpacity style={{width:35,height:35,backgroundColor:'#0fa'}} onPress={()=>this.bbbb()}>
                         <Text>解绑</Text>
                     </TouchableOpacity> 
-                </View> */}
+                </View>
                 {/*顶部电量可行驶里程*/}
                 <LinearGradient
                     start={{x: 0, y: 0}}  

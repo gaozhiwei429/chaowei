@@ -10,6 +10,7 @@ import {
 
 import CWBtnCell from './CWBtnCell';
 
+
 export default class CWButton extends Component {
     static navigationOptions = {
         headerTitle:(<Text style={{fontSize:20,flex: 1, textAlign: 'center'}}>更多</Text>),
@@ -25,7 +26,7 @@ export default class CWButton extends Component {
         headerPressColorAndroid:'gray',
         headerBackImage: (<Image source={require('../../img/leftGoBack.png')} style={{width:18,height:14,marginLeft:15,marginRight:15}}/>),
     };
-
+    
     render() {
         return (
             <ScrollView style={styles.Binding}>

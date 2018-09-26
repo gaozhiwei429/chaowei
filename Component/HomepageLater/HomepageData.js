@@ -17,7 +17,7 @@ export default class BatteryData extends Component {
         }
     }
 
-    componentWillMount() {
+    componentDidMount() {
 
     };
 
@@ -50,15 +50,13 @@ export default class BatteryData extends Component {
                 {
                     chargerImg===0?
                         <View style={styles.Binding}>
-                            <TouchableOpacity style={styles.Btn} onPress={() => this.props.navigation.navigate('CWScanning',{ chargerImg:0})}>
+                            <TouchableOpacity 
+                                style={styles.Btn} 
+                                onPress={() => this.props.navigation.navigate('CWScanning',{ chargerImg:0})}
+                                >
                                 <Text style={styles.BtnText}>绑定</Text>
                                 <Image style={styles.BtnImg} source={require('../../img/next.png')}/>
                             </TouchableOpacity>
-                            {/* <TouchableOpacity style={styles.Btn} onPress={() => this.props.navigation.navigate('ChargerSvg')
-                            }>
-                                <Text style={styles.BtnText}>充电器数据曲线</Text>
-                                <Image style={styles.BtnImg} source={require('../../img/next.png')}/>
-                            </TouchableOpacity> */}
 
                             <TouchableOpacity style={styles.Btn} onPress={() => this.props.navigation.navigate('Charging')}>
                                 <Text style={styles.BtnText}>启动/停止充电</Text>

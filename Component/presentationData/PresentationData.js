@@ -47,8 +47,9 @@ export default class PresentationData extends Component {
                         </TouchableOpacity>
                         <TouchableOpacity 
                             style={styles.PresentationBtn} 
-                            onPress={ ()=>this.props.navigation.navigate('ChargerDetector') } >
-                            <Text>记录仪数据</Text>
+                            onPress={() => this.props.navigation.navigate('ChargerRecorder')}
+                            >
+                            <Text>充电器检测仪</Text>
                         </TouchableOpacity>
                     </View>
                 </View>

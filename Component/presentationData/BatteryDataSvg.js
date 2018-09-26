@@ -10,7 +10,7 @@ import {
 
 import CWBtnCell from '../CWButton/CWBtnCell';
 
-export default class CWButton extends Component {
+export default class BatteryDataSvg extends Component {
     static navigationOptions = {
         headerTitle:(<Text style={{fontSize:20,flex: 1, textAlign: 'center'}}>蓄电池数据</Text>), 
         headerStyle: {

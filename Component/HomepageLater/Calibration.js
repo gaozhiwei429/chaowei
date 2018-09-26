@@ -28,7 +28,6 @@ export default class Calibration extends Component {
             BatteryID: '',
             ChargerID:'',
             ChargerCalibration:'',
-            // ChargerElectricity:'',
             BatteryVoltage:'',
             voltager:40,
             Electricity:15,

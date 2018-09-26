@@ -16,6 +16,7 @@ var sqLite = new SQLiteText();
 var db;
 var batterypath = RNFS.ExternalDirectoryPath  + '/电池数据.csv'; // 文件路径
 var chargerpath = RNFS.ExternalDirectoryPath  + '/充电器数据.csv' ;// 文件路径
+var ChargerDetectorpath = RNFS.ExternalDirectoryPath + '/充电器检测仪数据.csv';
 
 export default class Filesystem extends Component {
     //构造函数
@@ -140,9 +141,9 @@ export default class Filesystem extends Component {
                     RNFS.appendFile(chargerpath, jsonarr, 'utf8')
                         .then((success) => {
                             var progress=(i/(len-1));
-                            console.log(progress);
+                            // console.log(progress);
                             var percentage=parseInt(progress*100);
-                            console.log(percentage);
+                            // console.log(percentage);
                             this.setState({
                                 AlertProgress: progress,
                                 percentage:percentage
@@ -159,16 +160,113 @@ export default class Filesystem extends Component {
         });
     }
 
+    /**
+     * 充电器检测仪参数说明：
+     * ChargerDetector_id             电池ID
+     * my_timestamp                   写入时间
+     * voltage                        当前的电压
+     * equilibrium_time               平衡时间
+     * capacity                       容量
+     * BoardTemperature               电路板温度
+     * AmbientTemperature             环境温度
+     * */
+    
+
+    async ChargerDetectorFile(){
+        //开启数据库
+        if(!db){
+            db = await sqLite.open();
+        }
+
+        let ChargerDetectorContent={
+            'ChargerDetector_id':'充电器检测仪ID', 
+            'my_timestamp': '写入时间', 
+            'voltage': '当前的电压',
+            'electric_current': '当前电流',
+            'capacity': '容量',
+            'BoardTemperature': '电路板温度',
+            'AmbientTemperature': '环境温度'
+        };
+
+        let ChargerDetectorJsonarr = 
+            ChargerDetectorContent.ChargerDetector_id + ',' + 
+            ChargerDetectorContent.my_timestamp + ',' + 
+            ChargerDetectorContent.voltage + ',' + 
+            ChargerDetectorContent.electric_current + ',' + 
+            ChargerDetectorContent.BoardTemperature + ',' +
+            ChargerDetectorContent.AmbientTemperature + ',' + '\n' ;
+
+        RNFS.writeFile(ChargerDetectorpath, ChargerDetectorJsonarr, 'utf8')
+            .then((success) => {
+                console.log('FILE WRITTEN!');
+            })
+            .catch((err) => {
+                console.log(err.message);
+            });
+
+        db.transaction((tx)=>{
+            tx.executeSql ( " select * from ChargerDetector order by id desc " , [],(tx,results)=>{
+                var len = results.rows.length;
+                for ( let i = 0 ; i < len ; i++ ) {
+                    let u = results.rows.item(i);
+                    let content = {
+                        'ChargerDetector_id':u.ChargerDetector_id,
+                        'my_timestamp': u.my_timestamp,
+                        'voltage': u.voltage ,
+                        'electric_current': u.electric_current ,
+                        'capacity': u.capacity ,
+                        'BoardTemperature': u.BoardTemperature , 
+                        'AmbientTemperature': u.AmbientTemperature
+                    };
+                    let ChargerDetectorJsonarr = 
+                    content.ChargerDetector_id + ',' +
+                    content.my_timestamp + ',' +
+                    content.voltage + ',' +
+                    content.electric_current + ',' +
+                    content.capacity + ',' +
+                    content.BoardTemperature + ',' + 
+                    content.AmbientTemperature + ',' + '\n';
+                    // write the file 
+                    RNFS.appendFile(ChargerDetectorpath, ChargerDetectorJsonarr, 'utf8')
+                        .then((success) => {
+                            var progress=(i/(len-1)); 
+                            var percentage=parseInt(progress*100);
+                            this.setState({
+                                AlertProgress: progress,
+                                percentage:percentage
+                            });
+                            this.refs.alert.open();
+                        })
+                        .catch((err) => {
+                            console.log(err.message);
+                        });
+                }
+            });
+        },(error)=>{
+            console.log(error);
+        });
+    }
+
+
     // 删除电池文件
     deleteFile(){
         RNFS.unlink(batterypath)  
-            .then(()=>{
-                this.refs.toast.show('文件删除成功!',2000);
-            })
+            // .then(()=>{
+            //     this.refs.toast.show('文件删除成功!',2000);
+            // })
             .catch((err)=>{
-                this.refs.toast.show('没有文件可以删除!',2000);
-            });
+                console.log(err)
+                // this.refs.toast.show('没有文件可以删除!',2000);
+            })
         RNFS.unlink(chargerpath)
+            // .then(()=>{
+            //     this.refs.toast.show('文件删除成功!',2000);
+            // })
+            .catch((err)=>{
+                console.log(err)
+                // this.refs.toast.show('没有文件可以删除!',2000);
+            })
+        RNFS.unlink(ChargerDetectorpath)
             .then(()=>{
                 this.refs.toast.show('文件删除成功!',2000);
             })
@@ -198,10 +296,13 @@ export default class Filesystem extends Component {
                 <AlertProgress ref='alert' btnText='确定' width={_width*0.55} progress={this.state.AlertProgress} percentage={this.state.percentage}/>
 
                 <TouchableOpacity onPress={()=>this.batteryWriteFile()} >
-                    <Text style={{margin:20,fontSize:20}}>导出电池数据</Text>
+                    <Text style={{margin:20,fontSize:20}}>电池数据</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={()=>this.chargerWriteFile()}>
-                    <Text style={{margin:20,fontSize:20}}>导出充电器数据</Text>
+                    <Text style={{margin:20,fontSize:20}}>充电器数据</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={()=>this.ChargerDetectorFile()}>
+                    <Text style={{margin:20,fontSize:20}}>充电器检测仪数据</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={()=>this.deleteFile()}>
                     <Text style={{margin:20,fontSize:20}}>删除文件</Text>
@@ -219,7 +320,9 @@ export default class Filesystem extends Component {
         );
     }
 };
+
 let _width = Dimensions.get('window').width;
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
