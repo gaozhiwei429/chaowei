@@ -433,20 +433,29 @@ export default class CWBatteryVoltage extends Component {
         var difference1Time=xTime.filter(function(v){ return battery1Time.indexOf(v) == -1 });
         difference1Time.map(item=>{
             return battery1.push(
-                {my_timestamp:item,voltage:null,battery_id:dataVoltage[0][0],id:0}
+                    {my_timestamp:item,voltage:null,battery_id:dataVoltage[0][0]}
                 )
         })
-        console.log(xTime);
-        console.log(battery1);
-        const ybattery1 = battery1.sort(function(a,b){
-            return Date.parse(a.my_timestamp) - Date.parse(b.my_timestamp);//时间正序
+        // console.log(battery1);
+        const ybattery1 = battery1.sort(function(a, b) {
+            if (a.my_timestamp < b.my_timestamp ) {
+                return -1;
+            } else if (a.my_timestamp > b.my_timestamp ) {
+                return 1;
+            } else {
+                if (a.my_timestamp < b.my_timestamp ) {
+                    return 1;
+                } else if (a.my_timestamp > b.my_timestamp ) {
+                    return -1;
+                }
+                return 0;
+            }
         }).map(item=>{
             return item.voltage
-        }) 
-        console.log(ybattery1) 
+        })
 
         //电池2
-        const battery2 = voltage[0].map((item,i)=>{
+        var battery2 = voltage[0].map((item,i)=>{
             if(dataVoltage[0][1]==voltage[0][i].battery_id){
                 return item
             }
@@ -454,7 +463,7 @@ export default class CWBatteryVoltage extends Component {
             return !(!val || val === "");
         })
 
-        const battery2Time=battery2.map(item=>{
+        var battery2Time=battery2.map(item=>{
             return item.my_timestamp
         })
 
@@ -463,15 +472,25 @@ export default class CWBatteryVoltage extends Component {
         difference2Time.map(item=>{
             return battery2.push(
                 {my_timestamp:item,voltage:null,battery_id:dataVoltage[0][1]}
-                )
+            )
         })
-        
-        const ybattery2 = battery2.sort(function(a,b){
-            return Date.parse(a.my_timestamp) - Date.parse(b.my_timestamp);//时间正序
+        var ybattery2 = battery2.sort(function(a, b) {
+            if (a.my_timestamp < b.my_timestamp ) {
+                return -1;
+            } else if (a.my_timestamp > b.my_timestamp ) {
+                return 1;
+            } else {
+                if (a.my_timestamp < b.my_timestamp ) {
+                    return 1;
+                } else if (a.my_timestamp > b.my_timestamp ) {
+                    return -1;
+                }
+                return 0;
+            }
         }).map(item=>{
             return item.voltage
         })
-
+        
         //电池3  
         const battery3 = voltage[0].map((item,i)=>{
             if(dataVoltage[0][2]==voltage[0][i].battery_id){
@@ -492,12 +511,23 @@ export default class CWBatteryVoltage extends Component {
                 {my_timestamp:item,voltage:null,battery_id:dataVoltage[0][2]}
                 )
         })
-        const ybattery3 = battery3.sort(function(a,b){
-            return Date.parse(a.my_timestamp) - Date.parse(b.my_timestamp);//时间正序
+        const ybattery3 = battery3.sort(function(a, b) {
+            if (a.my_timestamp < b.my_timestamp ) {
+                return -1;
+            } else if (a.my_timestamp > b.my_timestamp ) {
+                return 1;
+            } else {
+                if (a.my_timestamp < b.my_timestamp ) {
+                    return 1;
+                } else if (a.my_timestamp > b.my_timestamp ) {
+                    return -1;
+                }
+                return 0;
+            }
         }).map(item=>{
             return item.voltage
         })
-
+        
         //电池4 
         const battery4 = voltage[0].map((item,i)=>{
             if(dataVoltage[0][3]==voltage[0][i].battery_id){
@@ -518,8 +548,19 @@ export default class CWBatteryVoltage extends Component {
                 {my_timestamp:item,voltage:null,battery_id:dataVoltage[0][3]}
                 )
         })
-        const ybattery4 = battery4.sort(function(a,b){
-            return Date.parse(a.my_timestamp) - Date.parse(b.my_timestamp);//时间正序
+        const ybattery4 = battery4.sort(function(a, b) {
+            if (a.my_timestamp < b.my_timestamp ) {
+                return -1;
+            } else if (a.my_timestamp > b.my_timestamp ) {
+                return 1;
+            } else {
+                if (a.my_timestamp < b.my_timestamp ) {
+                    return 1;
+                } else if (a.my_timestamp > b.my_timestamp ) {
+                    return -1;
+                }
+                return 0;
+            }
         }).map(item=>{
             return item.voltage
         })
@@ -544,8 +585,19 @@ export default class CWBatteryVoltage extends Component {
                 {my_timestamp:item,voltage:null,battery_id:dataVoltage[0][4]}
                 )
         })
-        const ybattery5 = battery5.sort(function(a,b){
-            return Date.parse(a.my_timestamp) - Date.parse(b.my_timestamp);//时间正序
+        const ybattery5 = battery5.sort(function(a, b) {
+            if (a.my_timestamp < b.my_timestamp ) {
+                return -1;
+            } else if (a.my_timestamp > b.my_timestamp ) {
+                return 1;
+            } else {
+                if (a.my_timestamp < b.my_timestamp ) {
+                    return 1;
+                } else if (a.my_timestamp > b.my_timestamp ) {
+                    return -1;
+                }
+                return 0;
+            }
         }).map(item=>{
             return item.voltage
         })
@@ -571,8 +623,19 @@ export default class CWBatteryVoltage extends Component {
                 {my_timestamp:item,voltage:null,battery_id:dataVoltage[0][5]}
                 )
         })
-        const ybattery6 = battery6.sort(function(a,b){
-            return Date.parse(a.my_timestamp) - Date.parse(b.my_timestamp);//时间正序
+        const ybattery6 = battery6.sort(function(a, b) {
+            if (a.my_timestamp < b.my_timestamp ) {
+                return -1;
+            } else if (a.my_timestamp > b.my_timestamp ) {
+                return 1;
+            } else {
+                if (a.my_timestamp < b.my_timestamp ) {
+                    return 1;
+                } else if (a.my_timestamp > b.my_timestamp ) {
+                    return -1;
+                }
+                return 0;
+            }
         }).map(item=>{
             return item.voltage
         })

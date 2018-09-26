@@ -431,8 +431,19 @@ export default class CWBatteryTemperature extends Component {
                 )
         })
 
-        const ybattery1 = battery1.sort(function(a,b){
-            return Date.parse(a.my_timestamp) - Date.parse(b.my_timestamp);//时间正序
+        const ybattery1 = battery1.sort(function(a, b) {
+            if (a.my_timestamp < b.my_timestamp ) {
+                return -1;
+            } else if (a.my_timestamp > b.my_timestamp ) {
+                return 1;
+            } else {
+                if (a.my_timestamp < b.my_timestamp ) {
+                    return 1;
+                } else if (a.my_timestamp > b.my_timestamp ) {
+                    return -1;
+                }
+                return 0;
+            }
         }).map(item=>{
             return item.temperature
         })
@@ -459,8 +470,19 @@ export default class CWBatteryTemperature extends Component {
                 )
         })
         
-        const ybattery2 = battery2.sort(function(a,b){
-            return Date.parse(a.my_timestamp) - Date.parse(b.my_timestamp);//时间正序
+        const ybattery2 = battery2.sort(function(a, b) {
+            if (a.my_timestamp < b.my_timestamp ) {
+                return -1;
+            } else if (a.my_timestamp > b.my_timestamp ) {
+                return 1;
+            } else {
+                if (a.my_timestamp < b.my_timestamp ) {
+                    return 1;
+                } else if (a.my_timestamp > b.my_timestamp ) {
+                    return -1;
+                }
+                return 0;
+            }
         }).map(item=>{
             return item.temperature
         })
@@ -485,8 +507,19 @@ export default class CWBatteryTemperature extends Component {
                 {my_timestamp:item,temperature:null,battery_id:dataVoltage[0][2]}
                 )
         })
-        const ybattery3 = battery3.sort(function(a,b){
-            return Date.parse(a.my_timestamp) - Date.parse(b.my_timestamp);//时间正序
+        const ybattery3 = battery3.sort(function(a, b) {
+            if (a.my_timestamp < b.my_timestamp ) {
+                return -1;
+            } else if (a.my_timestamp > b.my_timestamp ) {
+                return 1;
+            } else {
+                if (a.my_timestamp < b.my_timestamp ) {
+                    return 1;
+                } else if (a.my_timestamp > b.my_timestamp ) {
+                    return -1;
+                }
+                return 0;
+            }
         }).map(item=>{
             return item.temperature
         })
@@ -511,8 +544,19 @@ export default class CWBatteryTemperature extends Component {
                 {my_timestamp:item,temperature:null,battery_id:dataVoltage[0][3]}
                 )
         })
-        const ybattery4 = battery4.sort(function(a,b){
-            return Date.parse(a.my_timestamp) - Date.parse(b.my_timestamp);//时间正序
+        const ybattery4 = battery4.sort(function(a, b) {
+            if (a.my_timestamp < b.my_timestamp ) {
+                return -1;
+            } else if (a.my_timestamp > b.my_timestamp ) {
+                return 1;
+            } else {
+                if (a.my_timestamp < b.my_timestamp ) {
+                    return 1;
+                } else if (a.my_timestamp > b.my_timestamp ) {
+                    return -1;
+                }
+                return 0;
+            }
         }).map(item=>{
             return item.temperature
         })
@@ -537,8 +581,19 @@ export default class CWBatteryTemperature extends Component {
                 {my_timestamp:item,temperature:null,battery_id:dataVoltage[0][4]}
                 )
         })
-        const ybattery5 = battery5.sort(function(a,b){
-            return Date.parse(a.my_timestamp) - Date.parse(b.my_timestamp);//时间正序
+        const ybattery5 = battery5.sort(function(a, b) {
+            if (a.my_timestamp < b.my_timestamp ) {
+                return -1;
+            } else if (a.my_timestamp > b.my_timestamp ) {
+                return 1;
+            } else {
+                if (a.my_timestamp < b.my_timestamp ) {
+                    return 1;
+                } else if (a.my_timestamp > b.my_timestamp ) {
+                    return -1;
+                }
+                return 0;
+            }
         }).map(item=>{
             return item.temperature
         })
@@ -564,8 +619,19 @@ export default class CWBatteryTemperature extends Component {
                 {my_timestamp:item,temperature:null,battery_id:dataVoltage[0][5]}
                 )
         })
-        const ybattery6 = battery6.sort(function(a,b){
-            return Date.parse(a.my_timestamp) - Date.parse(b.my_timestamp);//时间正序
+        const ybattery6 = battery6.sort(function(a, b) {
+            if (a.my_timestamp < b.my_timestamp ) {
+                return -1;
+            } else if (a.my_timestamp > b.my_timestamp ) {
+                return 1;
+            } else {
+                if (a.my_timestamp < b.my_timestamp ) {
+                    return 1;
+                } else if (a.my_timestamp > b.my_timestamp ) {
+                    return -1;
+                }
+                return 0;
+            }
         }).map(item=>{
             return item.temperature
         })
