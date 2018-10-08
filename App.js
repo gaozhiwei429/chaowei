@@ -49,10 +49,10 @@ import AboutUs from './Component/AboutUs/AboutUs';//关于我们
 import CWBleConnect from './Component/CWBleSearch/CWBleConnect';//连接读取数据
 import PresentationData from './Component/presentationData/PresentationData';//数据
 import TAB from './Component/presentationData/TAB';//蓄电池数据(滑动)
-import BatteryDataSvg from './Component/presentationData/BatteryDataSvg';//蓄电池数据(单)
 import Shopping from './Component/Shopping/Shopping';//商城 
 import RSSI from './Component/CWBleSearch/RSSI';//RSSI
 import ChargerRecorder from "./Component/presentationData/ChargerRecorder";//充电器检测仪
+import Table from './Component/Table/Table';//表
 
 //测试
 import ListView from './Component/ListView/ListView'
@@ -91,11 +91,11 @@ const RootStack = createStackNavigator({
         AboutUs : { screen : AboutUs } ,
         CWBleConnect : { screen : CWBleConnect } ,
         PresentationData : { screen : PresentationData } ,
-        BatteryDataSvg : { screen : BatteryDataSvg } , 
         Shopping : { screen : Shopping } ,
         RSSI : { screen : RSSI } ,
         ChargerDetector : { screen : ChargerDetector } ,
         ChargerRecorder : { screen : ChargerRecorder } ,
+        Table : { screen: Table },
 
         //测试
         ListView:{screen:ListView},
@@ -106,7 +106,7 @@ const RootStack = createStackNavigator({
         CWEchart:{screen:CWEchart},
     },
     {
-        initialRouteName: 'CWGLaunchlmage', 
+        initialRouteName: 'CWGLaunchlmage',
     }    
 );
 

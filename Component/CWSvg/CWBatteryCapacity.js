@@ -39,6 +39,7 @@ export default class CWBatteryCapacity extends Component {
             ybattery6:[],
             previous:0,
             xTime:[],
+            batteryBind:[],
         };
     }
 
@@ -386,8 +387,7 @@ export default class CWBatteryCapacity extends Component {
 
 
         //蓄电池存储数据
-        const dataVoltage = await Promise.all([promise2]);
-
+        const batteryBind = await Promise.all([promise2]);
         //查询数据库总数据
         let voltageData = new Promise(function (resolve,reject){
             return db.transaction((tx)=>{
@@ -418,7 +418,7 @@ export default class CWBatteryCapacity extends Component {
         
         //电池1
         const battery1 = capacity[0].map((item,i)=>{
-            if(dataVoltage[0][0]==capacity[0][i].battery_id){
+            if(batteryBind[0][0]==capacity[0][i].battery_id){
                 return item
             }
         }).filter(function(val){//过滤掉undefined
@@ -433,7 +433,7 @@ export default class CWBatteryCapacity extends Component {
         var difference1Time=xTime.filter(function(v){ return battery1Time.indexOf(v) == -1 })
         difference1Time.map(item=>{
             return battery1.push(
-                {my_timestamp:item,capacity:null,battery_id:dataVoltage[0][0]}
+                {my_timestamp:item,capacity:null,battery_id:batteryBind[0][0]}
                 )
         })
 
@@ -457,7 +457,7 @@ export default class CWBatteryCapacity extends Component {
 
         //电池2
         const battery2 = capacity[0].map((item,i)=>{
-            if(dataVoltage[0][1]==capacity[0][i].battery_id){
+            if(batteryBind[0][1]==capacity[0][i].battery_id){
                 return item
             }
         }).filter(function(val){//过滤掉undefined
@@ -472,7 +472,7 @@ export default class CWBatteryCapacity extends Component {
         var difference2Time=xTime.filter(function(v){ return battery2Time.indexOf(v) == -1 })
         difference2Time.map(item=>{
             return battery2.push(
-                {my_timestamp:item,capacity:null,battery_id:dataVoltage[0][1]}
+                {my_timestamp:item,capacity:null,battery_id:batteryBind[0][1]}
                 )
         })
         
@@ -495,7 +495,7 @@ export default class CWBatteryCapacity extends Component {
 
         //电池3  
         const battery3 = capacity[0].map((item,i)=>{
-            if(dataVoltage[0][2]==capacity[0][i].battery_id){
+            if(batteryBind[0][2]==capacity[0][i].battery_id){
                 return item
             }
         }).filter(function(val){//过滤掉undefined
@@ -510,7 +510,7 @@ export default class CWBatteryCapacity extends Component {
         var difference3Time=xTime.filter(function(v){ return battery3Time.indexOf(v) == -1 })
         difference3Time.map(item=>{
             return battery3.push(
-                {my_timestamp:item,capacity:null,battery_id:dataVoltage[0][2]}
+                {my_timestamp:item,capacity:null,battery_id:batteryBind[0][2]}
                 )
         })
         const ybattery3 = battery3.sort(function(a, b) {
@@ -532,7 +532,7 @@ export default class CWBatteryCapacity extends Component {
 
         //电池4 
         const battery4 = capacity[0].map((item,i)=>{
-            if(dataVoltage[0][3]==capacity[0][i].battery_id){
+            if(batteryBind[0][3]==capacity[0][i].battery_id){
                 return item
             }
         }).filter(function(val){//过滤掉undefined
@@ -547,7 +547,7 @@ export default class CWBatteryCapacity extends Component {
         var difference4Time=xTime.filter(function(v){ return battery4Time.indexOf(v) == -1 })
         difference4Time.map(item=>{
             return battery4.push(
-                {my_timestamp:item,capacity:null,battery_id:dataVoltage[0][3]}
+                {my_timestamp:item,capacity:null,battery_id:batteryBind[0][3]}
                 )
         })
         const ybattery4 = battery4.sort(function(a, b) {
@@ -569,7 +569,7 @@ export default class CWBatteryCapacity extends Component {
 
         //电池5
         const battery5 = capacity[0].map((item,i)=>{
-            if(dataVoltage[0][4]==capacity[0][i].battery_id){
+            if(batteryBind[0][4]==capacity[0][i].battery_id){
                 return item
             }
         }).filter(function(val){//过滤掉undefined
@@ -584,7 +584,7 @@ export default class CWBatteryCapacity extends Component {
         var difference5Time=xTime.filter(function(v){ return battery5Time.indexOf(v) == -1 })
         difference5Time.map(item=>{
             return battery5.push(
-                {my_timestamp:item,capacity:null,battery_id:dataVoltage[0][4]}
+                {my_timestamp:item,capacity:null,battery_id:batteryBind[0][4]}
                 )
         })
         const ybattery5 = battery5.sort(function(a, b) {
@@ -607,7 +607,7 @@ export default class CWBatteryCapacity extends Component {
 
         //电池6
         const battery6 = capacity[0].map((item,i)=>{
-            if(dataVoltage[0][5]==capacity[0][i].battery_id){
+            if(batteryBind[0][5]==capacity[0][i].battery_id){
                 return item
             }
         }).filter(function(val){//过滤掉undefined
@@ -622,7 +622,7 @@ export default class CWBatteryCapacity extends Component {
         var difference6Time=xTime.filter(function(v){ return battery6Time.indexOf(v) == -1 })
         difference6Time.map(item=>{
             return battery6.push(
-                {my_timestamp:item,capacity:null,battery_id:dataVoltage[0][5]}
+                {my_timestamp:item,capacity:null,battery_id:batteryBind[0][5]}
                 )
         })
         const ybattery6 = battery6.sort(function(a, b) {
@@ -649,7 +649,9 @@ export default class CWBatteryCapacity extends Component {
             ybattery4,
             ybattery5,
             ybattery6,
-            xTime
+            xTime,
+            capacity,
+            batteryBind,
         })
     }
     // 查询历史数据
@@ -807,7 +809,25 @@ export default class CWBatteryCapacity extends Component {
         this.battery4Time && clearTimeout(this.battery4Time);
         this.battery5Time && clearTimeout(this.battery5Time);
         this.battery6Time && clearTimeout(this.battery6Time);
+            this.state.ybattery1=[];
+            this.state.ybattery2=[];
+            this.state.ybattery3=[];
+            this.state.ybattery4=[];
+            this.state.ybattery5=[];
+            this.state.ybattery6=[];
+            this.state.xTime=[];
+            this.state.capacity=[];
+            this.state.batteryBind=[];
     }
+
+    table(){
+        this.props.navigation.navigate('Table',{ 
+            localData:this.state.capacity,
+            batteryBind:this.state.batteryBind,
+            capacity:true,
+        })
+    }
+
     static navigationOptions = {
         headerTitle:(<Text style={{fontSize:20,flex: 1, textAlign: 'center'}}>蓄电池容量数据</Text>), 
         headerStyle: {
@@ -822,7 +842,7 @@ export default class CWBatteryCapacity extends Component {
         headerPressColorAndroid:'gray',
         headerBackImage: (<Image source={require('../../img/leftGoBack.png')} style={{width:18,height:14,marginLeft:15,marginRight:15}}/>),
     };
-    render() {    
+    render() {   
         const option= {
             title: {
                 text: '',
@@ -844,34 +864,34 @@ export default class CWBatteryCapacity extends Component {
                 showTitle:true,
                 feature : {
                     dataView : {
-                        show: true,
+                        show: false,
                         readOnly: true,
-                        optionToContent: function(opt) {
-                            var axisData = opt.xAxis[0].data;
-                            var series = opt.series;
-                            var table = '<div style="height:350px;overflow:auto"><table style="width:100%;text-align:center;"><tbody><tr>'
-                                         + '<td>时间</td>'
-                                         + '<td>' + series[0].name + '</td>'
-                                         + '<td>' + series[1].name + '</td>'
-                                         + '<td>' + series[2].name + '</td>'
-                                         + '<td>' + series[3].name + '</td>'
-                                         + '<td>' + series[4].name + '</td>'
-                                         + '<td>' + series[5].name + '</td>'
-                                         + '</tr>';
-                            for (var i = 0, l = axisData.length; i < l; i++) {
-                                table += '<tr>'
-                                         + '<td>' + axisData[i] + '</td>'
-                                         + '<td>' + series[0].data[i] + '</td>'
-                                         + '<td>' + series[1].data[i] + '</td>'
-                                         + '<td>' + series[2].data[i] + '</td>'
-                                         + '<td>' + series[3].data[i] + '</td>'
-                                         + '<td>' + series[4].data[i] + '</td>'
-                                         + '<td>' + series[5].data[i] + '</td>'
-                                         + '</tr>';
-                            }
-                            table += '</tbody></table></div>';
-                            return table;
-                        },
+                        // optionToContent: function(opt) {
+                        //     var axisData = opt.xAxis[0].data;
+                        //     var series = opt.series;
+                        //     var table = '<div style="height:350px;overflow:auto"><table style="width:100%;text-align:center;"><tbody><tr>'
+                        //                  + '<td>时间</td>'
+                        //                  + '<td>' + series[0].name + '</td>'
+                        //                  + '<td>' + series[1].name + '</td>'
+                        //                  + '<td>' + series[2].name + '</td>'
+                        //                  + '<td>' + series[3].name + '</td>'
+                        //                  + '<td>' + series[4].name + '</td>'
+                        //                  + '<td>' + series[5].name + '</td>'
+                        //                  + '</tr>';
+                        //     for (var i = 0, l = axisData.length; i < l; i++) {
+                        //         table += '<tr>'
+                        //                  + '<td>' + axisData[i] + '</td>'
+                        //                  + '<td>' + series[0].data[i] + '</td>'
+                        //                  + '<td>' + series[1].data[i] + '</td>'
+                        //                  + '<td>' + series[2].data[i] + '</td>'
+                        //                  + '<td>' + series[3].data[i] + '</td>'
+                        //                  + '<td>' + series[4].data[i] + '</td>'
+                        //                  + '<td>' + series[5].data[i] + '</td>'
+                        //                  + '</tr>';
+                        //     }
+                        //     table += '</tbody></table></div>';
+                        //     return table;
+                        // },
                     },//show是否显示表格，readOnly是否只读
                     magicType : {
                         //折线图  柱形图    总数统计 分开平铺
@@ -958,6 +978,16 @@ export default class CWBatteryCapacity extends Component {
         };
         return (
             <View style={styles.container}>
+                <TouchableOpacity 
+                    activeOpacity={0.5}
+                    style={{marginLeft:'90%',width:25,height:25}}  
+                    onPress={()=>this.table()}
+                >
+                    <Image
+                        style={{width:25,height:25}}
+                        source={require('../../img/dataTable/dataTable.png')}
+                    />
+                </TouchableOpacity>
                 <Echarts
                     option={option}
                     width={Dimensions.get('window').width}

@@ -20,6 +20,7 @@
     "react-native-ble-plx": "^0.9.1",
     "react-native-camera": "^1.1.4",
     "react-native-countdown-component": "^1.7.2",
+    "react-native-data-table": "^0.2.0",
     "react-native-datepicker": "^1.7.2",
     "react-native-deprecated-custom-components": "^0.1.2",
     "react-native-device-info": "^0.21.5",

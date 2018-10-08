@@ -99,7 +99,6 @@ class VoltageCurrent extends Component {
         chargerVoltageData = [];
         chargerElectricCurrentData=[];
         chargerTimeData=[];
-
         this.ChargerDetectorClearTime && clearTimeout(this.ChargerDetectorClearTime);
     }
 
@@ -134,8 +133,27 @@ class VoltageCurrent extends Component {
                 showTitle:true,
                 feature : {
                     dataView : {
-                        show: true, 
+                        show: false, 
                         readOnly: true,
+                        // optionToContent: function(opt) {
+                        //     var axisData = opt.xAxis[0].data;
+                        //     var series = opt.series;
+                        //     var table = '<div style="height:350px;overflow:auto"><table style="width:100%;text-align:center;"><tbody><tr>'
+                        //                  + '<td>时间</td>'
+                        //                  + '<td>' + series[0].name + '</td>'
+                        //                  + '<td>' + series[1].name + '</td>'
+                                         
+                        //                  + '</tr>';
+                        //     for (var i = 0, l = axisData.length; i < l; i++) {
+                        //         table += '<tr>'
+                        //                  + '<td>' + axisData[i] + '</td>'
+                        //                  + '<td>' + series[0].data[i] + '</td>'
+                        //                  + '<td>' + series[1].data[i] + '</td>'
+                        //                  + '</tr>';
+                        //     }
+                        //     table += '</tbody></table></div>';
+                        //     return table;
+                        // },
                     },//show是否显示表格，readOnly是否只读
                     magicType : {
                         //折线图  柱形图    总数统计 分开平铺
@@ -309,7 +327,29 @@ class Temperature extends Component {
                 show : true,
                 showTitle:true,
                 feature : {
-                    dataView : {show: true, readOnly: true},//show是否显示表格，readOnly是否只读
+                    dataView : {
+                        show: false, 
+                        readOnly: true,
+                        // optionToContent: function(opt) {
+                        //     var axisData = opt.xAxis[0].data;
+                        //     var series = opt.series;
+                        //     var table = '<div style="height:350px;overflow:auto"><table style="width:100%;text-align:center;"><tbody><tr>'
+                        //                  + '<td>时间</td>'
+                        //                  + '<td>' + series[0].name + '</td>'
+                        //                  + '<td>' + series[1].name + '</td>'
+                                         
+                        //                  + '</tr>';
+                        //     for (var i = 0, l = axisData.length; i < l; i++) {
+                        //         table += '<tr>'
+                        //                  + '<td>' + axisData[i] + '</td>'
+                        //                  + '<td>' + series[0].data[i] + '</td>'
+                        //                  + '<td>' + series[1].data[i] + '</td>'
+                        //                  + '</tr>';
+                        //     }
+                        //     table += '</tbody></table></div>';
+                        //     return table;
+                        // },
+                    },//show是否显示表格，readOnly是否只读
                     magicType : {
                         //折线图  柱形图    总数统计 分开平铺
                         //type: ['line'],//'line', 'bar','stack' ,'tiled'
@@ -485,7 +525,29 @@ class CapacityPower extends Component {
                 show : true,
                 showTitle:true,
                 feature : {
-                    dataView : {show: true, readOnly: true},//show是否显示表格，readOnly是否只读
+                    dataView : {
+                        show: false, 
+                        readOnly: true,
+                        // optionToContent: function(opt) {
+                        //     var axisData = opt.xAxis[0].data;
+                        //     var series = opt.series;
+                        //     var table = '<div style="height:350px;overflow:auto"><table style="width:100%;text-align:center;"><tbody><tr>'
+                        //                  + '<td>时间</td>'
+                        //                  + '<td>' + series[0].name + '</td>'
+                        //                  + '<td>' + series[1].name + '</td>'
+                                         
+                        //                  + '</tr>';
+                        //     for (var i = 0, l = axisData.length; i < l; i++) {
+                        //         table += '<tr>'
+                        //                  + '<td>' + axisData[i] + '</td>'
+                        //                  + '<td>' + series[0].data[i] + '</td>'
+                        //                  + '<td>' + series[1].data[i] + '</td>'
+                        //                  + '</tr>';
+                        //     }
+                        //     table += '</tbody></table></div>';
+                        //     return table;
+                        // },
+                    },//show是否显示表格，readOnly是否只读
                     magicType : {
                         //折线图  柱形图    总数统计 分开平铺
                         //type: ['line'],//'line', 'bar','stack' ,'tiled'
@@ -539,7 +601,7 @@ class CapacityPower extends Component {
         }; 
         return (
             <Echarts
-                option={option}
+                option={option} 
                 width={Dimensions.get('window').width}
             />
         );

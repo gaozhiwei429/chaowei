@@ -97,3 +97,34 @@ export function replaceTime(txt){
         }
         return time1;
 }
+
+//json 去重
+
+    function obj2key(obj, keys){    
+        var n = keys.length,       
+        key = [];    
+        while(n--){       
+        key.push(obj[keys[n]]);   
+        }    
+        return key.join('|')
+    }
+    
+    
+    /**
+     * 去重操作
+     * @param {object} array 待去重的数组
+     * @param  {object} keys 包含key值字符串的数组
+     * @return {object} 返回去重后的数组
+     */
+export function uniqeByKeys(array,keys){    
+        var arr = [];   
+        var hash = {};    
+        for (var i = 0, j = array.length; i < j; i++) {       
+        var k = obj2key(array[i], keys);       
+        if (!(k in hash)) {           
+        hash[k] = true;           
+        arr.push(array[i]);       
+     } 
+       }   
+        return arr ;
+    }

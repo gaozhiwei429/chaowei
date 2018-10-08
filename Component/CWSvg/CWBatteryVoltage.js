@@ -38,9 +38,12 @@ export default class CWBatteryVoltage extends Component {
             ybattery4:[],
             ybattery5:[],
             ybattery6:[],
+            TimeSorting1:[],
             previous:18,
             xTime:[],
             voltageData:[],
+            Loading:false,
+            batteryBind:[],
         };
     }
 
@@ -436,8 +439,8 @@ export default class CWBatteryVoltage extends Component {
                     {my_timestamp:item,voltage:null,battery_id:dataVoltage[0][0]}
                 )
         })
-        // console.log(battery1);
-        const ybattery1 = battery1.sort(function(a, b) {
+        
+        const TimeSorting1 =battery1.sort(function(a, b) {
             if (a.my_timestamp < b.my_timestamp ) {
                 return -1;
             } else if (a.my_timestamp > b.my_timestamp ) {
@@ -450,7 +453,8 @@ export default class CWBatteryVoltage extends Component {
                 }
                 return 0;
             }
-        }).map(item=>{
+        })
+        const ybattery1 = TimeSorting1.map(item=>{
             return item.voltage
         })
 
@@ -490,6 +494,7 @@ export default class CWBatteryVoltage extends Component {
         }).map(item=>{
             return item.voltage
         })
+        
         
         //电池3  
         const battery3 = voltage[0].map((item,i)=>{
@@ -623,6 +628,7 @@ export default class CWBatteryVoltage extends Component {
                 {my_timestamp:item,voltage:null,battery_id:dataVoltage[0][5]}
                 )
         })
+
         const ybattery6 = battery6.sort(function(a, b) {
             if (a.my_timestamp < b.my_timestamp ) {
                 return -1;
@@ -641,24 +647,21 @@ export default class CWBatteryVoltage extends Component {
         })
         
         this.setState({
+            voltage,
+            TimeSorting1,
             ybattery1,
             ybattery2,
             ybattery3,
             ybattery4,
             ybattery5,
             ybattery6,
-            xTime
+            xTime,
+            Loading:true,
+            batteryBind:dataVoltage,
         })
     }
 
     historyTime(whether){
-        // battery1VoltageData=[];
-        // battery2VoltageData=[];
-        // battery3VoltageData=[];
-        // battery4VoltageData=[];
-        // battery5VoltageData=[];
-        // battery6VoltageData=[];
-        // batteryWriteTime = [];
         this.battery1TimeVoltage && clearInterval(this.battery1TimeVoltage);
         this.battery2TimeVoltage && clearInterval(this.battery2TimeVoltage);
         this.battery3TimeVoltage && clearInterval(this.battery3TimeVoltage);
@@ -808,12 +811,20 @@ export default class CWBatteryVoltage extends Component {
         batteryWriteTime = [];
         promiseValues;
         voltageData=[];
-        this.battery1TimeVoltage && clearTimeout(this.battery1TimeVoltage);
-        this.battery2TimeVoltage && clearTimeout(this.battery2TimeVoltage);
-        this.battery3TimeVoltage && clearTimeout(this.battery3TimeVoltage);
-        this.battery4TimeVoltage && clearTimeout(this.battery4TimeVoltage);
-        this.battery5TimeVoltage && clearTimeout(this.battery5TimeVoltage);
-        this.battery6TimeVoltage && clearTimeout(this.battery6TimeVoltage);   
+        // this.battery1TimeVoltage && clearTimeout(this.battery1TimeVoltage);
+        // this.battery2TimeVoltage && clearTimeout(this.battery2TimeVoltage);
+        // this.battery3TimeVoltage && clearTimeout(this.battery3TimeVoltage);
+        // this.battery4TimeVoltage && clearTimeout(this.battery4TimeVoltage);
+        // this.battery5TimeVoltage && clearTimeout(this.battery5TimeVoltage);
+        // this.battery6TimeVoltage && clearTimeout(this.battery6TimeVoltage);
+    }
+
+    table(){
+        this.props.navigation.navigate('Table',{ 
+            localData:this.state.voltage,
+            batteryBind:this.state.batteryBind,
+            voltage:true,
+        })
     }
 
     static navigationOptions = {
@@ -831,7 +842,6 @@ export default class CWBatteryVoltage extends Component {
         headerBackImage: (<Image source={require('../../img/leftGoBack.png')} style={{width:18,height:14,marginLeft:15,marginRight:15}}/>),
     };
     render() {
-        
         const option= {
             title: {
                 text: '',
@@ -840,6 +850,7 @@ export default class CWBatteryVoltage extends Component {
             tooltip : { //点击某一个点的数据的时候，显示出悬浮窗
                 trigger: 'none',//item,axis,none
             },
+            smooth:true,
             legend: {//可以手动选择现实几个图标
                 data:['电池1','电池2','电池3','电池4','电池5','电池6'],
                 top:'top',   
@@ -852,34 +863,34 @@ export default class CWBatteryVoltage extends Component {
                 showTitle:true,
                 feature : {
                     dataView : {
-                        show: true, 
+                        show: false, 
                         readOnly: true,
-                        optionToContent: function(opt) {
-                            var axisData = opt.xAxis[0].data;
-                            var series = opt.series;
-                            var table = '<div style="height:350px;overflow:auto"><table style="width:100%;text-align:center;"><tbody><tr>'
-                                         + '<td>时间</td>'
-                                         + '<td>' + series[0].name + '</td>'
-                                         + '<td>' + series[1].name + '</td>'
-                                         + '<td>' + series[2].name + '</td>'
-                                         + '<td>' + series[3].name + '</td>'
-                                         + '<td>' + series[4].name + '</td>'
-                                         + '<td>' + series[5].name + '</td>'
-                                         + '</tr>';
-                            for (var i = 0, l = axisData.length; i < l; i++) {
-                                table += '<tr>'
-                                         + '<td>' + axisData[i] + '</td>'
-                                         + '<td>' + series[0].data[i] + '</td>'
-                                         + '<td>' + series[1].data[i] + '</td>'
-                                         + '<td>' + series[2].data[i] + '</td>'
-                                         + '<td>' + series[3].data[i] + '</td>'
-                                         + '<td>' + series[4].data[i] + '</td>'
-                                         + '<td>' + series[5].data[i] + '</td>'
-                                         + '</tr>';
-                            }
-                            table += '</tbody></table></div>';
-                            return table;
-                        },
+                        // optionToContent: function(opt) {
+                        //     var axisData = opt.xAxis[0].data;
+                        //     var series = opt.series;
+                        //     var table = '<div style="height:350px;overflow:auto"><table style="width:100%;text-align:center;"><tbody><tr>'
+                        //                  + '<td>时间</td>'
+                        //                  + '<td>' + series[0].name + '</td>'
+                        //                  + '<td>' + series[1].name + '</td>'
+                        //                  + '<td>' + series[2].name + '</td>'
+                        //                  + '<td>' + series[3].name + '</td>'
+                        //                  + '<td>' + series[4].name + '</td>'
+                        //                  + '<td>' + series[5].name + '</td>'
+                        //                  + '</tr>';
+                        //     for (var i = 0, l = axisData.length; i < l; i++) {
+                        //         table += '<tr>'
+                        //                  + '<td>' + axisData[i] + '</td>'
+                        //                  + '<td>' + series[0].data[i] + '</td>'
+                        //                  + '<td>' + series[1].data[i] + '</td>'
+                        //                  + '<td>' + series[2].data[i] + '</td>'
+                        //                  + '<td>' + series[3].data[i] + '</td>'
+                        //                  + '<td>' + series[4].data[i] + '</td>'
+                        //                  + '<td>' + series[5].data[i] + '</td>'
+                        //                  + '</tr>';
+                        //     }
+                        //     table += '</tbody></table></div>';
+                        //     return table;
+                        // },
                         // contentToOption:function(){
 
                         // }
@@ -970,11 +981,23 @@ export default class CWBatteryVoltage extends Component {
         };
         return (
             <View style={styles.container}>
+                <TouchableOpacity 
+                    activeOpacity={0.5}
+                    style={{marginLeft:'90%',width:25,height:25}}  
+                    onPress={()=>this.table()}
+                >
+                    <Image
+                        style={{width:25,height:25}}
+                        source={require('../../img/dataTable/dataTable.png')}
+                    />
+                </TouchableOpacity>
+                
                 <Echarts
                     option={option}
                     width={Dimensions.get('window').width}
                 />
-                <View style={styles.switching}>
+                
+                {/* <View style={styles.switching}> */}
                     {/* <TouchableOpacity style={styles.selected} onPress={()=>this.componentDidMount()}>
                         <Text>实时数据</Text>
                     </TouchableOpacity> */}
@@ -984,7 +1007,7 @@ export default class CWBatteryVoltage extends Component {
                     <TouchableOpacity style={styles.selected}  onPress={()=>this.historyTime(0)}>
                         <Text>下一页</Text>
                     </TouchableOpacity> */}
-                </View>
+                {/* </View> */}
             </View>
         );
     }

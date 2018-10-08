@@ -37,25 +37,12 @@ public class MainApplication extends Application implements ReactApplication {
 
     @Override
     protected List<ReactPackage> getPackages() {
-      return Arrays.<ReactPackage>asList(
-          new MainReactPackage(),
-            new LinearGradientPackage(),
-          new BaiduMapPackage(),
-          new RNFSPackage(),
-          new SplashScreenReactPackage(),
-          new BlePackage(),
-          new SvgPackage(),
-          new RNDeviceInfo(),
-          /*把视图控制器注册到应用中*/
-          new FlashLightPackage(),
-          new BleBroadcastPackage(),
-          new RNCameraPackage(),
-          new VectorIconsPackage(),
-          new SQLitePluginPackage(),   // register SQLite Plugin here
-          new WeChatPackage(),
-          new AlipayPackage(),
-          new OpenfolderPackage()
-      );
+      return Arrays.<ReactPackage>asList(new MainReactPackage(), new LinearGradientPackage(), new BaiduMapPackage(),
+          new RNFSPackage(), new SplashScreenReactPackage(), new BlePackage(), new SvgPackage(), new RNDeviceInfo(),
+          /* 把视图控制器注册到应用中 */
+          new FlashLightPackage(), new BleBroadcastPackage(), new RNCameraPackage(), new VectorIconsPackage(),
+          new SQLitePluginPackage(), // register SQLite Plugin here
+          new WeChatPackage(), new AlipayPackage(), new OpenfolderPackage());
     }
 
     @Override

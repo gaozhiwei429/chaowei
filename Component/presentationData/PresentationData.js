@@ -42,7 +42,7 @@ export default class PresentationData extends Component {
                         </TouchableOpacity>
                         <TouchableOpacity
                             style={styles.PresentationBtn}   
-                            onPress={ ()=>this.props.navigation.navigate('BatteryDataSvg') } >
+                            onPress={ ()=>this.props.navigation.navigate('TAB') } >
                             <Text>蓄电池数据</Text>  
                         </TouchableOpacity>
                         <TouchableOpacity 

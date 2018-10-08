@@ -4,12 +4,13 @@ import {
     View,
     Image,  
 } from 'react-native';
-import { createMaterialTopTabNavigator,TabNavigator } from 'react-navigation'
+import { TabNavigator } from 'react-navigation'
 
 import CWBatteryTemperature from '../CWSvg/CWBatteryTemperature';//温度
 import CWBatteryVoltage from '../CWSvg/CWBatteryVoltage';//电压
 import CWBatteryElectricCurrent from '../CWSvg/CWBatteryElectricCurrent';//电流
 import CWBatteryCapacity from '../CWSvg/CWBatteryCapacity';//容量
+import BattteryPower from '../CWSvg/BatteryPower';//功率
 
 const Tabs = TabNavigator({
     BatteryVoltage: {
@@ -36,29 +37,37 @@ const Tabs = TabNavigator({
             tabBarLabel: '容量',
         }
     },
-    // CWSvgBatteryone,  //电池1
-    // CWSvgBatterTwo,//电池2
-    // CWSvgBatteryThree,//电池3
-    // CWSvgBatteryFour,//电池4
+    BattteryPower: {
+        screen: BattteryPower,
+        navigationOptions: {
+            tabBarLabel: '功率',
+        }
+    },
 }, {
     //设置TabNavigator的位置
-    tabBarPosition: 'top',
-    backBehavior: 'none',
-    //...
+    tabBarPosition: 'bottom',
+    swipeEnabled:false,
+    animationEnabled:true,
+    // lazy:false,
+    backBehavior:'none',
     tabBarOptions: {
-        activeTintColor: '#474747',
+        activeTintColor: '#3BB6FF',     // 文字和图片选中颜色
+        activeBackgroundColor:'#fff',       //文字和图片选中的背景色
+        inactiveTintColor: '#999',      // 文字和图片默认颜色
+        inactiveBackgroundColor:'#fff',     //文字和图片默认的背景色
+        indicatorStyle: {height: 0},    // android 中TabBar下面会显示一条线，高度设为 0 后就不显示线了 暂时解决这个问题
         labelStyle: {
             fontSize: 17,
         },
         tabStyle: {
-            // width: 100,
-            height:40,
+            height:50,
         },
-        activeTabStyle: {
-            backgroundColor: 'red',
-        },
+        scrollEnabled:false,//是否启用可滚动选项卡
         style: {
-            backgroundColor: '#3BB6FF',
+            backgroundColor: '#F5FCFF',
+            paddingBottom:0,
+            borderColor:'#fff',
+
         },
     },
 });
@@ -76,16 +85,6 @@ Tabs.navigationOptions = {
     ),
     headerPressColorAndroid:'gray',
     headerBackImage: (<Image source={require('../../img/leftGoBack.png')} style={{width:18,height:14,marginLeft:15,marginRight:15}}/>),
-
-    // header:  /* Your custom header */
-    //     <View
-    //         style={{
-    //             height: 30,
-    //             marginTop: 10 /* only for IOS to give StatusBar Space */
-    //         }}
-    //     >
-    //         <Text>This is CustomHeader</Text>
-    //     </View>
 
 };
 

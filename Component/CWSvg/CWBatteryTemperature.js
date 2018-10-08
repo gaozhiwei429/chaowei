@@ -38,6 +38,7 @@ export default class CWBatteryTemperature extends Component {
             ybattery6:[],
             previous:0,
             xTime:[],
+            batteryBind:[],
         };
     }
 
@@ -637,13 +638,15 @@ export default class CWBatteryTemperature extends Component {
         })
 
         this.setState({
+            temperature,
             ybattery1,
             ybattery2,
             ybattery3,
             ybattery4,
             ybattery5,
             ybattery6,
-            xTime
+            xTime,
+            batteryBind:dataVoltage,
         })
 
 
@@ -802,6 +805,14 @@ export default class CWBatteryTemperature extends Component {
         this.battery6Time && clearTimeout(this.battery6Time);
     }
 
+    table(){
+        this.props.navigation.navigate('Table',{ 
+            localData:this.state.temperature,
+            batteryBind:this.state.batteryBind,
+            temperature:true,
+        })
+    }
+
     static navigationOptions = {
         headerTitle:(<Text style={{fontSize:20,flex: 1, textAlign: 'center'}}>蓄电池温度数据</Text>), 
         headerStyle: {
@@ -838,34 +849,34 @@ export default class CWBatteryTemperature extends Component {
                 showTitle:true,
                 feature : {
                     dataView : {
-                        show: true, 
+                        show: false, 
                         readOnly: true,
-                        optionToContent: function(opt) {
-                            var axisData = opt.xAxis[0].data;
-                            var series = opt.series;
-                            var table = '<div style="height:350px;overflow:auto"><table style="width:100%;text-align:center;"><tbody><tr>'
-                                         + '<td>时间</td>'
-                                         + '<td>' + series[0].name + '</td>'
-                                         + '<td>' + series[1].name + '</td>'
-                                         + '<td>' + series[2].name + '</td>'
-                                         + '<td>' + series[3].name + '</td>'
-                                         + '<td>' + series[4].name + '</td>'
-                                         + '<td>' + series[5].name + '</td>'
-                                         + '</tr>';
-                            for (var i = 0, l = axisData.length; i < l; i++) {
-                                table += '<tr>'
-                                         + '<td>' + axisData[i] + '</td>'
-                                         + '<td>' + series[0].data[i] + '</td>'
-                                         + '<td>' + series[1].data[i] + '</td>'
-                                         + '<td>' + series[2].data[i] + '</td>'
-                                         + '<td>' + series[3].data[i] + '</td>'
-                                         + '<td>' + series[4].data[i] + '</td>'
-                                         + '<td>' + series[5].data[i] + '</td>'
-                                         + '</tr>';
-                            }
-                            table += '</tbody></table></div>';
-                            return table;
-                        },
+                        // optionToContent: function(opt) {
+                        //     var axisData = opt.xAxis[0].data;
+                        //     var series = opt.series;
+                        //     var table = '<div style="height:350px;overflow:auto"><table style="width:100%;text-align:center;"><tbody><tr>'
+                        //                  + '<td>时间</td>'
+                        //                  + '<td>' + series[0].name + '</td>'
+                        //                  + '<td>' + series[1].name + '</td>'
+                        //                  + '<td>' + series[2].name + '</td>'
+                        //                  + '<td>' + series[3].name + '</td>'
+                        //                  + '<td>' + series[4].name + '</td>'
+                        //                  + '<td>' + series[5].name + '</td>'
+                        //                  + '</tr>';
+                        //     for (var i = 0, l = axisData.length; i < l; i++) {
+                        //         table += '<tr>'
+                        //                  + '<td>' + axisData[i] + '</td>'
+                        //                  + '<td>' + series[0].data[i] + '</td>'
+                        //                  + '<td>' + series[1].data[i] + '</td>'
+                        //                  + '<td>' + series[2].data[i] + '</td>'
+                        //                  + '<td>' + series[3].data[i] + '</td>'
+                        //                  + '<td>' + series[4].data[i] + '</td>'
+                        //                  + '<td>' + series[5].data[i] + '</td>'
+                        //                  + '</tr>';
+                        //     }
+                        //     table += '</tbody></table></div>';
+                        //     return table;
+                        // },
                     },//show是否显示表格，readOnly是否只读
                     magicType : {
                         //折线图  柱形图    总数统计 分开平铺
@@ -951,6 +962,16 @@ export default class CWBatteryTemperature extends Component {
         };
         return (
             <View style={styles.container}>
+                <TouchableOpacity
+                    activeOpacity={0.5}
+                    style={{marginLeft:'90%',width:25,height:25}}  
+                    onPress={()=>this.table()}
+                >
+                    <Image
+                        style={{width:25,height:25}}
+                        source={require('../../img/dataTable/dataTable.png')}
+                    />
+                </TouchableOpacity>
                 <Echarts
                     option={option}
                     width={Dimensions.get('window').width}

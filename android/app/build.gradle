@@ -157,7 +157,7 @@ android {
 }
 
 dependencies {
-    compile 'qiuxiang:baidumap-sdk:0.0.5'//百度sdk
+    // compile 'qiuxiang:baidumap-sdk:0.0.5'//百度sdk
     compile project(':react-native-linear-gradient')
     compile project(':react-native-baidumap-sdk')
     compile project(':react-native-fs')
