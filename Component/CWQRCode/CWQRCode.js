@@ -139,6 +139,7 @@ export default class CWQRCode extends Component {
         });
         let flash =this.state.switchFlash;
         QRCodeScanner.switchState(flash, () => {
+            
         }, (message) => {
             console.error(message);
         })

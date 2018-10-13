@@ -50,9 +50,13 @@ function bindSingle(){
     var endMark=equipmentList.concat('20',commonality.padding(others.length+1,2));//
     var endRepair = equipmentList.concat('0000');//填补
     if(others.length === otherIndex+1){
-        bleBroadcast.start(commandList ,endMark);// BLE广播
+        bleBroadcast.start(commandList ,endMark ,()=>{
+            alert('手机不支持广播')
+        });// BLE广播
     }else {
-        bleBroadcast.start(commandList ,endRepair);// BLE广播
+        bleBroadcast.start(commandList ,endRepair,()=>{
+            alert('手机不支持广播')
+        });// BLE广播
     }
     // var con=commandList.concat(equipmentList);//广播的数据
     // console.log(con);//广播的数据 
@@ -351,7 +355,7 @@ export default class CWHome extends Component {
         if(this.state.BleScanErr){
             this.refs.bleScan.open();
         }else{ 
-            if(PhoneBind[0][0] !== '123'){
+            if(PhoneBind[0] !== '123'){
                 bindSingle();
                 this.refs.toast.show('开始绑定!',1500);
                 if(BleScan !== undefined){

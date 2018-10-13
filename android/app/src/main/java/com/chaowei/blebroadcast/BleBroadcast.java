@@ -14,6 +14,7 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReactContext;
 import android.os.ParcelUuid;
+import com.facebook.react.bridge.Callback;
 import static com.facebook.react.bridge.UiThreadUtil.runOnUiThread;
 
 public class BleBroadcast extends ReactContextBaseJavaModule {
@@ -37,12 +38,13 @@ public class BleBroadcast extends ReactContextBaseJavaModule {
         return bluetoothAdapter;
     }
 
-    private BluetoothManager getBluetoothManager() {
-        if (bluetoothManager == null) {
-            bluetoothManager = (BluetoothManager) context.getSystemService(Context.BLUETOOTH_SERVICE);
-        }
-        return bluetoothManager;
-    }
+    // private BluetoothManager getBluetoothManager() {
+    // if (bluetoothManager == null) {
+    // bluetoothManager = (BluetoothManager)
+    // context.getSystemService(Context.BLUETOOTH_SERVICE);
+    // }
+    // return bluetoothManager;
+    // }
 
     @Override
     public String getName() {
@@ -50,32 +52,39 @@ public class BleBroadcast extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void start(String str2, String str) {
+    public void start(String str2, String str, Callback error) {
+
         if (getBluetoothAdapter() == null) {
             toast("蓝牙不支持");
             return;
         }
 
         if (!bluetoothAdapter.isEnabled()) {
-            toast("请打开蓝牙开关");
+            // toast("请打开蓝牙开关");
+            // error.invoke(true);
             return;
         }
+
         if (!bluetoothAdapter.isMultipleAdvertisementSupported()) {
-            toast("当前手机不支持蓝牙广播");// BLE Advertise
+            // toast("当前手机不支持蓝牙广播1");// BLE Advertise
+            error.invoke(true);
             return;
         }
         mBluetoothLeAdvertiser = bluetoothAdapter.getBluetoothLeAdvertiser();
         if (mBluetoothLeAdvertiser == null) {
-            toast("当前手机不支持蓝牙广播");
+            // toast("当前手机不支持蓝牙广播2");
+            error.invoke(true);
             return;
         }
 
         AdvertiseSettings advertiseSettings = createAdvSettings(false, 0);
 
         if (advertiseSettings == null) {
-            toast("当前手机不支持蓝牙广播");
+            // toast("当前手机不支持蓝牙广播");
+            error.invoke(true);
             return;
         }
+
         final byte[] broadcastData = BleBroadcast.hexStringToBytes(str);
         final byte[] broadcastData2 = BleBroadcast.hexStringToBytes(str2);
         mBluetoothLeAdvertiser.stopAdvertising(mAdvertiseCallback);
