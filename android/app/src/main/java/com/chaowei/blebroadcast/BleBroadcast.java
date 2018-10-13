@@ -50,18 +50,18 @@ public class BleBroadcast extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void start(String str2,String str) {
+    public void start(String str2, String str) {
         if (getBluetoothAdapter() == null) {
             toast("蓝牙不支持");
             return;
         }
 
         if (!bluetoothAdapter.isEnabled()) {
-//            toast("请打开蓝牙开关");
+            toast("请打开蓝牙开关");
             return;
         }
         if (!bluetoothAdapter.isMultipleAdvertisementSupported()) {
-            toast("当前手机不支持蓝牙广播");//BLE Advertise
+            toast("当前手机不支持蓝牙广播");// BLE Advertise
             return;
         }
         mBluetoothLeAdvertiser = bluetoothAdapter.getBluetoothLeAdvertiser();
@@ -83,7 +83,8 @@ public class BleBroadcast extends ReactContextBaseJavaModule {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mBluetoothLeAdvertiser.startAdvertising(createAdvSettings(true, 0), createAdvertiseData(broadcastData,broadcastData2), mAdvertiseCallback);
+                mBluetoothLeAdvertiser.startAdvertising(createAdvSettings(true, 0),
+                        createAdvertiseData(broadcastData, broadcastData2), mAdvertiseCallback);
 
             }
         });
@@ -109,25 +110,29 @@ public class BleBroadcast extends ReactContextBaseJavaModule {
         return mAdvertiseSettings;
     }
 
-    public AdvertiseData createAdvertiseData(byte[]  data,byte[]  data1) {
+    public AdvertiseData createAdvertiseData(byte[] data, byte[] data1) {
         AdvertiseData.Builder mDataBuilder = new AdvertiseData.Builder();
 
-        //mDataBuilder.addServiceUuid( ParcelUuid.fromString("0000ffe1-0000-1000-8000-00805f9b34fb"));
-        //mDataBuilder.addServiceData( ParcelUuid.fromString("0000ae8f-0000-1000-8000-00805f9b34fb"),new byte[]{0x64,0x12});
+        // mDataBuilder.addServiceUuid(
+        // ParcelUuid.fromString("0000ffe1-0000-1000-8000-00805f9b34fb"));
+        // mDataBuilder.addServiceData(
+        // ParcelUuid.fromString("0000ae8f-0000-1000-8000-00805f9b34fb"),new
+        // byte[]{0x64,0x12});
 
-       // int a =data1[0];
-       // int b =data1[0]<<8;
-//       int h =(data1[0]<<8)+0x01;
-        int h =(data1[0])+(data1[1]<<8);
-       //int h =a+b;
-       //mDataBuilder.addManufacturerData(data1[1], data);
+        // int a =data1[0];
+        // int b =data1[0]<<8;
+        // int h =(data1[0]<<8)+0x01;
+        int h = (data1[0]) + (data1[1] << 8);
+        // int h =a+b;
+        // mDataBuilder.addManufacturerData(data1[1], data);
         mDataBuilder.addManufacturerData(h, data);
         AdvertiseData mAdvertiseData = mDataBuilder.build();
         return mAdvertiseData;
     }
+
     private AdvertiseCallback mAdvertiseCallback = new AdvertiseCallback() {
         @Override
-        public void onStartSuccess(AdvertiseSettings settingsInEffect){
+        public void onStartSuccess(AdvertiseSettings settingsInEffect) {
             super.onStartSuccess(settingsInEffect);
 
             // ToastUtils.showToast(MainActivity.this, "开启广播成功", 2000);
@@ -136,7 +141,8 @@ public class BleBroadcast extends ReactContextBaseJavaModule {
         @Override
         public void onStartFailure(int errorCode) {
             super.onStartFailure(errorCode);
-            // ToastUtils.showToast(MainActivity.this, "开启广播失败 errorCode：" + errorCode, 2000);
+            // ToastUtils.showToast(MainActivity.this, "开启广播失败 errorCode：" + errorCode,
+            // 2000);
         }
     };
 
@@ -145,8 +151,8 @@ public class BleBroadcast extends ReactContextBaseJavaModule {
             return null;
         }
         hexString = hexString.toUpperCase();
-        if(hexString.length()%2!=0){
-            hexString="0"+hexString;
+        if (hexString.length() % 2 != 0) {
+            hexString = "0" + hexString;
         }
 
         int length = hexString.length() / 2;
@@ -158,6 +164,7 @@ public class BleBroadcast extends ReactContextBaseJavaModule {
         }
         return d;
     }
+
     public static byte charToByte(char c) {
         return (byte) "0123456789ABCDEF".indexOf(c);
     }

@@ -6,7 +6,8 @@ import {
     TouchableOpacity,
     Dimensions,
     Alert,
-    Image
+    Image,
+    ScrollView
 } from 'react-native';
 
 import Echarts from 'native-echarts';
@@ -384,7 +385,6 @@ export default class CWBatteryCapacity extends Component {
         });
 
         */}
-
 
         //蓄电池存储数据
         const batteryBind = await Promise.all([promise2]);
@@ -977,7 +977,7 @@ export default class CWBatteryCapacity extends Component {
             ],
         };
         return (
-            <View style={styles.container}>
+            <ScrollView style={styles.container}>
                 <TouchableOpacity 
                     activeOpacity={0.5}
                     style={{marginLeft:'90%',width:25,height:25}}  
@@ -1003,7 +1003,7 @@ export default class CWBatteryCapacity extends Component {
                         <Text>下一页</Text>
                     </TouchableOpacity> */}
                 </View>
-            </View>
+            </ScrollView>
         );
     }
 }

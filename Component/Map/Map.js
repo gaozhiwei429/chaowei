@@ -123,10 +123,11 @@ export default class Map extends Component {
             iconLat:latitude,
             iconLon:longitude,
         })
-        // console.log(latitude,longitude,'图标位置');
-        // console.log(this.state.location.latitude,this.state.location.longitude,'当前位置');
+        console.log(latitude,longitude,'图标位置');
+        console.log(this.state.location.latitude,this.state.location.longitude,'当前位置');
     }
     async openMap(){
+        
         this.ActionSheet.show();
         const { location, iconLat, iconLon } = this.state;
 
@@ -201,10 +202,9 @@ export default class Map extends Component {
                                 <Text>可步行</Text>
                                 <Text>{this.state.distance}米</Text>
                             </View> */}
-                            <TouchableOpacity style={{flex:1,alignItems:'center'}} onPress={()=>this.openMap()}>
+                            {/* <TouchableOpacity style={{flex:1,alignItems:'center'}} onPress={()=>this.openMap()}>
                                 <Text style={{fontSize:25,color:'#808080'}}>点击导航</Text>
-                                {/* <Text style={{fontSize:25,color:'#111'}}>{this.state.distance}米</Text> */}
-                            </TouchableOpacity>
+                            </TouchableOpacity> */}
                         </View>
                     </View>:<View/>
                 }
@@ -214,12 +214,12 @@ export default class Map extends Component {
                     location={this.state.location}
                     locationMode='follow'    
                     zoomLevel={18}//缩放级别，取值范围 [3, 21]
-                    locationEnabled //是否显示定位图层    
-                    zoomControlsDisabled//是否禁用缩放按钮
-                    overlookDisabled//是否禁用倾斜手势 
+                    locationEnabled //显示定位图层    
+                    zoomControlsDisabled//禁用缩放按钮
+                    overlookDisabled//禁用倾斜手势 
                     onClick={this.onClick}
                     onStatusChange={this.onStatusChange}
-                    rotateDisabled//
+                    rotateDisabled//禁用选择手势
                     buildingsDisabled//禁用3D建筑
                 >
                     

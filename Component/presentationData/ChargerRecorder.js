@@ -10,14 +10,16 @@ import CWBtnCell from "../CWButton/CWBtnCell";
 import * as commonality from '../../commonality';
 import { LOGGER_STORAGE_KEY } from '../../config';
 import * as storage from '../../storage';
+import AlertS from '../Alert/Alert';
 
 export default class ChargerRecorder extends Component {
 
     constructor(){
         super();
         this.state = {
-            ChargerRecorder:'',
+            ChargerRecorder:[],
             status:'',
+            BleScanErr:false,
         };
         this.deviceMap = new Map();
     } 
@@ -30,18 +32,20 @@ export default class ChargerRecorder extends Component {
                 return;
             }
             this.setState({
-                ChargerRecorder
+                ChargerRecorder:result
             })
         })
         
-        /**蓝牙扫描绑定*/
+        /**蓝牙搜索*/
         this.deviceMap.clear();
         BluetoothManager.manager.startDeviceScan(null, null, (error, device) => {
             if (error) {
                 if(error.errorCode == 102){
                     this.refs.bleScan.open();
+                    this.setState({
+                        BleScanErr:true
+                    })
                 }
-                console.log(error);
                 return;  
             }else{
                 this.deviceMap.set(device.id,device); //使用Map类型保存搜索到的蓝牙设备，确保列表不显示重复的设备
@@ -59,7 +63,7 @@ export default class ChargerRecorder extends Component {
                         let BleScanId5 = BleScanArrayId.slice(8, 10);
                         let BleScanId6 = BleScanArrayId.slice(10, 12);
                         var BleScanId = BleScanId6.concat(BleScanId5, BleScanId4, BleScanId3, BleScanId2, BleScanId1).toLowerCase();
-                        if(BleScanId == this.state.ChargerRecorder && Interception==chargerDetectorIdentifier){
+                        if(BleScanId == this.state.ChargerRecorder[0] && Interception==chargerDetectorIdentifier){
                             this.setState({
                                 status:paseInt(BleDataArray.slice(32,34),16),
                             })
@@ -89,6 +93,7 @@ export default class ChargerRecorder extends Component {
 
         return (
             <View style={styles.container}>
+                <AlertS ref='bleScan' title='提示' btnText='确定' msg='请先打开蓝牙开关！' />
                 <View style={styles.status}>
                     <Text style={styles.statusHeader}>状态：</Text>
                     <Text style={styles.statusText}>{
@@ -99,6 +104,7 @@ export default class ChargerRecorder extends Component {
                         :this.state.status===4?'充电故障保护状态'
                         :this.state.status===5?'零点校准模式'
                         :this.state.status===6?'参数校准模式'
+                        :this.state.BleScanErr===true?'蓝牙未开启'
                         :'搜索中...'
                         }</Text>
                 </View>

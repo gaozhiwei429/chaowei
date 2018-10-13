@@ -19,112 +19,24 @@ import { CHARGER_BIND_STORAGE_KEY } from '../../config';
 var sqLite = new SQLiteText();
 var db;
 
-var chargerVoltageData = [];
-var chargerElectricCurrentData=[];
-var chargerTemperatureData=[];
-var chargerCapacityData=[];
-var chargerTimeData=[];
-var promiseValues;
+
 export default class ChargerSvg extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            chargerVoltage:[],
-            chargerElectricCurrent:[],
-            chargerTemperature:[],
-            chargerCapacity:[],
-            chargerTimeData:[],
-            chargerTime:[],
-            previous:0,
-
             xTime:[],
             chargerData:[],
         };
     }
 
     async componentDidMount(){
-        chargerVoltageData = [];
-        chargerElectricCurrentData=[];
-        chargerTemperatureData=[];
-        chargerCapacityData=[];
-        chargerTimeData=[];
-        this.setState({
-            previous:0,
-        });
+
         //开启数据库
         if(!db){
             db = await sqLite.open();
         }
         //删除数据
         // sqLite.deleteData();
-
-        {/*
-        // 充电器
-        storage.get(CHARGER_BIND_STORAGE_KEY, (error, result) => {
-            if (error) {
-                reject(error);
-                return;
-            }
-            promiseValues=result;
-            //查询
-            db.transaction((tx)=>{
-                tx.executeSql("SELECT * FROM (SELECT * FROM charger WHERE charger_id='"+result[0]+"' ORDER BY id DESC )  AS chargerTab ORDER BY my_timestamp ASC", [],(tx,results)=>{
-                    // SELECT * FROM (SELECT *FROM group_chatmsg_v WHERE ((group_Id=46 AND send_user_id=28 AND receive_user_id=70) OR (group_Id=46 AND receive_user_id=28 AND STATUS=1)) AND is_delete =0 ORDER BY crtime DESC LIMIT 15)  AS chatMsgTable ORDER BY crtime ASC
-                    var len = results.rows.length;
-                    for(var i=0; i<len; i++){
-                        var u = results.rows.item(i);    
-                        chargerVoltageData.push(u.voltage);
-                        chargerElectricCurrentData.push(u.electric_current);
-                        chargerTemperatureData.push(u.chargerTemperature);
-                        chargerCapacityData.push(u.capacity);
-                        chargerTimeData.push(u.my_timestamp);    
-                    }
-                    this.setState({
-                        chargerVoltage:chargerVoltageData,
-                        chargerElectricCurrent:chargerElectricCurrentData,
-                        chargerTemperature:chargerTemperatureData,
-                        chargerCapacity:chargerCapacityData,
-                        chargerTime:chargerTimeData,
-                    })
-                });
-            },(error)=>{
-                console.log(error);
-            });
-            const chargerFeedback = () => {
-                alert('1');
-                //查询
-                db.transaction((tx)=>{
-                    tx.executeSql("select * from charger where charger_id= '"+result[0]+"' order by my_timestamp desc limit 1", [],(tx,results)=>{
-                        var len = results.rows.length;
-                        for(var i=0; i<len; i++){
-                            var u = results.rows.item(i);
-                            chargerVoltageData.push(u.voltage);
-                            chargerElectricCurrentData.push(u.electric_current);
-                            chargerTemperatureData.push(u.chargerTemperature);
-                            chargerCapacityData.push(u.capacity);
-                            chargerTimeData.push(u.my_timestamp); 
-                        }  
-                        this.setState({
-                            chargerVoltage:chargerVoltageData,
-                            chargerElectricCurrent:chargerElectricCurrentData,
-                            chargerTemperature:chargerTemperatureData,
-                            chargerCapacity:chargerCapacityData,
-                            chargerTime:chargerTimeData,
-                        });
-                        this.chargerClearTime = setTimeout(chargerFeedback, 1000);
-                    });
-                },(error)=>{ 
-                    console.log(error);
-                });
-            };
-            this.chargerClearTime && setTimeout(chargerFeedback, 1000);
-        });
-
-        */}
-
-
-
-
 
         /** 充电器*/
         let CHARGER_BIND=new Promise(function (resolve,reject) {
@@ -157,7 +69,7 @@ export default class ChargerSvg extends Component {
         })
 
         let chargerData = await Promise.all([voltageData]);
-
+        
         // 取到时间
         const repeatTime=chargerData[0].map((item,i) => {
             return item.my_timestamp
@@ -172,86 +84,15 @@ export default class ChargerSvg extends Component {
             chargerData:commonality.uniqeByKeys(...chargerData,['my_timestamp']),
             xTime, 
         })
-
-
-    }
-
-    async historyTime(whether){
-        chargerVoltageData = [];
-        chargerElectricCurrentData=[];
-        chargerTemperatureData=[];
-        chargerCapacityData=[];
-        chargerTimeData=[]; 
-        this.chargerClearTime && clearTimeout(this.chargerClearTime);
-        if(whether===0){ 
-            this.setState({
-                previous:this.state.previous+18,
-            });
-        }else{
-            if(this.state.previous-18<0){
-                Alert.alert('','sorry，查到最顶部没有数据了！',[{
-                    text:'确定',onPress:()=>{}   
-                }])
-                return;  
-            }else{
-                this.setState({
-                    previous:this.state.previous-18,
-                });
-            }
-        }
-
-        //开启数据库
-        if(!db){
-            db = await sqLite.open();
-        }
-
-        //查询
-        db.transaction((tx)=>{
-            tx.executeSql("SELECT * FROM (SELECT * FROM charger WHERE charger_id='"+promiseValues[0]+"' ORDER BY id DESC LIMIT '"+this.state.previous+"',18)  AS chargerTab ORDER BY my_timestamp ASC", [],(tx,results)=>{
-                //"SELECT * FROM (SELECT * FROM charger WHERE charger_id='"+promiseValues[0]+"' ORDER BY id DESC LIMIT 18 OFFSET 16)  AS chargerTab ORDER BY my_timestamp ASC"
-                var len = results.rows.length;
-                if(len<1){
-                    Alert.alert('','sorry，数据查完了！',[{
-                        text:'确定',onPress:()=>{}  
-                    }])
-                    this.setState({
-                        previous:this.state.previous-18,
-                    })
-                    return;
-                }
-                for(var i=0; i<len; i++){
-                    var u = results.rows.item(i);
-                    chargerVoltageData.push(u.voltage);
-                    chargerElectricCurrentData.push(u.electric_current);
-                    chargerTemperatureData.push(u.chargerTemperature);
-                    chargerCapacityData.push(u.capacity);
-                    chargerTimeData.push(u.my_timestamp);  
-                }
-                this.setState({
-                    chargerVoltage:chargerVoltageData,
-                    chargerElectricCurrent:chargerElectricCurrentData,
-                    chargerTemperature:chargerTemperatureData,
-                    chargerCapacity:chargerCapacityData,
-                    chargerTime:chargerTimeData,
-                })
-            });
-        },(error)=>{
-            console.log(error);
-        });
-
     }
 
     componentWillUnmount() {
-        chargerVoltageData = [];
-        chargerElectricCurrentData=[];
-        chargerTemperatureData=[];
-        chargerCapacityData=[];
-        chargerTimeData=[];
         this.chargerClearTime && clearTimeout(this.chargerClearTime);
     }
+
     table(){
         this.props.navigation.navigate('Table',{
-            charger:0,
+            charger:true,
             localData:[this.state.chargerData],
         })
     }
@@ -267,6 +108,7 @@ export default class ChargerSvg extends Component {
         headerPressColorAndroid:'gray',
         headerBackImage: (<Image source={require('../../img/leftGoBack.png')} style={{width:18,height:14,marginLeft:15,marginRight:15}}/>),
     };
+
     render() {
         const option= {
             title : {
@@ -390,7 +232,7 @@ export default class ChargerSvg extends Component {
             ],
         };
         return (
-            <View style={styles.container}>
+            <ScrollView style={styles.container}>
                 <TouchableOpacity 
                     activeOpacity={0.5}
                     style={{marginLeft:'90%',width:25,height:25}}  
@@ -405,19 +247,7 @@ export default class ChargerSvg extends Component {
                     option={option}
                     width={Dimensions.get('window').width}
                 />
-               
-                {/* <View style={styles.switching}>
-                    <TouchableOpacity style={styles.selected} onPress={()=>this.componentDidMount()}>
-                        <Text>实时数据</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.selected}  onPress={()=>this.historyTime(1)}>
-                        <Text>上一页</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.selected}  onPress={()=>this.historyTime(0)}>
-                        <Text>下一页</Text>
-                    </TouchableOpacity>
-                </View> */}
-            </View> 
+            </ScrollView> 
         );
     }
 }

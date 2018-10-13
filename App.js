@@ -52,7 +52,7 @@ import TAB from './Component/presentationData/TAB';//蓄电池数据(滑动)
 import Shopping from './Component/Shopping/Shopping';//商城 
 import RSSI from './Component/CWBleSearch/RSSI';//RSSI
 import ChargerRecorder from "./Component/presentationData/ChargerRecorder";//充电器检测仪
-import Table from './Component/Table/Table';//表
+import Table from './Component/Table/Table';//数据视图表
 
 //测试
 import ListView from './Component/ListView/ListView'

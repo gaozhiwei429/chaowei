@@ -89,7 +89,7 @@ export default class Table extends Component {
   
   renderHeader() {
     const { params } = this.props.navigation.state;
-    const { localData,charger,batteryBind, } = params;
+    const { charger,batteryBind,detectorVoltageCurrent,detectorTemperature,CapacityPower, } = params;
 
     return (
       <Header>
@@ -100,7 +100,20 @@ export default class Table extends Component {
           width={2}
         />
         
-        {charger==0?
+        {
+          CapacityPower?
+          <HeaderCell 
+            width={0}
+          />:detectorTemperature?
+          <HeaderCell width={0}/>:
+          detectorVoltageCurrent?
+          <HeaderCell
+            style={styles.headerCell}
+            key="1"
+            text='电压'
+            width={1}
+            isAscending={false}
+          />:charger?
           <HeaderCell
             style={styles.headerCell}
             key="1"
@@ -117,7 +130,19 @@ export default class Table extends Component {
           />:<HeaderCell width={0}/>
           }
         
-        {charger==0?
+        {
+          CapacityPower?
+          <HeaderCell  width={0}/>:
+          detectorTemperature?
+          <HeaderCell width={0}/>:
+          detectorVoltageCurrent?
+          <HeaderCell
+            style={styles.headerCell}
+            key="3"
+            text={'电流'}
+            width={1}
+            isAscending={false}
+          />:charger?
           <HeaderCell
             style={styles.headerCell}
             key="3"
@@ -135,13 +160,24 @@ export default class Table extends Component {
           />:<HeaderCell width={0}/>
         }
 
-        {charger==0?
+        {
+          CapacityPower?
+          <HeaderCell  width={0}/>:
+          detectorTemperature?
           <HeaderCell
           style={styles.headerCell}
           key="5"
-          text='温度'
+          text='电路板温度'
           width={1}
-        />:batteryBind[0].length>=3?
+        />:
+          detectorVoltageCurrent?
+          <HeaderCell width={0}/>:charger?
+          <HeaderCell
+            style={styles.headerCell}
+            key="5"
+            text='温度'
+            width={1}
+          />:batteryBind[0].length>=3?
         <HeaderCell
           style={styles.headerCell}
           key="6"
@@ -151,7 +187,23 @@ export default class Table extends Component {
         />:<HeaderCell width={0}/>
       }
 
-        {charger==0?
+        {
+          CapacityPower?
+          <HeaderCell 
+            style={styles.headerCell}
+            key="1"
+            text='容量'
+            width={1}
+            isAscending={false}
+          />:
+          detectorTemperature?
+          <HeaderCell
+          style={styles.headerCell}
+          key="6"
+          text='环境温度'
+          width={1}
+        />:detectorVoltageCurrent?
+          <HeaderCell width={0}/>:charger?
           <HeaderCell
           style={styles.headerCell}
           key="7"
@@ -167,19 +219,40 @@ export default class Table extends Component {
         />:<HeaderCell width={0}/>
       }
 
-      {charger==0?<HeaderCell width={0}/>:
-        batteryBind[0].length>=5?
-        <HeaderCell
-          style={styles.headerCell}
-          key="9"
-          text='电池5'
-          width={1}
-          isAscending={false}
-        />:<HeaderCell width={0}/>
+      {
+          CapacityPower?
+          <HeaderCell 
+            style={styles.headerCell}
+            key="1"
+            text='功率'
+            width={1}
+            isAscending={false}
+          />:
+          detectorTemperature?
+          <HeaderCell width={0}/>:
+          detectorVoltageCurrent?
+          <HeaderCell width={0}/>:
+          charger?
+          <HeaderCell width={0}/>:
+          batteryBind[0].length>=5?
+          <HeaderCell
+            style={styles.headerCell}
+            key="9"
+            text='电池5'
+            width={1}
+            isAscending={false}
+          />:<HeaderCell width={0}/>
       }
 
       {
-        charger==0?<HeaderCell width={0}/>:
+        CapacityPower?
+        <HeaderCell  width={0}/>:
+        detectorTemperature?
+        <HeaderCell width={0}/>:
+        detectorVoltageCurrent?
+        <HeaderCell width={0}/>:
+        charger?
+        <HeaderCell width={0}/>:
         batteryBind[0].length>=6?
         <HeaderCell
           style={styles.headerCell}
@@ -197,7 +270,7 @@ export default class Table extends Component {
   renderRow(item) {
     let rowStyle = item.id%2 === 0  ? styles.whiteRow : styles.row;
     const { params } = this.props.navigation.state;
-    const { charger,batteryBind,capacity,electric_current,temperature,voltage,power } = params;
+    const { charger,batteryBind,capacity,electric_current,temperature,voltage,power,detectorVoltageCurrent,detectorTemperature,CapacityPower } = params;
     return (
       <Row style={rowStyle}>
         {/* 时间 */}
@@ -205,154 +278,205 @@ export default class Table extends Component {
           {item.my_timestamp}
         </Cell>
 
-        {charger==0?  //充电器电压
+        {
+          CapacityPower?
+          <Cell width={0}/>:
+          detectorTemperature?
+          <Cell width={0}/>:detectorVoltageCurrent?
+          <Cell style={styles.cell} width={1}>
+            {item.voltage}
+          </Cell>:charger?  //充电器电压
           <Cell style={styles.cell} width={1}>
             {item.voltage}
           </Cell>:
-          capacity===true&&batteryBind[0].length>=1?
+          capacity&&batteryBind[0].length>=1?
           <Cell style={styles.cell} width={1}>
             {batteryBind&&batteryBind[0][0]==item.battery_id?item.capacity:null}
           </Cell>:
-          electric_current===true&&batteryBind[0].length>=1?
+          electric_current&&batteryBind[0].length>=1?
           <Cell style={styles.cell} width={1}>
             {batteryBind&&batteryBind[0][0]==item.battery_id?item.electric_current:null}
           </Cell>:
-          temperature===true&&batteryBind[0].length>=1?
+          temperature&&batteryBind[0].length>=1?
           <Cell style={styles.cell} width={1}>
             {batteryBind&&batteryBind[0][0]==item.battery_id?item.temperature:null}
           </Cell>:
-          voltage===true&&batteryBind[0].length>=1?
+          voltage&&batteryBind[0].length>=1?
           <Cell style={styles.cell} width={1}>
             {batteryBind&&batteryBind[0][0]==item.battery_id?item.voltage:null}
           </Cell>:
-          power===true&&batteryBind[0].length>=1?
+          power&&batteryBind[0].length>=1?
           <Cell style={styles.cell} width={1}>
             {batteryBind&&batteryBind[0][0]==item.battery_id?item.voltage*item.electric_current:null}
           </Cell>:
           <Cell width={0}/>
         }
 
-        {charger==0?  //充电器温度
+        {
+          CapacityPower?
+          <Cell width={0}/>:
+          detectorTemperature?
+          <Cell width={0}/>:
+          detectorVoltageCurrent?
           <Cell style={styles.cell} width={1}>
             {item.electric_current} 
           </Cell>:
-          capacity===true&&batteryBind[0].length>=2?
+          charger?  //充电器电流
+          <Cell style={styles.cell} width={1}>
+            {item.electric_current} 
+          </Cell>:
+          capacity&&batteryBind[0].length>=2?
           <Cell style={styles.cell} width={1}>
             {batteryBind&&batteryBind[0][1]==item.battery_id?item.capacity:null}
           </Cell>:
-          electric_current===true&&batteryBind[0].length>=2?
+          electric_current&&batteryBind[0].length>=2?
           <Cell style={styles.cell} width={1}>
             {batteryBind&&batteryBind[0][1]==item.battery_id?item.electric_current:null}
           </Cell>:
-          temperature===true&&batteryBind[0].length>=2?
+          temperature&&batteryBind[0].length>=2?
           <Cell style={styles.cell} width={1}>
             {batteryBind&&batteryBind[0][1]==item.battery_id?item.temperature:null}
           </Cell>:
-          voltage===true&&batteryBind[0].length>=2?
+          voltage&&batteryBind[0].length>=2?
           <Cell style={styles.cell} width={1}>
             {batteryBind&&batteryBind[0][1]==item.battery_id?item.voltage:null}
           </Cell>:
-          power===true&&batteryBind[0].length>=2?
+          power&&batteryBind[0].length>=2?
           <Cell style={styles.cell} width={1}>
             {batteryBind&&batteryBind[0][1]==item.battery_id?item.voltage*item.electric_current:null}
           </Cell>:
           <Cell width={0}/>
         }
         
-        {charger==0?    //充电器电流
+        {
+          CapacityPower?
+          <Cell width={0}/>:
+          detectorTemperature?//检测仪电路板温度
+          <Cell style={styles.cell} width={1}>
+            {item.BoardTemperature}
+          </Cell>:
+          detectorVoltageCurrent?
+          <Cell width={0}/>:charger?    //充电器温度
           <Cell style={styles.cell} width={1}>
             {item.chargerTemperature}
           </Cell>:
-          capacity===true&&batteryBind[0].length>=3?
+          capacity&&batteryBind[0].length>=3?
           <Cell style={styles.cell} width={1}>
             {batteryBind&&batteryBind[0][2]==item.battery_id?item.capacity:null}
           </Cell>:
-          electric_current===true&&batteryBind[0].length>=3?
+          electric_current&&batteryBind[0].length>=3?
           <Cell style={styles.cell} width={1}>
             {batteryBind&&batteryBind[0][2]==item.battery_id?item.electric_current:null}
           </Cell>:
-          temperature===true&&batteryBind[0].length>=3?
+          temperature&&batteryBind[0].length>=3?
           <Cell style={styles.cell} width={1}>
             {batteryBind&&batteryBind[0][2]==item.battery_id?item.temperature:null}
           </Cell>:
-          voltage===true&&batteryBind[0].length>=3?
+          voltage&&batteryBind[0].length>=3?
           <Cell style={styles.cell} width={1}>
             {batteryBind&&batteryBind[0][2]==item.battery_id?item.voltage:null}
           </Cell>:
-          power===true&&batteryBind[0].length>=3?
+          power&&batteryBind[0].length>=3?
           <Cell style={styles.cell} width={1}>
             {batteryBind&&batteryBind[0][2]==item.battery_id?item.voltage*item.electric_current:null}
           </Cell>:
           <Cell width={0}/>
         }
 
-        {charger==0?    //充电器容量
+        {
+          CapacityPower?//充电器检测仪容量
           <Cell style={styles.cell} width={1}>
             {item.capacity}
           </Cell>:
-          capacity===true&&batteryBind[0].length>=4?
+          detectorTemperature?//检测仪环境温度
+          <Cell style={styles.cell} width={1}>
+            {item.AmbientTemperature}
+          </Cell>:
+          detectorVoltageCurrent?
+          <Cell width={0}/>:
+          charger? //充电器容量
+          <Cell style={styles.cell} width={1}>
+            {item.capacity}
+          </Cell>:
+          capacity&&batteryBind[0].length>=4?
           <Cell style={styles.cell} width={1}>
             {batteryBind&&batteryBind[0][3]==item.battery_id?item.capacity:null}
           </Cell>:
-          electric_current===true&&batteryBind[0].length>=4?
+          electric_current&&batteryBind[0].length>=4?
           <Cell style={styles.cell} width={1}>
             {batteryBind&&batteryBind[0][3]==item.battery_id?item.electric_current:null}
           </Cell>:
-          temperature===true&&batteryBind[0].length>=4?
+          temperature&&batteryBind[0].length>=4?
           <Cell style={styles.cell} width={1}>
             {batteryBind&&batteryBind[0][3]==item.battery_id?item.temperature:null}
           </Cell>:
-          voltage===true&&batteryBind[0].length>=4?
+          voltage&&batteryBind[0].length>=4?
           <Cell style={styles.cell} width={1}>
             {batteryBind&&batteryBind[0][3]==item.battery_id?item.voltage:null}
           </Cell>:
-          power===true&&batteryBind[0].length>=4?
+          power&&batteryBind[0].length>=4?
           <Cell style={styles.cell} width={1}>
             {batteryBind&&batteryBind[0][3]==item.battery_id?item.voltage*item.electric_current:null}
           </Cell>:
           <Cell width={0}/>
         }
 
-        {capacity===true&&batteryBind[0].length>=5?
+        {
+          CapacityPower?
+          <Cell style={styles.cell} width={1}>
+            {(item.voltage)*(item.electric_current)}
+          </Cell>:
+          detectorTemperature?
+          <Cell width={0}/>:
+          detectorVoltageCurrent?
+          <Cell width={0}/>:
+          capacity&&batteryBind[0].length>=5?
           <Cell style={styles.cell} width={1}>
             {batteryBind&&batteryBind[0][4]==item.battery_id?item.capacity:null}
           </Cell>:
-          electric_current===true&&batteryBind[0].length>=5?
+          electric_current&&batteryBind[0].length>=5?
           <Cell style={styles.cell} width={1}>
             {batteryBind&&batteryBind[0][4]==item.battery_id?item.electric_current:null}
           </Cell>:
-          temperature===true&&batteryBind[0].length>=5?
+          temperature&&batteryBind[0].length>=5?
           <Cell style={styles.cell} width={1}>
             {batteryBind&&batteryBind[0][4]==item.battery_id?item.temperature:null}
           </Cell>:
-          voltage===true&&batteryBind[0].length>=5?
+          voltage&&batteryBind[0].length>=5?
           <Cell style={styles.cell} width={1}>
             {batteryBind&&batteryBind[0][4]==item.battery_id?item.voltage:null}
           </Cell>:
-          power===true&&batteryBind[0].length>=5?
+          power&&batteryBind[0].length>=5?
           <Cell style={styles.cell} width={1}>
             {batteryBind&&batteryBind[0][4]==item.battery_id?item.voltage*item.electric_current:null}
           </Cell>:
           <Cell width={0}/>
         }
 
-        {capacity===true&&batteryBind[0].length>=6?
+        {
+          CapacityPower?
+          <Cell width={0}/>:
+          detectorTemperature?
+          <Cell width={0}/>:
+          detectorVoltageCurrent?
+          <Cell width={0}/>:
+          capacity&&batteryBind[0].length>=6?
           <Cell style={styles.cell} width={1}>
             {batteryBind&&batteryBind[0][5]==item.battery_id?item.capacity:null}
           </Cell>:
-          electric_current===true&&batteryBind[0].length>=6?
+          electric_current&&batteryBind[0].length>=6?
           <Cell style={styles.cell} width={1}>
             {batteryBind&&batteryBind[0][5]==item.battery_id?item.electric_current:null}
           </Cell>:
-          temperature===true&&batteryBind[0].length>=6?
+          temperature&&batteryBind[0].length>=6?
           <Cell style={styles.cell} width={1}>
             {batteryBind&&batteryBind[0][5]==item.battery_id?item.temperature:null}
           </Cell>:
-          voltage===true&&batteryBind[0].length>=6?
+          voltage&&batteryBind[0].length>=6?
           <Cell style={styles.cell} width={1}>
             {batteryBind&&batteryBind[0][5]==item.battery_id?item.voltage:null}
           </Cell>:
-          power===true&&batteryBind[0].length>=6?
+          power&&batteryBind[0].length>=6?
           <Cell style={styles.cell} width={1}>
             {batteryBind&&batteryBind[0][5]==item.battery_id?item.voltage*item.electric_current:null}
           </Cell>:

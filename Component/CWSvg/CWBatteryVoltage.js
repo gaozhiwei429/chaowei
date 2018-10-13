@@ -13,7 +13,7 @@ import {
 import Echarts from 'native-echarts';
 import SQLiteText from '../SQLite/sqlite';
 import * as storage from '../../storage';
-// import _ from 'lodash'; 
+// import _ from 'lodash';
 import { BATTERY_BIND_STORAGE_KEY,CHARGER_BIND_STORAGE_KEY } from '../../config';
 import * as commonality from '../../commonality';
 var sqLite = new SQLiteText();
@@ -659,6 +659,7 @@ export default class CWBatteryVoltage extends Component {
             Loading:true,
             batteryBind:dataVoltage,
         })
+        
     }
 
     historyTime(whether){
@@ -980,7 +981,7 @@ export default class CWBatteryVoltage extends Component {
             ],    
         };
         return (
-            <View style={styles.container}>
+            <ScrollView style={styles.container}>
                 <TouchableOpacity 
                     activeOpacity={0.5}
                     style={{marginLeft:'90%',width:25,height:25}}  
@@ -1008,7 +1009,7 @@ export default class CWBatteryVoltage extends Component {
                         <Text>下一页</Text>
                     </TouchableOpacity> */}
                 {/* </View> */}
-            </View>
+            </ScrollView>
         );
     }
 }

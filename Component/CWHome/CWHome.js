@@ -37,6 +37,7 @@ var chargerIdentifier = '0289382687921502'; //充电器识别固定码
 var batteryIdentifier = '0388382687921502'; //蓄电池识别固定码
 var chargerDetectorIdentifier = '0189382687921502';//充电器检测仪识别固定码  048a382687921502
 var BleScan;
+var BleScanError;
 var BroadcastJudgment;
 var detector;
 
@@ -66,6 +67,7 @@ export default class CWHome extends Component {
             chargerStorage:0,
             batteryStorage:0,
             chargerLen:0,
+            BleScanErr:false,
         };
         this.deviceMap = new Map();
     } 
@@ -154,18 +156,19 @@ export default class CWHome extends Component {
 
         /** 电池充电器数据广播*/
         Promise.all([promise1,promise2,LOGGER]).then((values) => {
-            // console.log(values); 
             batteryArray=[].concat(values[0],values[1]);//绑定电池与充电器合并后的数组
-            detector=values[2]
-            // console.log(batteryArray);    
+            detector=values[2];//记录仪
+
             /**蓝牙扫描绑定*/
             this.deviceMap.clear();
             BluetoothManager.manager.startDeviceScan(null, null, (error, device) => {
                 if (error) {
                     if(error.errorCode == 102){
                         this.refs.bleScan.open();
+                        this.setState({
+                            BleScanErr:true
+                        })
                     }
-                    console.log(error);
                     return;  
                 }else{
                     this.deviceMap.set(device.id,device); //使用Map类型保存搜索到的蓝牙设备，确保列表不显示重复的设备
@@ -331,27 +334,26 @@ export default class CWHome extends Component {
     }
 
     /**绑定*/
-    cbanding(){
-        storage.get(PHONE_BIND_STORAGE_KEY, (error, result) => {
-            if(result !== '123'){
-                bindSingle();
-                this.refs.toast.show('开始绑定!',1500)
-            }else{
-                this.refs.toast.show('已绑定完成!',1500)
-            }
-        });
-        /**蓝牙扫描绑定*/
-        this.deviceMap.clear();
-        BluetoothManager.manager.startDeviceScan(null, null, (error, device) => {
-            if (error) {
-                if(error.errorCode == 102){
-                    this.refs.bleScan.open();
+    async banding(){
+        /** 充电器*/
+        let phoneBind=new Promise(function (resolve,reject) {
+            return storage.get(PHONE_BIND_STORAGE_KEY, (error, result) => {
+                if (error) {
+                    reject(error);
+                    return;
                 }
-                console.log(err);
-                return;
-            }else{
-                this.deviceMap.set(device.id,device); //使用Map类型保存搜索到的蓝牙设备，确保列表不显示重复的设备
-                BleScan = [...this.deviceMap.values()];
+                resolve(result);
+            })}
+        );
+        //充电器存储数据
+        const PhoneBind = await Promise.all([phoneBind]);
+        
+        if(this.state.BleScanErr){
+            this.refs.bleScan.open();
+        }else{ 
+            if(PhoneBind[0][0] !== '123'){
+                bindSingle();
+                this.refs.toast.show('开始绑定!',1500);
                 if(BleScan !== undefined){
                     for (let z = 0;z<BleScan.length;z++) {
                         var BleDataArray=commonality.CharToHex(commonality.base64decode(BleScan[z].manufacturerData)).replace(/\\x/g,'').replace(/\s+/g,'').toLowerCase();
@@ -364,7 +366,7 @@ export default class CWHome extends Component {
                         let BleScanId5 = BleScanArrayId.slice(8, 10);
                         let BleScanId6 = BleScanArrayId.slice(10, 12);
                         let BleScanId = BleScanId6.concat(BleScanId5, BleScanId4, BleScanId3, BleScanId2, BleScanId1).toLowerCase();
-
+        
                         var InterceptionB = BleDataArray.slice(20,32);  //截取搜索到蓝牙广播的部分数据
                         var Interception=InterceptionA.concat(InterceptionB);
                         var BleBroadcastID=batteryArray[currentIndex];
@@ -396,8 +398,13 @@ export default class CWHome extends Component {
                         }
                     }
                 }
+            }else{
+                this.setState({
+                    bandingImg: 1
+                });
+                this.refs.toast.show('已绑定完成!',1500)
             }
-        });
+        } 
     }
 
     // 蓝牙广播结束
@@ -644,7 +651,7 @@ export default class CWHome extends Component {
                 </View>
                 {/*绑定按钮*/}
                 {this.state.bandingImg===0?
-                    <TouchableOpacity style={{position:'absolute',bottom:20,left:20}} onPress={()=>{this.cbanding()}}>
+                    <TouchableOpacity style={{position:'absolute',bottom:20,left:20}} onPress={()=>{this.banding()}}>
                         <Image style={{width:width/8,height:width/8 }} source={require('../../img/bind.png')}/>
                     </TouchableOpacity>:<View/>}
                 <EasyToast

@@ -5,17 +5,14 @@ import {
     View,
     TouchableOpacity,
     Dimensions,
-    ScrollView,
     Image,
-    Alert, 
 } from 'react-native';
-
+import { TabNavigator } from 'react-navigation';
 import Echarts from 'native-echarts';
 import SQLiteText from '../SQLite/sqlite';
-import * as storage from '../../storage';
+// import * as storage from '../../storage';
 import * as commonality from '../../commonality';
-// import _ from 'lodash';
-import { CHARGER_BIND_STORAGE_KEY,LOGGER_STORAGE_KEY} from '../../config';
+// import { CHARGER_BIND_STORAGE_KEY,LOGGER_STORAGE_KEY} from '../../config';
 var sqLite = new SQLiteText();
 var db;
 
@@ -27,13 +24,12 @@ class VoltageCurrent extends Component {
             chargerElectricCurrent:[],
             chargerTimeData:[],
             chargerTime:[],
+            ChargerDetector:[],
+            xTime:[],
         };
     }
 
     async componentDidMount(){
-        var chargerVoltageData = [];
-        var chargerElectricCurrentData=[];
-        var chargerTimeData=[];
 
         //开启数据库
         if(!db){
@@ -43,56 +39,42 @@ class VoltageCurrent extends Component {
         // sqLite.deleteData();
 
         /** 充电器检测仪*/
-        storage.get(LOGGER_STORAGE_KEY, (error, result) => {
-            if (error) {
-                reject(error);
-                return;
-            }
-            //查询
-            db.transaction((tx)=>{
-                tx.executeSql("SELECT voltage,electric_current,my_timestamp FROM (SELECT voltage,electric_current,my_timestamp FROM ChargerDetector WHERE ChargerDetector_id='"+result[0]+"' ORDER BY id DESC )  AS chargerDetectorTab ORDER BY my_timestamp ASC", [],(tx,results)=>{
-                    // SELECT * FROM (SELECT *FROM group_chatmsg_v WHERE ((group_Id=46 AND send_user_id=28 AND receive_user_id=70) OR (group_Id=46 AND receive_user_id=28 AND STATUS=1)) AND is_delete =0 ORDER BY crtime DESC LIMIT 15)  AS chatMsgTable ORDER BY crtime ASC
+
+        //查询数据库总数据
+        let Database = new Promise(function (resolve,reject){
+            return db.transaction((tx)=>{
+                tx.executeSql("select ChargerDetector_id,my_timestamp,voltage,electric_current from ChargerDetector where ChargerDetector_id order by my_timestamp asc", [],(tx,results)=>{
                     var len = results.rows.length;
-                    for(var i=0; i<len; i++){
-                        var u = results.rows.item(i);    
-                        chargerVoltageData.push(u.voltage);
-                        chargerElectricCurrentData.push(u.electric_current);
-                        chargerTimeData.push(u.my_timestamp);    
+                    let Database=[];
+                    for(let i=0; i<len; i++){
+                        var u = results.rows.item(i);
+                        Database.push(u);
                     }
-                    this.setState({
-                        chargerVoltage:chargerVoltageData,
-                        chargerElectricCurrent:chargerElectricCurrentData,
-                        chargerTime:chargerTimeData,
-                    })
+                    resolve(Database);
                 });
             },(error)=>{
-                console.log(error);
+                reject(error);
             });
+        })
 
-            const ChargerDetectorFeedback = () => {
-                //查询
-                db.transaction((tx)=>{
-                    tx.executeSql("select voltage,electric_current,my_timestamp from ChargerDetector where ChargerDetector_id= '"+result[0]+"' order by my_timestamp desc limit 1", [],(tx,results)=>{
-                        var len = results.rows.length;
-                        for(var i=0; i<len; i++){
-                            var u = results.rows.item(i);
-                            chargerVoltageData.push(u.voltage);
-                            chargerElectricCurrentData.push(u.electric_current);
-                            chargerTimeData.push(u.my_timestamp); 
-                        }  
-                        this.setState({
-                            chargerVoltage:chargerVoltageData,
-                            chargerElectricCurrent:chargerElectricCurrentData,
-                            chargerTime:chargerTimeData,
-                        });
-                        this.ChargerDetectorClearTime = setTimeout(ChargerDetectorFeedback, 60000);
-                    });
-                },(error)=>{ 
-                    console.log(error);
-                });
-            };
-            this.ChargerDetectorClearTime && setTimeout(ChargerDetectorFeedback, 60000);
-        });
+        let ChargerDetector = await Promise.all([Database]);
+
+        // 取到时间
+        const repeatTime=ChargerDetector[0].map((item,i) => {
+            return item.my_timestamp
+        })
+
+        //时间去重后排序
+        const xTime = Array.from(new Set(repeatTime)).sort(function(a, b){
+            return a > b ? 1 : -1; // 这里改为大于号
+        })
+
+        this.setState({
+            ChargerDetector:commonality.uniqeByKeys(...ChargerDetector,['my_timestamp']),
+            xTime, 
+        })
+
+
     }
 
     componentWillUnmount() {
@@ -100,6 +82,13 @@ class VoltageCurrent extends Component {
         chargerElectricCurrentData=[];
         chargerTimeData=[];
         this.ChargerDetectorClearTime && clearTimeout(this.ChargerDetectorClearTime);
+    }
+
+    table(){
+        this.props.navigation.navigate('Table',{
+            detectorVoltageCurrent:true,
+            localData:[this.state.ChargerDetector],
+        })
     }
 
     static navigationOptions = {
@@ -135,25 +124,6 @@ class VoltageCurrent extends Component {
                     dataView : {
                         show: false, 
                         readOnly: true,
-                        // optionToContent: function(opt) {
-                        //     var axisData = opt.xAxis[0].data;
-                        //     var series = opt.series;
-                        //     var table = '<div style="height:350px;overflow:auto"><table style="width:100%;text-align:center;"><tbody><tr>'
-                        //                  + '<td>时间</td>'
-                        //                  + '<td>' + series[0].name + '</td>'
-                        //                  + '<td>' + series[1].name + '</td>'
-                                         
-                        //                  + '</tr>';
-                        //     for (var i = 0, l = axisData.length; i < l; i++) {
-                        //         table += '<tr>'
-                        //                  + '<td>' + axisData[i] + '</td>'
-                        //                  + '<td>' + series[0].data[i] + '</td>'
-                        //                  + '<td>' + series[1].data[i] + '</td>'
-                        //                  + '</tr>';
-                        //     }
-                        //     table += '</tbody></table></div>';
-                        //     return table;
-                        // },
                     },//show是否显示表格，readOnly是否只读
                     magicType : {
                         //折线图  柱形图    总数统计 分开平铺
@@ -170,7 +140,7 @@ class VoltageCurrent extends Component {
                 boundaryGap:false,
                 type : 'category',
                 name : '时间',//时间
-                data: this.state.chargerTime.map(function(item){
+                data: this.state.xTime.map(function(item){
                     return commonality.replaceTime(item); 
                 }),
             },
@@ -194,27 +164,42 @@ class VoltageCurrent extends Component {
                     name: '电压(V)',
                     type: 'line',
                     smooth:true,
-                    data: this.state.chargerVoltage,
+                    data:this.state.ChargerDetector && this.state.ChargerDetector.map(item=>{
+                        return item.voltage
+                    }),
                     showSymbol: false,
                 }, {
                     name: '电流(A)',
                     type: 'line',
                     smooth:true,
-                    data: this.state.chargerElectricCurrent,
+                    data:this.state.ChargerDetector && this.state.ChargerDetector.map(item=>{
+                        return item.electric_current
+                    }),
                     showSymbol: false,
                     yAxisIndex:1,
                 }
             ],
         };
         return (
-            <Echarts
-                option={option}
-                width={Dimensions.get('window').width}
-            />
+            <View style={styles.container}>
+                <TouchableOpacity 
+                    activeOpacity={0.5}
+                    style={{marginLeft:'90%',width:25,height:25}}  
+                    onPress={()=>this.table()}
+                >
+                    <Image
+                        style={{width:25,height:25}}
+                        source={require('../../img/dataTable/dataTable.png')}
+                    />
+                </TouchableOpacity>
+                <Echarts
+                    option={option} 
+                    width={Dimensions.get('window').width}
+                />
+            </View>
         );
     }
 }
-
 
 class Temperature extends Component {
     constructor(props) {
@@ -223,13 +208,13 @@ class Temperature extends Component {
             BoardTemperature:[],
             AmbientTemperature:[],
             TimeData:[],
+
+            ChargerDetector:[],
+            xTime:[],
         };
     }
 
     async componentDidMount(){
-        var BoardTemperatureData = [];
-        var AmbientTemperatureData=[];
-        var TimeData=[];
 
         //开启数据库
         if(!db){
@@ -238,56 +223,39 @@ class Temperature extends Component {
         //删除数据
         // sqLite.deleteData();
 
-        /** 充电器检测仪*/
-        storage.get(LOGGER_STORAGE_KEY, (error, result) => {
-            if (error) {
-                reject(error);
-                return;
-            }
-            //查询
-            db.transaction((tx)=>{
-                tx.executeSql("SELECT BoardTemperature,AmbientTemperature,my_timestamp FROM (SELECT BoardTemperature,AmbientTemperature,my_timestamp FROM ChargerDetector WHERE ChargerDetector_id='"+result[0]+"' ORDER BY id DESC )  AS chargerDetectorTab ORDER BY my_timestamp ASC", [],(tx,results)=>{
+        //查询数据库总数据
+        let Database = new Promise(function (resolve,reject){
+            return db.transaction((tx)=>{
+                tx.executeSql("select ChargerDetector_id,my_timestamp,BoardTemperature,AmbientTemperature from ChargerDetector where ChargerDetector_id order by my_timestamp asc", [],(tx,results)=>{
                     var len = results.rows.length;
-                    for(var i=0; i<len; i++){
-                        var u = results.rows.item(i);    
-                        BoardTemperatureData.push(u.BoardTemperature);
-                        AmbientTemperatureData.push(u.AmbientTemperature);
-                        TimeData.push(u.my_timestamp);    
+                    let Database=[];
+                    for(let i=0; i<len; i++){
+                        var u = results.rows.item(i);
+                        Database.push(u);
                     }
-                    this.setState({
-                        BoardTemperature:BoardTemperatureData,
-                        AmbientTemperature:AmbientTemperatureData,
-                        TimeData,
-                    })
+                    resolve(Database);
                 });
             },(error)=>{
-                console.log(error);
+                reject(error);
             });
+        })
 
-            const TemperatureFeedback = () => {
-                //查询
-                db.transaction((tx)=>{
-                    tx.executeSql("select BoardTemperature,AmbientTemperature,my_timestamp from ChargerDetector where ChargerDetector_id= '"+result[0]+"' order by my_timestamp desc limit 1", [],(tx,results)=>{
-                        var len = results.rows.length;
-                        for(var i=0; i<len; i++){
-                            var u = results.rows.item(i);
-                            BoardTemperatureData.push(u.BoardTemperature);
-                            AmbientTemperatureData.push(u.AmbientTemperature);
-                            TimeData.push(u.my_timestamp);    
-                        }  
-                        this.setState({
-                            BoardTemperature:BoardTemperatureData,
-                            AmbientTemperature:AmbientTemperatureData,
-                            TimeData,
-                        });
-                        this.ChargerDetectorClearTime = setTimeout(ChargerDetectorFeedback, 60000);
-                    });
-                },(error)=>{ 
-                    console.log(error);
-                });
-            };
-            this.TemperatureClearTime && setTimeout(TemperatureFeedback, 60000);
-        });
+        let ChargerDetector = await Promise.all([Database]);
+
+        // 取到时间
+        const repeatTime=ChargerDetector[0].map((item,i) => {
+            return item.my_timestamp
+        })
+
+        //时间去重后排序
+        const xTime = Array.from(new Set(repeatTime)).sort(function(a, b){
+            return a > b ? 1 : -1; // 这里改为大于号
+        })
+
+        this.setState({
+            ChargerDetector:commonality.uniqeByKeys(...ChargerDetector,['my_timestamp']),
+            xTime, 
+        })
     }
 
     componentWillUnmount() {
@@ -295,6 +263,13 @@ class Temperature extends Component {
         AmbientTemperatureData=[];
         TimeData=[];
         this.TemperatureClearTime && clearTimeout(this.TemperatureClearTime);
+    }
+
+    table(){
+        this.props.navigation.navigate('Table',{
+            detectorTemperature:true,
+            localData:[this.state.ChargerDetector],
+        })
     }
 
     static navigationOptions = {
@@ -330,25 +305,6 @@ class Temperature extends Component {
                     dataView : {
                         show: false, 
                         readOnly: true,
-                        // optionToContent: function(opt) {
-                        //     var axisData = opt.xAxis[0].data;
-                        //     var series = opt.series;
-                        //     var table = '<div style="height:350px;overflow:auto"><table style="width:100%;text-align:center;"><tbody><tr>'
-                        //                  + '<td>时间</td>'
-                        //                  + '<td>' + series[0].name + '</td>'
-                        //                  + '<td>' + series[1].name + '</td>'
-                                         
-                        //                  + '</tr>';
-                        //     for (var i = 0, l = axisData.length; i < l; i++) {
-                        //         table += '<tr>'
-                        //                  + '<td>' + axisData[i] + '</td>'
-                        //                  + '<td>' + series[0].data[i] + '</td>'
-                        //                  + '<td>' + series[1].data[i] + '</td>'
-                        //                  + '</tr>';
-                        //     }
-                        //     table += '</tbody></table></div>';
-                        //     return table;
-                        // },
                     },//show是否显示表格，readOnly是否只读
                     magicType : {
                         //折线图  柱形图    总数统计 分开平铺
@@ -365,7 +321,7 @@ class Temperature extends Component {
                 boundaryGap:false,
                 type : 'category',
                 name : '时间',//时间
-                data: this.state.TimeData.map(function(item){
+                data: this.state.xTime.map(function(item){
                     return commonality.replaceTime(item); 
                 }),
             },
@@ -389,23 +345,39 @@ class Temperature extends Component {
                     name: '电路板温度(°)',
                     type: 'line',
                     smooth:true,
-                    data: this.state.BoardTemperature,
+                    data:this.state.ChargerDetector && this.state.ChargerDetector.map(item=>{
+                        return item.BoardTemperature
+                    }),
                     showSymbol: false,
                 }, {
                     name: '环境温度(°)',
                     type: 'line',
                     smooth:true,
-                    data: this.state.AmbientTemperature,
+                    data:this.state.ChargerDetector && this.state.ChargerDetector.map(item=>{
+                        return item.AmbientTemperature
+                    }),
                     showSymbol: false,
                     yAxisIndex:1,
                 }
             ],
         };
         return (
-            <Echarts
-                option={option}
-                width={Dimensions.get('window').width}
-            />
+            <View style={styles.container}>
+                <TouchableOpacity 
+                    activeOpacity={0.5}
+                    style={{marginLeft:'90%',width:25,height:25}}  
+                    onPress={()=>this.table()}
+                >
+                    <Image
+                        style={{width:25,height:25}}
+                        source={require('../../img/dataTable/dataTable.png')}
+                    />
+                </TouchableOpacity>
+                <Echarts
+                    option={option} 
+                    width={Dimensions.get('window').width}
+                />
+            </View>
         );
     }
 }
@@ -417,13 +389,13 @@ class CapacityPower extends Component {
             capacityData:[],
             CapacityPowerData:[],
             TimeData:[],
+
+            ChargerDetector:[],
+            xTime:[],
         };
     }
 
     async componentDidMount(){
-        var capacityData = [];
-        var CapacityPowerData=[];
-        var TimeData=[];
 
         //开启数据库
         if(!db){
@@ -433,59 +405,40 @@ class CapacityPower extends Component {
         // sqLite.deleteData();
 
         /** 充电器检测仪*/
-        storage.get(LOGGER_STORAGE_KEY, (error, result) => {
-            if (error) {
-                reject(error);
-                return;
-            }
-            //查询
-            db.transaction((tx)=>{
-                tx.executeSql("SELECT capacity,voltage,my_timestamp,electric_current FROM (SELECT capacity,voltage,my_timestamp,electric_current FROM ChargerDetector WHERE ChargerDetector_id='"+result[0]+"' ORDER BY id DESC )  AS chargerDetectorTab ORDER BY my_timestamp ASC", [],(tx,results)=>{
+       
+        //查询数据库总数据
+        let Database = new Promise(function (resolve,reject){
+            return db.transaction((tx)=>{
+                tx.executeSql("select ChargerDetector_id,my_timestamp,capacity,voltage,electric_current from ChargerDetector where ChargerDetector_id order by my_timestamp asc", [],(tx,results)=>{
                     var len = results.rows.length;
-                    for(var i=0; i<len; i++){
-                        var u = results.rows.item(i);    
-                        capacityData.push(u.capacity);
-                        CapacityPowerData.push((u.voltage*u.electric_current).toFixed(2));
-                        TimeData.push(u.my_timestamp);  
-                        console.log((u.voltage*u.electric_current).toFixed(2));
-                        // console.log(u.voltage*u.electric_current)   
-                    } 
-                    
-                    this.setState({
-                        capacityData,
-                        CapacityPowerData,
-                        TimeData,
-                    })
+                    let Database=[];
+                    for(let i=0; i<len; i++){
+                        var u = results.rows.item(i);
+                        Database.push(u);
+                    }
+                    resolve(Database);
                 });
             },(error)=>{
-                console.log(error);
+                reject(error);
             });
+        })
 
-            const TemperatureFeedback = () => {
-                //查询
-                db.transaction((tx)=>{
-                    tx.executeSql("select capacity,voltage,my_timestamp,electric_current from ChargerDetector where ChargerDetector_id= '"+result[0]+"' order by my_timestamp desc limit 1", [],(tx,results)=>{
-                        var len = results.rows.length;
-                        for(var i=0; i<len; i++){
-                            var u = results.rows.item(i);
-                            capacityData.push(u.capacity);
-                            CapacityPowerData.push((u.voltage*u.electric_current).toFixed(2));
-                            
-                            TimeData.push(u.my_timestamp);    
-                        }  
-                        this.setState({
-                            capacityData,
-                            CapacityPowerData,
-                            TimeData,
-                        });
-                        this.ChargerDetectorClearTime = setTimeout(ChargerDetectorFeedback, 60000);
-                    });
-                },(error)=>{ 
-                    console.log(error);
-                });
-            };
-            this.TemperatureClearTime && setTimeout(TemperatureFeedback, 60000);
-        });
+        let ChargerDetector = await Promise.all([Database]);
+
+        // 取到时间
+        const repeatTime=ChargerDetector[0].map((item,i) => {
+            return item.my_timestamp
+        })
+
+        //时间去重后排序
+        const xTime = Array.from(new Set(repeatTime)).sort(function(a, b){
+            return a > b ? 1 : -1; // 这里改为大于号
+        })
+
+        this.setState({
+            ChargerDetector:commonality.uniqeByKeys(...ChargerDetector,['my_timestamp']),
+            xTime, 
+        })
     }
 
     componentWillUnmount() {
@@ -493,6 +446,13 @@ class CapacityPower extends Component {
         CapacityPowerData=[];
         TimeData=[];
         this.TemperatureClearTime && clearTimeout(this.TemperatureClearTime);
+    }
+
+    table(){
+        this.props.navigation.navigate('Table',{
+            CapacityPower:true,
+            localData:[this.state.ChargerDetector],
+        })
     }
 
     static navigationOptions = {
@@ -528,25 +488,6 @@ class CapacityPower extends Component {
                     dataView : {
                         show: false, 
                         readOnly: true,
-                        // optionToContent: function(opt) {
-                        //     var axisData = opt.xAxis[0].data;
-                        //     var series = opt.series;
-                        //     var table = '<div style="height:350px;overflow:auto"><table style="width:100%;text-align:center;"><tbody><tr>'
-                        //                  + '<td>时间</td>'
-                        //                  + '<td>' + series[0].name + '</td>'
-                        //                  + '<td>' + series[1].name + '</td>'
-                                         
-                        //                  + '</tr>';
-                        //     for (var i = 0, l = axisData.length; i < l; i++) {
-                        //         table += '<tr>'
-                        //                  + '<td>' + axisData[i] + '</td>'
-                        //                  + '<td>' + series[0].data[i] + '</td>'
-                        //                  + '<td>' + series[1].data[i] + '</td>'
-                        //                  + '</tr>';
-                        //     }
-                        //     table += '</tbody></table></div>';
-                        //     return table;
-                        // },
                     },//show是否显示表格，readOnly是否只读
                     magicType : {
                         //折线图  柱形图    总数统计 分开平铺
@@ -563,7 +504,7 @@ class CapacityPower extends Component {
                 boundaryGap:false,
                 type : 'category',
                 name : '时间',//时间
-                data: this.state.TimeData.map(function(item){
+                data: this.state.xTime.map(function(item){
                     return commonality.replaceTime(item); 
                 }),
             },
@@ -587,62 +528,117 @@ class CapacityPower extends Component {
                     name: '容量(Ah)',
                     type: 'line',
                     smooth:true,
-                    data: this.state.capacityData,
+                    data:this.state.ChargerDetector && this.state.ChargerDetector.map(item=>{
+                        return item.capacity
+                    }),
                     showSymbol: false,
                 }, {
                     name: '功率(W)',
                     type: 'line',
                     smooth:true,
-                    data: this.state.CapacityPowerData,
+                    data:this.state.ChargerDetector && this.state.ChargerDetector.map(item=>{
+                        return item.voltage*item.electric_current
+                    }),
                     showSymbol: false,
                     yAxisIndex:1,
                 }
             ],
         }; 
         return (
-            <Echarts
-                option={option} 
-                width={Dimensions.get('window').width}
-            />
+            <View style={styles.container}>
+                <TouchableOpacity 
+                    activeOpacity={0.5}
+                    style={{marginLeft:'90%',width:25,height:25}}  
+                    onPress={()=>this.table()}
+                >
+                    <Image
+                        style={{width:25,height:25}}
+                        source={require('../../img/dataTable/dataTable.png')}
+                    />
+                </TouchableOpacity>
+                <Echarts
+                    option={option} 
+                    width={Dimensions.get('window').width}
+                />
+            </View>
         );
     }
 }
 
-export default class ChargerDetector extends Component {
 
-    static navigationOptions = {
-        headerTitle:(<Text style={{fontSize:20,flex: 1, textAlign: 'center'}}>充电器检测仪数据图</Text>),
-        headerStyle: {
-            height: 40,
+const ChargerDetector = TabNavigator({
+        VoltageCurrent: {
+            screen: VoltageCurrent,
+            navigationOptions: {
+                tabBarLabel: '电压/电流',
+            }
         },
+        Temperature: {
+            screen: Temperature,
+            navigationOptions: {
+                tabBarLabel: '温度',
+            },
+        },
+        CapacityPower: {
+            screen: CapacityPower,
+            navigationOptions: {
+                tabBarLabel: '容量/功率',
+            }
+        },
+    }, {
+        //设置TabNavigator的位置
+        tabBarPosition: 'bottom',
+        swipeEnabled:false,
+        animationEnabled:true,
+        // lazy:false,
+        backBehavior:'none',
+        tabBarOptions: {
+            activeTintColor: '#3BB6FF',     // 文字和图片选中颜色
+            activeBackgroundColor:'#fff',       //文字和图片选中的背景色
+            inactiveTintColor: '#999',      // 文字和图片默认颜色
+            inactiveBackgroundColor:'#fff',     //文字和图片默认的背景色
+            indicatorStyle: {height: 0},    // android 中TabBar下面会显示一条线，高度设为 0 后就不显示线了 暂时解决这个问题
+            labelStyle: {
+                fontSize: 17,
+            },
+            tabStyle: {
+                height:50,
+            },
+            scrollEnabled:false,//是否启用可滚动选项卡
+            style: {
+                backgroundColor: '#F5FCFF',
+                paddingBottom:0,
+                borderColor:'#fff',
+    
+            },
+        },
+    });
+    
+    ChargerDetector.navigationOptions = {
+        headerTitle:(<Text style={{fontSize:20,flex: 1, textAlign: 'center'}}>充电器检测仪数据</Text>),
+        headerStyle:{
+            height:40,
+        },
+        // headerLeft:(
+        //     <View/>
+        // ),
         headerRight: (
-            <View/>
+            <View style={{height: 44,width: 55,justifyContent: 'center',paddingRight:15} }/>
         ),
         headerPressColorAndroid:'gray',
         headerBackImage: (<Image source={require('../../img/leftGoBack.png')} style={{width:18,height:14,marginLeft:15,marginRight:15}}/>),
+    
     };
+    
+export default ChargerDetector;
 
-    render() {
-        
-        return (
-            <ScrollView style={styles.container}>
-                <View style={{marginTop:15,marginBottom:15}}>
-                    <VoltageCurrent/>
-                </View>
-                <View style={{marginTop:15,marginBottom:15}}>
-                    <Temperature/>
-                </View>
-                <View style={{marginTop:15,marginBottom:15}}>
-                    <CapacityPower/>
-                </View>
-            </ScrollView>
-        );
-    }
-}
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: -20,
     },
     switching:{
         marginTop:15,

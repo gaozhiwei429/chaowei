@@ -961,7 +961,7 @@ export default class CWBatteryTemperature extends Component {
             ],
         };
         return (
-            <View style={styles.container}>
+            <ScrollView style={styles.container}>
                 <TouchableOpacity
                     activeOpacity={0.5}
                     style={{marginLeft:'90%',width:25,height:25}}  
@@ -987,7 +987,7 @@ export default class CWBatteryTemperature extends Component {
                         <Text>下一页</Text>
                     </TouchableOpacity> */}
                 </View>
-            </View>
+            </ScrollView>
         );
     }
 }

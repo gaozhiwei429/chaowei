@@ -19,7 +19,6 @@ import * as commonality from '../../commonality';
 var sqLite = new SQLiteText();
 var db;
 
-var promiseValues;
 export default class BatteryPower extends Component {
     constructor(props) {
         super(props);
@@ -30,23 +29,13 @@ export default class BatteryPower extends Component {
             ybattery4:[],
             ybattery5:[],
             ybattery6:[],
-            previous:18,
             xTime:[],
             batteryBind:[],
         };
     }
 
     async componentDidMount(){
-        battery1VoltageData= [];
-        battery2VoltageData=[];
-        battery3VoltageData=[];
-        battery4VoltageData=[];
-        battery5VoltageData=[];
-        battery6VoltageData=[];
-        batteryWriteTime = [];
-        this.setState({
-            previous:0,
-        });
+        
         //开启数据库
         if(!db){
             db = await sqLite.open();
@@ -335,21 +324,7 @@ export default class BatteryPower extends Component {
     }
 
     componentWillUnmount() {
-        battery1VoltageData= [];
-        battery2VoltageData=[];
-        battery3VoltageData=[];
-        battery4VoltageData=[];
-        battery5VoltageData = [];
-        battery6VoltageData = [];
-        batteryWriteTime = [];
-        promiseValues;
-        voltageData=[];
         this.battery1TimeVoltage && clearTimeout(this.battery1TimeVoltage);
-        this.battery2TimeVoltage && clearTimeout(this.battery2TimeVoltage);
-        this.battery3TimeVoltage && clearTimeout(this.battery3TimeVoltage);
-        this.battery4TimeVoltage && clearTimeout(this.battery4TimeVoltage);
-        this.battery5TimeVoltage && clearTimeout(this.battery5TimeVoltage);
-        this.battery6TimeVoltage && clearTimeout(this.battery6TimeVoltage);   
     }
 
     table(){
