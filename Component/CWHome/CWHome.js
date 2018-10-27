@@ -36,8 +36,7 @@ var Identifier = '382687921502'; //识别码固定值
 var chargerIdentifier = '0289382687921502'; //充电器识别固定码
 var batteryIdentifier = '0388382687921502'; //蓄电池识别固定码
 var chargerDetectorIdentifier = '0189382687921502';//充电器检测仪识别固定码  048a382687921502
-var BleScan;
-var BleScanError;
+var BleScan=[];
 var BroadcastJudgment;
 var detector;
 
@@ -51,11 +50,11 @@ function bindSingle(){
     var endRepair = equipmentList.concat('0000');//填补
     if(others.length === otherIndex+1){
         bleBroadcast.start(commandList ,endMark ,()=>{
-            alert('手机不支持广播')
+            this.refs.toast.show('此设备不支持!',1500)
         });// BLE广播
     }else {
-        bleBroadcast.start(commandList ,endRepair,()=>{
-            alert('手机不支持广播')
+        bleBroadcast.start(commandList ,endRepair ,()=>{
+            this.refs.toast.show('此设备不支持!',1500)
         });// BLE广播
     }
     // var con=commandList.concat(equipmentList);//广播的数据
@@ -77,7 +76,7 @@ export default class CWHome extends Component {
     } 
 
     componentDidMount() {
-
+        
         /** 是否绑定*/
         storage.get(PHONE_BIND_STORAGE_KEY, (error, result) => {
             if(result == '123' ){
@@ -158,28 +157,40 @@ export default class CWHome extends Component {
             })
         })
 
-        /** 电池充电器数据广播*/
+        
+        
+
+        /** 电池、充电器本地存储数据*/
         Promise.all([promise1,promise2,LOGGER]).then((values) => {
             batteryArray=[].concat(values[0],values[1]);//绑定电池与充电器合并后的数组
             detector=values[2];//记录仪
 
+            // this.deviceMap.clear();
+            // BluetoothManager.manager.startDeviceScan(null, null, (error, device) => {                
+            //     if (error) {
+            //         if(error.errorCode == 102){
+            //             this.refs.bleScan.open();
+            //         }
+            //         this.refs.toast.show('主人,蓝牙搜索出错啦~',1500)
+            //     }else{
+            //         this.deviceMap.set(device.id,device); //使用Map类型保存搜索到的蓝牙设备，确保列表不显示重复的设备
+            //         BleScan = [...this.deviceMap.values()];
+            //     }
+            // })
             /**蓝牙扫描绑定*/
             this.deviceMap.clear();
             BluetoothManager.manager.startDeviceScan(null, null, (error, device) => {
                 if (error) {
                     if(error.errorCode == 102){
                         this.refs.bleScan.open();
-                        this.setState({
-                            BleScanErr:true
-                        })
                     }
-                    return;  
+                    this.refs.toast.show('主人,蓝牙搜索出错啦~',1500)
                 }else{
                     this.deviceMap.set(device.id,device); //使用Map类型保存搜索到的蓝牙设备，确保列表不显示重复的设备
                     BleScan = [...this.deviceMap.values()];
                 }
-            })
-            //向数据库写数据
+            }) 
+            // 向数据库写数据
             this.writeDatabase();
         });
     }
@@ -246,7 +257,7 @@ export default class CWHome extends Component {
                         let BleScanRssi=BleScan[i].rssi;//BLE信号强度
                         if (batteryArray !== undefined && BleScanRssi > -80) {  
                             for (var r=0;r<batteryArray.length;r++){
-                                var scanIdentifier = searchBle.slice(0, 16);//搜索到的电池识别码与ID   
+                                var scanIdentifier = searchBle.slice(0, 16);//搜索到的电池识别码与ID 
                                 if(scanIdentifier == batteryIdentifier && batteryArray[r] == equipmentID){//判断电池识别码与ID
                                     // 电池数据
                                     var batteryData = [];
@@ -271,6 +282,7 @@ export default class CWHome extends Component {
                                     var actionBattery = sqLite.insertbatteryData(batteryData, () => {});
                                     actionsBattery.push(actionBattery);
                                 }else if(scanIdentifier == chargerIdentifier && batteryArray[r] == equipmentID){
+                                    console.log(searchBle);
                                     // 充电器数据
                                     var chargerData = [];
                                     var charger = {};
@@ -319,11 +331,11 @@ export default class CWHome extends Component {
                     this.storageTime=setTimeout(loop, 60000);
                 });
             };
-            setTimeout(loop, 1000);
+            loop();
             }
         ),
             (error) => {
-                console.warn('失败：' + JSON.stringify(error.message))
+                this.refs.toast.show('位置数据获取失败！',1000)
             }, {
             // 提高精确度，但是获取的速度会慢一点
             enableHighAccuracy: true,
@@ -332,32 +344,31 @@ export default class CWHome extends Component {
             // 示应用程序的缓存时间，每次请求都是立即去获取一个全新的对象内容
             maximumAge: 1000,
         };
-
         return;
-        
     }
 
     /**绑定*/
-    async banding(){
-        /** 充电器*/
-        let phoneBind=new Promise(function (resolve,reject) {
-            return storage.get(PHONE_BIND_STORAGE_KEY, (error, result) => {
-                if (error) {
-                    reject(error);
-                    return;
-                }
-                resolve(result);
-            })}
-        );
-        //充电器存储数据
-        const PhoneBind = await Promise.all([phoneBind]);
-        
-        if(this.state.BleScanErr){
-            this.refs.bleScan.open();
-        }else{ 
-            if(PhoneBind[0] !== '123'){
+    banding(){
+        storage.get(PHONE_BIND_STORAGE_KEY, (error, result) => {
+            if(result !== '123'){
                 bindSingle();
-                this.refs.toast.show('开始绑定!',1500);
+                this.refs.toast.show('开始绑定!',1500)
+            }else{
+                this.refs.toast.show('已绑定完成!',1500)
+            }
+        });
+        /**蓝牙扫描绑定*/
+        this.deviceMap.clear();
+        BluetoothManager.manager.startDeviceScan(null, null, (error, device) => {
+            if (error) {
+                if(error.errorCode == 102){
+                    this.refs.bleScan.open();
+                }
+                console.log(err);
+                return;
+            }else{
+                this.deviceMap.set(device.id,device); //使用Map类型保存搜索到的蓝牙设备，确保列表不显示重复的设备
+                BleScan = [...this.deviceMap.values()];
                 if(BleScan !== undefined){
                     for (let z = 0;z<BleScan.length;z++) {
                         var BleDataArray=commonality.CharToHex(commonality.base64decode(BleScan[z].manufacturerData)).replace(/\\x/g,'').replace(/\s+/g,'').toLowerCase();
@@ -370,7 +381,7 @@ export default class CWHome extends Component {
                         let BleScanId5 = BleScanArrayId.slice(8, 10);
                         let BleScanId6 = BleScanArrayId.slice(10, 12);
                         let BleScanId = BleScanId6.concat(BleScanId5, BleScanId4, BleScanId3, BleScanId2, BleScanId1).toLowerCase();
-        
+
                         var InterceptionB = BleDataArray.slice(20,32);  //截取搜索到蓝牙广播的部分数据
                         var Interception=InterceptionA.concat(InterceptionB);
                         var BleBroadcastID=batteryArray[currentIndex];
@@ -383,7 +394,7 @@ export default class CWHome extends Component {
                                     storage.get(PHONE_BIND_STORAGE_KEY, (error, result) => {
                                         result = (result || '').replace(result,'123');
                                         storage.save(PHONE_BIND_STORAGE_KEY, result, () => {
-                                            if(result == '123'){ 
+                                            if(result == '123'){
                                                 bleBroadcast.stop();
                                                 this.refs.toast_su.success();
                                                 this.setState({
@@ -402,13 +413,8 @@ export default class CWHome extends Component {
                         }
                     }
                 }
-            }else{
-                this.setState({
-                    bandingImg: 1
-                });
-                this.refs.toast.show('已绑定完成!',1500)
             }
-        } 
+        });
     }
 
     // 蓝牙广播结束
@@ -421,32 +427,32 @@ export default class CWHome extends Component {
 
     //电池1
     banding1(){
-        bleBroadcast.start('0101' ,'382687921502000001f0ffffff01');// 蓝牙广播开始
+        bleBroadcast.start('0101' ,'3826879215020000'+'07f0ffffff01',()=>{alert('此手机不支持')});// 蓝牙广播开始
     }
     //电池2
     banding2(){
-        bleBroadcast.start('0101' ,'382687921502000002f0ffffff01');// 蓝牙广播开始
+        bleBroadcast.start('0101' ,'3826879215020000'+'08f0ffffff01',()=>{alert('此手机不支持')});// 蓝牙广播开始
     }
     //电池3
     banding3(){
-        bleBroadcast.start('0101' ,'382687921502000003f0ffffff01');// 蓝牙广播开始
+        bleBroadcast.start('0101' ,'3826879215020000'+'03f0ffffff01',()=>{alert('此手机不支持')});// 蓝牙广播开始
     }
     //电池4
     banding4(){
-        bleBroadcast.start('0101' ,'382687921502000004f0ffffff01');// 蓝牙广播开始
+        bleBroadcast.start('0101' ,'38268792150200000'+'04f0ffffff01',()=>{alert('此手机不支持')});// 蓝牙广播开始
     }
     //电池5
     banding5(){
-        bleBroadcast.start('0101' ,'382687921502000005f0ffffff01');// 蓝牙广播开始
+        bleBroadcast.start('0101' ,'3826879215020000'+'05f0ffffff01',()=>{alert('此手机不支持')});// 蓝牙广播开始
     }
     //电池6
     banding6(){
-        bleBroadcast.start('0101' ,'382687921502000006f0ffffff01');// 蓝牙广播开始
+        bleBroadcast.start('0101' ,'3826879215020000'+'06f0ffffff01',()=>{alert('此手机不支持')});// 蓝牙广播开始
     }
     //充电器
     banding7(){
-        bleBroadcast.start('0101' ,'382687921502000001f0ffffff00');// 蓝牙广播开始
-    }
+        bleBroadcast.start('0101' ,'3826879215020000'+'02f0ffffff00',()=>{alert('此手机不支持')});// 蓝牙广播开始
+    } 
     //BLE stop
     aaaa(){  
         bleBroadcast.stop();    
@@ -487,7 +493,7 @@ export default class CWHome extends Component {
                 <AlertS ref='bleScan' title='提示' btnText='确定' msg='请先打开蓝牙开关！' />
 
                 {/*测试*/}
-                <View style={{justifyContent:'space-around',flexDirection:'row'}}>
+                {/* <View style={{justifyContent:'space-around',flexDirection:'row'}}>
                     <TouchableOpacity style={{width:35,height:35,backgroundColor:'#0fa'}} onPress={()=>this.banding1()}>
                         <Text>电池1-01</Text>
                     </TouchableOpacity>
@@ -515,7 +521,7 @@ export default class CWHome extends Component {
                     <TouchableOpacity style={{width:35,height:35,backgroundColor:'#0fa'}} onPress={()=>this.bbbb()}>
                         <Text>解绑</Text>
                     </TouchableOpacity> 
-                </View>
+                </View> */}
                 {/*顶部电量可行驶里程*/}
                 <LinearGradient
                     start={{x: 0, y: 0}}  
@@ -543,7 +549,7 @@ export default class CWHome extends Component {
                         </TouchableOpacity>}
                     {/*右侧电池按钮*/}
                     <View style={styles.viewRightImage}>
-                        {this.state.batteryStorage===1||this.state.batteryStorage===2||this.state.batteryStorage===3||this.state.batteryStorage===4||this.state.batteryStorage===5||this.state.batteryStorage===6?
+                        {this.state.batteryStorage>=1?
                             <TouchableOpacity
                                 activeOpacity={0.5}
                                 onPress={() => this.props.navigation.navigate('HomepageData', { index: 0 })}
@@ -561,7 +567,7 @@ export default class CWHome extends Component {
                                 />
                             </View>
                         }
-                        {this.state.batteryStorage===2||this.state.batteryStorage===3||this.state.batteryStorage===4||this.state.batteryStorage===5||this.state.batteryStorage===6?
+                        {this.state.batteryStorage>=2?
                             <TouchableOpacity
                                 activeOpacity={0.5}
                                 onPress={() => this.props.navigation.navigate('HomepageData', { index: 1 })}
@@ -579,7 +585,7 @@ export default class CWHome extends Component {
                                 />
                             </View>
                         }
-                        {this.state.batteryStorage===3||this.state.batteryStorage===4||this.state.batteryStorage===5||this.state.batteryStorage===6?
+                        {this.state.batteryStorage>=3?
                             <TouchableOpacity
                                 activeOpacity={0.5}
                                 onPress={() => this.props.navigation.navigate('HomepageData', { index: 2 })}
@@ -597,7 +603,7 @@ export default class CWHome extends Component {
                                 />
                             </View>
                         }
-                        {this.state.batteryStorage===4||this.state.batteryStorage===5||this.state.batteryStorage===6?
+                        {this.state.batteryStorage>=4?
                             <TouchableOpacity
                                 activeOpacity={0.5}
                                 onPress={() => this.props.navigation.navigate('HomepageData', { index: 3 })}
@@ -615,7 +621,7 @@ export default class CWHome extends Component {
                                 />
                             </View>
                         }
-                        {this.state.batteryStorage===5||this.state.batteryStorage===6?
+                        {this.state.batteryStorage>=5?
                             <TouchableOpacity
                                 activeOpacity={0.5}
                                 onPress={() => this.props.navigation.navigate('HomepageData', { index: 4 })}
@@ -633,7 +639,7 @@ export default class CWHome extends Component {
                                 />
                             </View>
                         }
-                        {this.state.batteryStorage===6?
+                        {this.state.batteryStorage>=6?
                             <TouchableOpacity
                                 activeOpacity={0.5}
                                 onPress={() => this.props.navigation.navigate('HomepageData', { index: 5 })}

@@ -52,7 +52,7 @@ public class BleBroadcast extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void start(String str2, String str, Callback error) {
+    public void start(String str2, String str, Callback BleBroadcastError) {// Callback BleBroadcastError
 
         if (getBluetoothAdapter() == null) {
             toast("蓝牙不支持");
@@ -61,19 +61,19 @@ public class BleBroadcast extends ReactContextBaseJavaModule {
 
         if (!bluetoothAdapter.isEnabled()) {
             // toast("请打开蓝牙开关");
-            // error.invoke(true);
+            // BleBroadcastError.invoke(true);
             return;
         }
 
         if (!bluetoothAdapter.isMultipleAdvertisementSupported()) {
             // toast("当前手机不支持蓝牙广播1");// BLE Advertise
-            error.invoke(true);
+            BleBroadcastError.invoke(true);
             return;
         }
         mBluetoothLeAdvertiser = bluetoothAdapter.getBluetoothLeAdvertiser();
         if (mBluetoothLeAdvertiser == null) {
             // toast("当前手机不支持蓝牙广播2");
-            error.invoke(true);
+            BleBroadcastError.invoke(true);
             return;
         }
 
@@ -81,7 +81,7 @@ public class BleBroadcast extends ReactContextBaseJavaModule {
 
         if (advertiseSettings == null) {
             // toast("当前手机不支持蓝牙广播");
-            error.invoke(true);
+            BleBroadcastError.invoke(true);
             return;
         }
 

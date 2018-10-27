@@ -30,11 +30,11 @@ export default class ChargerSvg extends Component {
     }
 
     async componentDidMount(){
-
         //开启数据库
         if(!db){
             db = await sqLite.open();
         }
+        
         //删除数据
         // sqLite.deleteData();
 
@@ -50,50 +50,52 @@ export default class ChargerSvg extends Component {
         );
         //充电器存储数据
         const chargerBind = await Promise.all([CHARGER_BIND]);
-
-        //查询数据库总数据
-        let voltageData = new Promise(function (resolve,reject){
-            return db.transaction((tx)=>{
-                tx.executeSql("select charger_id,capacity,voltage,my_timestamp,chargerTemperature,electric_current from charger where charger_id order by my_timestamp asc", [],(tx,results)=>{
-                    var len = results.rows.length;
-                    let voltageData=[];
-                    for(let i=0; i<len; i++){
-                        var u = results.rows.item(i);
-                        voltageData.push(u);
-                    }
-                    resolve(voltageData);
-                });
-            },(error)=>{
-                reject(error);
-            });
-        })
-
-        let chargerData = await Promise.all([voltageData]);
         
-        // 取到时间
-        const repeatTime=chargerData[0].map((item,i) => {
-            return item.my_timestamp
-        })
-
-        //时间去重后排序
-        const xTime = Array.from(new Set(repeatTime)).sort(function(a, b){
-            return a > b ? 1 : -1; // 这里改为大于号
-        })
-
-        this.setState({
-            chargerData:commonality.uniqeByKeys(...chargerData,['my_timestamp']),
-            xTime, 
-        })
+        const loop = ()=>{
+            //查询数据库总数据
+            new Promise(function (resolve,reject){
+                return db.transaction((tx)=>{
+                    tx.executeSql("select charger_id,capacity,voltage,my_timestamp,chargerTemperature,electric_current from charger where charger_id order by my_timestamp asc", [],(tx,results)=>{
+                        var len = results.rows.length;
+                        let voltageData=[];
+                        for(let i=0; i<len; i++){
+                            var u = results.rows.item(i);
+                            voltageData.push(u);
+                        }
+                        resolve(voltageData);
+                    });
+                },(error)=>{
+                    reject(error);
+                });
+            }).then((voltageData)=>{
+                // 取到时间
+                const repeatTime=voltageData.map((item,i) => {
+                    return item.my_timestamp
+                })
+        
+                //时间去重后排序
+                const xTime = Array.from(new Set(repeatTime)).sort(function(a, b){
+                    return a > b ? 1 : -1; // 这里改为大于号
+                })
+        
+                this.setState({
+                    chargerData:commonality.uniqeByKeys(voltageData,['my_timestamp']),
+                    xTime, 
+                })
+            })
+            this.chargerTime=setTimeout(loop,60000);
+        }
+        loop();
     }
 
     componentWillUnmount() {
-        this.chargerClearTime && clearTimeout(this.chargerClearTime);
+        this.chargerTime && clearTimeout(this.chargerTime);
     }
 
     table(){
         this.props.navigation.navigate('Table',{
             charger:true,
-            localData:[this.state.chargerData],
+            localData:this.state.chargerData,
         })
     }
 
@@ -133,28 +135,6 @@ export default class ChargerSvg extends Component {
                     dataView : {
                         show: false, 
                         readOnly: true,
-                        // optionToContent: function(opt) {
-                        //     var axisData = opt.xAxis[0].data;
-                        //     var series = opt.series;
-                        //     var table = '<div style="height:350px;overflow:auto"><table style="width:100%;text-align:center;"><tbody><tr>'
-                        //     + '<td>时间</td>'
-                        //     + '<td>' + series[0].name + '</td>'
-                        //     + '<td>' + series[1].name + '</td>'
-                        //     + '<td>' + series[2].name + '</td>'
-                        //     + '<td>' + series[3].name + '</td>'
-                        //     + '</tr>';
-                        //     for (var i = 0, l = axisData.length; i < l; i++) {
-                        //         table += '<tr>'
-                        //                     + '<td>' + axisData[i] + '</td>'
-                        //                     + '<td>' + series[0].data[i] + '</td>'
-                        //                     + '<td>' + series[1].data[i] + '</td>'
-                        //                     + '<td>' + series[2].data[i] + '</td>'
-                        //                     + '<td>' + series[3].data[i] + '</td>'
-                        //                     + '</tr>';
-                        //     }
-                        //     table += '</tbody></table></div>';
-                        //     return table;
-                        // },
                     },//show是否显示表格，readOnly是否只读
                     // restore : {show: true},
                     magicType : {
@@ -188,7 +168,7 @@ export default class ChargerSvg extends Component {
             dataZoom: {
                 type: 'slider',
                 filterMode: 'filter', // 设定为 'filter' 从而 X 的窗口变化会影响 Y 的范围。
-                start: 80,
+                start: 0,
                 end: 100,
                 // realtime:false,
             },

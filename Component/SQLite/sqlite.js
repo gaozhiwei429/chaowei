@@ -182,7 +182,7 @@ export default class SQLite extends Component {
     }
 
     //写蓄电池数据
-    async insertbatteryData(batteryData, callback){
+    async insertbatteryData(batteryData){
         let len = batteryData.length;
         if (!db) {
             db = await this.open();
@@ -212,9 +212,7 @@ export default class SQLite extends Component {
                 let P_latitude = battery.P_latitude;
                 let sql = "INSERT INTO battery(battery_id,my_timestamp,voltage,electric_current,equilibrium_temperature,temperature,targetCurrent,targetVoltage,capacity,balanceVoltage,bindingState,equilibriumState,equilibrium_time,P_longitude,P_latitude)"+
                     "values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-                tx.executeSql(sql,[battery_id,my_timestamp,voltage,electric_current,equilibrium_temperature,temperature,targetCurrent,targetVoltage,capacity,balanceVoltage,bindingState,equilibriumState,equilibrium_time,P_longitude,P_latitude],()=>{
-                        callback();
-                    },(err)=>{
+                tx.executeSql(sql,[battery_id,my_timestamp,voltage,electric_current,equilibrium_temperature,temperature,targetCurrent,targetVoltage,capacity,balanceVoltage,bindingState,equilibriumState,equilibrium_time,P_longitude,P_latitude],(err)=>{
                         console.log(err);
                     }
                 );
@@ -252,7 +250,7 @@ export default class SQLite extends Component {
     }
 
     //写充电器数据
-    async insertchargerData(chargerData, callback){
+    async insertchargerData(chargerData){
         let len = chargerData.length;
         if (!db) {
             db = await this.open();
@@ -282,9 +280,7 @@ export default class SQLite extends Component {
                 let P_latitude = charger.P_latitude;
                 let sql = "INSERT INTO charger(charger_id,my_timestamp,voltage,electric_current,chargerTemperature,batteryTemperature,targetCurrent,targetVoltage,capacity,balanceVoltage,bindingState,chargingState,ambientTemperature,P_longitude,P_latitude)"+
                     "values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-                tx.executeSql(sql,[charger_id,my_timestamp,voltage,electric_current,chargerTemperature,batteryTemperature,targetCurrent,targetVoltage,capacity,balanceVoltage,bindingState,chargingState,ambientTemperature,P_longitude,P_latitude],()=>{
-                        callback();
-                    },(err)=>{
+                tx.executeSql(sql,[charger_id,my_timestamp,voltage,electric_current,chargerTemperature,batteryTemperature,targetCurrent,targetVoltage,capacity,balanceVoltage,bindingState,chargingState,ambientTemperature,P_longitude,P_latitude],(err)=>{
                         console.log(err);
                     }
                 );
@@ -322,7 +318,7 @@ export default class SQLite extends Component {
     }
 
     //写充电器检测仪数据  createChargerDetectorTable
-    async insertChargerDetectorData(ChargerDetectorData, callback){
+    async insertChargerDetectorData(ChargerDetectorData){
         let len = ChargerDetectorData.length;
         if (!db) {
             db = await this.open();
@@ -344,9 +340,7 @@ export default class SQLite extends Component {
                 let AmbientTemperature=ChargerDetector.AmbientTemperature;//add
                 let sql = "INSERT INTO ChargerDetector(ChargerDetector_id,my_timestamp,voltage,electric_current,capacity,BoardTemperature,AmbientTemperature)"+
                     "values(?,?,?,?,?,?,?)"; 
-                tx.executeSql(sql,[ChargerDetector_id,my_timestamp,voltage,electric_current,capacity,BoardTemperature,AmbientTemperature],()=>{
-                        callback();
-                    },(err)=>{
+                tx.executeSql(sql,[ChargerDetector_id,my_timestamp,voltage,electric_current,capacity,BoardTemperature,AmbientTemperature],(err)=>{
                         console.log(err);
                     }
                 );

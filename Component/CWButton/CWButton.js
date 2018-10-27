@@ -9,7 +9,8 @@ import {
 } from 'react-native';
 
 import CWBtnCell from './CWBtnCell';
-
+import { Initializer } from 'react-native-baidumap-sdk';
+Initializer.init();
 
 export default class CWButton extends Component {
     static navigationOptions = {

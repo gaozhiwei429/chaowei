@@ -63,9 +63,11 @@ export default class Calibration extends Component {
             if (error) {
                 if(error.errorCode == 102){
                     this.refs.bleScan.open();
+                    this.setState({
+                        BleScanErr:true
+                    })
                 }
-                console.log(error);
-                return;
+                BluetoothManager.stopScan();
             }else{
                 this.deviceMap.set(device.id,device); //使用Map类型保存搜索到的蓝牙设备，确保列表不显示重复的设备
                 let data1 = [...this.deviceMap.values()];
@@ -87,8 +89,11 @@ export default class Calibration extends Component {
                         let ChargerFixedValue = '0289382687921502';//判断固定值
                         if(fixed === ChargerFixedValue){
                             if(BleScan !== null && StorageChargerID == BleScanId){//电压、电流校准
+                                console.log(BleScan)
                                 storage.get(CALIBRATION_CHARGER_VOLTAGE_VALUE_STORAGE_KEY,() => {
-                                    this.setState({ ChargerCalibration: BleScan});
+                                    this.setState({ 
+                                        ChargerCalibration: BleScan
+                                    })
                                 });
                             }
                         }
@@ -125,9 +130,9 @@ export default class Calibration extends Component {
         const { params } = this.props.navigation.state;
         const { chargerImg } = params;
         if(chargerImg === 0){
-            bleBroadcast.start('0002','3826879215020000'+this.state.voltager+this.state.ChargerID);//电压
+            bleBroadcast.start('0002','3826879215020000'+this.state.voltager+this.state.ChargerID,()=>{alert('此手机不支持')});//电压
         }else {
-            bleBroadcast.start('0002','3826879215020000'+this.state.voltager+this.state.BatteryID);//电压
+            bleBroadcast.start('0002','3826879215020000'+this.state.voltager+this.state.BatteryID,()=>{alert('此手机不支持')});//电压
         }
     }
 
@@ -135,10 +140,12 @@ export default class Calibration extends Component {
         const { params } = this.props.navigation.state;
         const { chargerImg } = params;
         if(chargerImg === 0){
-            bleBroadcast.start('0003','3826879215020000'+this.state.Electricity+this.state.ChargerID);//电流
+            bleBroadcast.start('0003','3826879215020000'+this.state.Electricity+this.state.ChargerID,()=>{alert('此手机不支持')});//电流
         }
     }
-
+    componentWillUnmount (){
+        BluetoothManager.stopScan();
+    }
 
     static navigationOptions = {
         headerTitle:(<Text style={{fontSize:20,flex: 1,textAlign:'center'}}>校准</Text>),

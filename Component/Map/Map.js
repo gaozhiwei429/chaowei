@@ -44,7 +44,7 @@ export default class Map extends Component {
             distanceIs:false,
             iconLat:undefined,
             iconLon:undefined,
-            actionSheetConfig: [],
+            actionSheetConfig: []
         };
     }
     // 打开页面获取位置数据
@@ -123,32 +123,48 @@ export default class Map extends Component {
             iconLat:latitude,
             iconLon:longitude,
         })
-        console.log(latitude,longitude,'图标位置');
-        console.log(this.state.location.latitude,this.state.location.longitude,'当前位置');
+        // console.log(latitude,longitude,'图标位置');
+        // console.log(this.state.location.latitude,this.state.location.longitude,'当前位置');
     }
     async openMap(){
         
         this.ActionSheet.show();
         const { location, iconLat, iconLon } = this.state;
+  
+        var dataIntArr=fetch('https://restapi.amap.com/v3/assistant/coordinate/convert?locations='+location.longitude+','+location.latitude+'|' + iconLon +','+ iconLat + '&coordsys=baidu&output=json&key=14d59bc23db0c0755b4c33f0cadbf974')
+            .then((response) => //当前位置经纬数据
+                response.json()
+            )
+            .then((responseJson) => {
+                var dataStrArr=responseJson.locations.replace(/\;/g, ",").split(",");//分割成字符串数组
+                var dataIntArr=[];//保存转换后的整型字符串
+                return dataIntArr=dataStrArr.map(function(data){
+                    return +data;
+                });
+            })
+            .catch((error) =>{
+              console.error(error);
+            });
+        const Position = await Promise.all([dataIntArr]);
 
-        const urls = [
+        const urls = [  
             {
                 text: '使用高德地图导航',
                 downloadText: '下载高德地图',
                 downloadUrl: 'http://wap.amap.com',
-                openUrl: `androidamap://route?sourceApplication=com.chaowei&slat=${location.latitude}&slon=${location.longitude}&sname=当前位置&dlat=${iconLat}&dlon=${iconLon}&dname=充电桩&dev=1&m=0&t=4`,
-            },
+                openUrl: 'androidamap://route?sourceApplication=com.chaowei&dev=0&m=0&t=4&slat=' + Position[0][1] +'&slon=' + Position[0][0] + '&sname=当前位置&dlat=' + Position[0][3] + '&dlon=' + Position[0][2] + '&dname=充电桩',//&div=0&m=0
+            }, 
             {
                 text: '使用百度地图导航',
                 downloadText: '下载百度地图',
                 downloadUrl: 'https://map.baidu.com/zt/client/index/',
-                openUrl: `bdapp://map/direction?origin=${location.latitude + ',' + location.longitude}&destination=${iconLat},${iconLon}&mode=walking&coord_type=wgs84&src=com.chaowei`,
+                openUrl: `baidumap://map/direction?origin=${location.latitude + ',' + location.longitude}&destination=${iconLat},${iconLon}&mode=walking&src=com.chaowei`,
             },
         ];
 
         const actions = urls.map(item => Linking.canOpenURL(item.openUrl));
         const results = await Promise.all(actions);
-        
+    
         const actionSheetConfig = results.map((result, i) => {
             return {
                 text: result ? urls[i].text : urls[i].downloadText,
@@ -202,9 +218,9 @@ export default class Map extends Component {
                                 <Text>可步行</Text>
                                 <Text>{this.state.distance}米</Text>
                             </View> */}
-                            {/* <TouchableOpacity style={{flex:1,alignItems:'center'}} onPress={()=>this.openMap()}>
+                            <TouchableOpacity style={{flex:1,alignItems:'center'}} onPress={()=>this.openMap()}>
                                 <Text style={{fontSize:25,color:'#808080'}}>点击导航</Text>
-                            </TouchableOpacity> */}
+                            </TouchableOpacity>
                         </View>
                     </View>:<View/>
                 }

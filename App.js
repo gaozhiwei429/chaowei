@@ -11,8 +11,6 @@ const instructions = Platform.select({
     'Shake or press menu button for dev menu',
 });
 
-import { Initializer } from 'react-native-baidumap-sdk';
-
 //确保全局只有一个BleManager实例，BleModule类保存着蓝牙的连接信息
 import BleModule from './Component/CWBleSearch/BleModule';
 global.BluetoothManager = new BleModule();
@@ -114,7 +112,7 @@ export default class App extends Component {
     /** 获取地理位置（经纬度） */
     componentDidMount() {
         SplashScreen.hide();
-        Initializer.init('iOS 开发密钥').catch(e => console.error(e)); 
+        
         navigator.geolocation.getCurrentPosition(
             (position) => {
                 const positionData = position.coords;

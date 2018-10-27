@@ -57,270 +57,273 @@ export default class BatteryPower extends Component {
         //蓄电池存储数据
         const dataVoltage = await Promise.all([promise2]);
 
-        //查询数据库总数据
-        let voltageData = new Promise(function (resolve,reject){
-            return db.transaction((tx)=>{
-                tx.executeSql("select id,battery_id,my_timestamp,voltage,electric_current from battery where battery_id order by my_timestamp asc", [],(tx,results)=>{
-                    var len = results.rows.length;
-                    let voltageData=[];
-                    for(let i=0; i<len; i++){
-                        var u = results.rows.item(i);
-                        voltageData.push(u);
-                    }
-                    resolve(voltageData);
+        const loop = ()=>{
+            //查询数据库总数据
+            new Promise(function (resolve,reject){
+                return db.transaction((tx)=>{
+                    tx.executeSql("select id,battery_id,my_timestamp,voltage,electric_current from battery where battery_id order by my_timestamp asc", [],(tx,results)=>{
+                        var len = results.rows.length;
+                        let DatabaseData=[];
+                        for(let i=0; i<len; i++){
+                            var u = results.rows.item(i);
+                            DatabaseData.push(u);
+                        }
+                        resolve(DatabaseData);
+                    });
+                },(error)=>{
+                    reject(error);
                 });
-            },(error)=>{
-                reject(error);
-            });
-        })
-
-        const voltage = await Promise.all([voltageData]);
+            }).then((DatabaseData)=>{
+                const repeatTime=DatabaseData.map((item,i) => {
+                    return item.my_timestamp
+                })
         
-        const repeatTime=voltage[0].map((item,i) => {
-            return item.my_timestamp
-        })
-
-        //时间去重后排序
-        const xTime = Array.from(new Set(repeatTime)).sort(function(a, b){
-            return a > b ? 1 : -1; // 这里改为大于号
-        })
+                //时间去重后排序
+                const xTime = Array.from(new Set(repeatTime)).sort(function(a, b){
+                    return a > b ? 1 : -1; // 这里改为大于号
+                })
+                
+                //电池1
+                const battery1 = DatabaseData.map((item,i)=>{
+                    if(dataVoltage[0][0]==DatabaseData[i].battery_id){
+                        return item
+                    }
+                }).filter(function(val){//过滤掉undefined
+                    return !(!val || val === "");
+                })
         
-        //电池1
-        const battery1 = voltage[0].map((item,i)=>{
-            if(dataVoltage[0][0]==voltage[0][i].battery_id){
-                return item
-            }
-        }).filter(function(val){//过滤掉undefined
-            return !(!val || val === "");
-        })
-
-        const battery1Time=battery1.map(item=>{
-            return item.my_timestamp
-        })
-
-        //获取两个数组的差集且向原数组中push
-        var difference1Time=xTime.filter(function(v){ return battery1Time.indexOf(v) == -1 });
-        difference1Time.map(item=>{
-            return battery1.push(
-                    {my_timestamp:item,voltage:null,electric_current:null,battery_id:dataVoltage[0][0]}
-                )
-        })
+                const battery1Time=battery1.map(item=>{
+                    return item.my_timestamp
+                })
         
-        const ybattery1 = battery1.sort(function(a, b) {
-            if (a.my_timestamp < b.my_timestamp ) {
-                return -1;
-            } else if (a.my_timestamp > b.my_timestamp ) {
-                return 1;
-            } else {
-                if (a.my_timestamp < b.my_timestamp ) {
-                    return 1;
-                } else if (a.my_timestamp > b.my_timestamp ) {
-                    return -1;
-                }
-                return 0;
-            }
-        }).map(item=>{
-            return (item.voltage)*(item.electric_current)
-        })
-
-        //电池2
-        var battery2 = voltage[0].map((item,i)=>{
-            if(dataVoltage[0][1]==voltage[0][i].battery_id){
-                return item
-            }
-        }).filter(function(val){//过滤掉undefined
-            return !(!val || val === "");
-        })
-
-        var battery2Time=battery2.map(item=>{
-            return item.my_timestamp
-        })
-
-        //获取两个数组的差集且向原数组中push
-        var difference2Time=xTime.filter(function(v){ return battery2Time.indexOf(v) == -1 })
-        difference2Time.map(item=>{
-            return battery2.push(
-                {my_timestamp:item,voltage:null,electric_current:null,battery_id:dataVoltage[0][1]}
-            )
-        })
-
-        var ybattery2 = battery2.sort(function(a, b) {
-            if (a.my_timestamp < b.my_timestamp ) {
-                return -1;
-            } else if (a.my_timestamp > b.my_timestamp ) {
-                return 1;
-            } else {
-                if (a.my_timestamp < b.my_timestamp ) {
-                    return 1;
-                } else if (a.my_timestamp > b.my_timestamp ) {
-                    return -1;
-                }
-                return 0;
-            }
-        }).map(item=>{
-            return (item.voltage)*(item.electric_current)
-        })
+                //获取两个数组的差集且向原数组中push
+                var difference1Time=xTime.filter(function(v){ return battery1Time.indexOf(v) == -1 });
+                difference1Time.map(item=>{
+                    return battery1.push(
+                            {my_timestamp:item,voltage:null,electric_current:null,battery_id:dataVoltage[0][0]}
+                        )
+                })
+                
+                const ybattery1 = battery1.sort(function(a, b) {
+                    if (a.my_timestamp < b.my_timestamp ) {
+                        return -1;
+                    } else if (a.my_timestamp > b.my_timestamp ) {
+                        return 1;
+                    } else {
+                        if (a.my_timestamp < b.my_timestamp ) {
+                            return 1;
+                        } else if (a.my_timestamp > b.my_timestamp ) {
+                            return -1;
+                        }
+                        return 0;
+                    }
+                }).map(item=>{
+                    return (item.voltage)*(item.electric_current)
+                })
         
-        //电池3  
-        const battery3 = voltage[0].map((item,i)=>{
-            if(dataVoltage[0][2]==voltage[0][i].battery_id){
-                return item
-            }
-        }).filter(function(val){//过滤掉undefined
-            return !(!val || val === "");
-        })
-
-        const battery3Time=battery3.map(item=>{
-            return item.my_timestamp
-        })
-
-        //获取两个数组的差集且向原数组中push
-        var difference3Time=xTime.filter(function(v){ return battery3Time.indexOf(v) == -1 })
-        difference3Time.map(item=>{
-            return battery3.push(
-                {my_timestamp:item,voltage:null,electric_current:null,battery_id:dataVoltage[0][2]}
-                )
-        })
-        const ybattery3 = battery3.sort(function(a, b) {
-            if (a.my_timestamp < b.my_timestamp ) {
-                return -1;
-            } else if (a.my_timestamp > b.my_timestamp ) {
-                return 1;
-            } else {
-                if (a.my_timestamp < b.my_timestamp ) {
-                    return 1;
-                } else if (a.my_timestamp > b.my_timestamp ) {
-                    return -1;
-                }
-                return 0;
-            }
-        }).map(item=>{
-            return (item.voltage)*(item.electric_current)
-        })
+                //电池2
+                var battery2 = DatabaseData.map((item,i)=>{
+                    if(dataVoltage[0][1]==DatabaseData[i].battery_id){
+                        return item
+                    }
+                }).filter(function(val){//过滤掉undefined
+                    return !(!val || val === "");
+                })
         
-        //电池4 
-        const battery4 = voltage[0].map((item,i)=>{
-            if(dataVoltage[0][3]==voltage[0][i].battery_id){
-                return item
-            }
-        }).filter(function(val){//过滤掉undefined
-            return !(!val || val === "");
-        })
-
-        const battery4Time=battery4.map(item=>{
-            return item.my_timestamp
-        })
-
-        //获取两个数组的差集且向原数组中push
-        var difference4Time=xTime.filter(function(v){ return battery4Time.indexOf(v) == -1 })
-        difference4Time.map(item=>{
-            return battery4.push(
-                {my_timestamp:item,voltage:null,electric_current:null,battery_id:dataVoltage[0][3]}
-                )
-        })
-        const ybattery4 = battery4.sort(function(a, b) {
-            if (a.my_timestamp < b.my_timestamp ) {
-                return -1;
-            } else if (a.my_timestamp > b.my_timestamp ) {
-                return 1;
-            } else {
-                if (a.my_timestamp < b.my_timestamp ) {
-                    return 1;
-                } else if (a.my_timestamp > b.my_timestamp ) {
-                    return -1;
-                }
-                return 0;
-            }
-        }).map(item=>{
-            return (item.voltage)*(item.electric_current)
-        })
-
-        //电池5
-        const battery5 = voltage[0].map((item,i)=>{
-            if(dataVoltage[0][4]==voltage[0][i].battery_id){
-                return item
-            }
-        }).filter(function(val){//过滤掉undefined
-            return !(!val || val === "");
-        })
-
-        const battery5Time=battery5.map(item=>{
-            return item.my_timestamp
-        })
-
-        //获取两个数组的差集且向原数组中push
-        var difference5Time=xTime.filter(function(v){ return battery5Time.indexOf(v) == -1 })
-        difference5Time.map(item=>{
-            return battery5.push(
-                {my_timestamp:item,voltage:null,electric_current:null,battery_id:dataVoltage[0][4]}
-                )
-        })
-        const ybattery5 = battery5.sort(function(a, b) {
-            if (a.my_timestamp < b.my_timestamp ) {
-                return -1;
-            } else if (a.my_timestamp > b.my_timestamp ) {
-                return 1;
-            } else {
-                if (a.my_timestamp < b.my_timestamp ) {
-                    return 1;
-                } else if (a.my_timestamp > b.my_timestamp ) {
-                    return -1;
-                }
-                return 0;
-            }
-        }).map(item=>{
-            return (item.voltage)*(item.electric_current)
-        })
-
-
-        //电池6
-        const battery6 = voltage[0].map((item,i)=>{
-            if(dataVoltage[0][5]==voltage[0][i].battery_id){
-                return item
-            }
-        }).filter(function(val){//过滤掉undefined
-            return !(!val || val === "");
-        })
-
-        const battery6Time=battery6.map(item=>{
-            return item.my_timestamp
-        })
-
-        //获取两个数组的差集且向原数组中push
-        var difference6Time=xTime.filter(function(v){ return battery6Time.indexOf(v) == -1 })
-        difference6Time.map(item=>{
-            return battery6.push(
-                {my_timestamp:item,voltage:null,electric_current:null,battery_id:dataVoltage[0][5]}
-                )
-        })
-        const ybattery6 = battery6.sort(function(a, b) {
-            if (a.my_timestamp < b.my_timestamp ) {
-                return -1;
-            } else if (a.my_timestamp > b.my_timestamp ) {
-                return 1;
-            } else {
-                if (a.my_timestamp < b.my_timestamp ) {
-                    return 1;
-                } else if (a.my_timestamp > b.my_timestamp ) {
-                    return -1;
-                }
-                return 0;
-            }
-        }).map(item=>{
-            return (item.voltage)*(item.electric_current)
-        })
+                var battery2Time=battery2.map(item=>{
+                    return item.my_timestamp
+                })
         
-        this.setState({
-            ybattery1,
-            ybattery2,
-            ybattery3,
-            ybattery4,
-            ybattery5,
-            ybattery6,
-            voltage,
-            xTime,
-            batteryBind:dataVoltage,
-        })
+                //获取两个数组的差集且向原数组中push
+                var difference2Time=xTime.filter(function(v){ return battery2Time.indexOf(v) == -1 })
+                difference2Time.map(item=>{
+                    return battery2.push(
+                        {my_timestamp:item,voltage:null,electric_current:null,battery_id:dataVoltage[0][1]}
+                    )
+                })
+        
+                var ybattery2 = battery2.sort(function(a, b) {
+                    if (a.my_timestamp < b.my_timestamp ) {
+                        return -1;
+                    } else if (a.my_timestamp > b.my_timestamp ) {
+                        return 1;
+                    } else {
+                        if (a.my_timestamp < b.my_timestamp ) {
+                            return 1;
+                        } else if (a.my_timestamp > b.my_timestamp ) {
+                            return -1;
+                        }
+                        return 0;
+                    }
+                }).map(item=>{
+                    return (item.voltage)*(item.electric_current)
+                })
+                
+                //电池3  
+                const battery3 = DatabaseData.map((item,i)=>{
+                    if(dataVoltage[0][2]==DatabaseData[i].battery_id){
+                        return item
+                    }
+                }).filter(function(val){//过滤掉undefined
+                    return !(!val || val === "");
+                })
+        
+                const battery3Time=battery3.map(item=>{
+                    return item.my_timestamp
+                })
+        
+                //获取两个数组的差集且向原数组中push
+                var difference3Time=xTime.filter(function(v){ return battery3Time.indexOf(v) == -1 })
+                difference3Time.map(item=>{
+                    return battery3.push(
+                        {my_timestamp:item,voltage:null,electric_current:null,battery_id:dataVoltage[0][2]}
+                        )
+                })
+                const ybattery3 = battery3.sort(function(a, b) {
+                    if (a.my_timestamp < b.my_timestamp ) {
+                        return -1;
+                    } else if (a.my_timestamp > b.my_timestamp ) {
+                        return 1;
+                    } else {
+                        if (a.my_timestamp < b.my_timestamp ) {
+                            return 1;
+                        } else if (a.my_timestamp > b.my_timestamp ) {
+                            return -1;
+                        }
+                        return 0;
+                    }
+                }).map(item=>{
+                    return (item.voltage)*(item.electric_current)
+                })
+                
+                //电池4 
+                const battery4 = DatabaseData.map((item,i)=>{
+                    if(dataVoltage[0][3]==DatabaseData[i].battery_id){
+                        return item
+                    }
+                }).filter(function(val){//过滤掉undefined
+                    return !(!val || val === "");
+                })
+        
+                const battery4Time=battery4.map(item=>{
+                    return item.my_timestamp
+                })
+        
+                //获取两个数组的差集且向原数组中push
+                var difference4Time=xTime.filter(function(v){ return battery4Time.indexOf(v) == -1 })
+                difference4Time.map(item=>{
+                    return battery4.push(
+                        {my_timestamp:item,voltage:null,electric_current:null,battery_id:dataVoltage[0][3]}
+                        )
+                })
+                const ybattery4 = battery4.sort(function(a, b) {
+                    if (a.my_timestamp < b.my_timestamp ) {
+                        return -1;
+                    } else if (a.my_timestamp > b.my_timestamp ) {
+                        return 1;
+                    } else {
+                        if (a.my_timestamp < b.my_timestamp ) {
+                            return 1;
+                        } else if (a.my_timestamp > b.my_timestamp ) {
+                            return -1;
+                        }
+                        return 0;
+                    }
+                }).map(item=>{
+                    return (item.voltage)*(item.electric_current)
+                })
+        
+                //电池5
+                const battery5 = DatabaseData.map((item,i)=>{
+                    if(dataVoltage[0][4]==DatabaseData[i].battery_id){
+                        return item
+                    }
+                }).filter(function(val){//过滤掉undefined
+                    return !(!val || val === "");
+                })
+        
+                const battery5Time=battery5.map(item=>{
+                    return item.my_timestamp
+                })
+        
+                //获取两个数组的差集且向原数组中push
+                var difference5Time=xTime.filter(function(v){ return battery5Time.indexOf(v) == -1 })
+                difference5Time.map(item=>{
+                    return battery5.push(
+                        {my_timestamp:item,voltage:null,electric_current:null,battery_id:dataVoltage[0][4]}
+                        )
+                })
+                const ybattery5 = battery5.sort(function(a, b) {
+                    if (a.my_timestamp < b.my_timestamp ) {
+                        return -1;
+                    } else if (a.my_timestamp > b.my_timestamp ) {
+                        return 1;
+                    } else {
+                        if (a.my_timestamp < b.my_timestamp ) {
+                            return 1;
+                        } else if (a.my_timestamp > b.my_timestamp ) {
+                            return -1;
+                        }
+                        return 0;
+                    }
+                }).map(item=>{
+                    return (item.voltage)*(item.electric_current)
+                })
+        
+        
+                //电池6
+                const battery6 = DatabaseData.map((item,i)=>{
+                    if(dataVoltage[0][5]==DatabaseData[i].battery_id){
+                        return item
+                    }
+                }).filter(function(val){//过滤掉undefined
+                    return !(!val || val === "");
+                })
+        
+                const battery6Time=battery6.map(item=>{
+                    return item.my_timestamp
+                })
+        
+                //获取两个数组的差集且向原数组中push
+                var difference6Time=xTime.filter(function(v){ return battery6Time.indexOf(v) == -1 })
+                difference6Time.map(item=>{
+                    return battery6.push(
+                        {my_timestamp:item,voltage:null,electric_current:null,battery_id:dataVoltage[0][5]}
+                        )
+                })
+                const ybattery6 = battery6.sort(function(a, b) {
+                    if (a.my_timestamp < b.my_timestamp ) {
+                        return -1;
+                    } else if (a.my_timestamp > b.my_timestamp ) {
+                        return 1;
+                    } else {
+                        if (a.my_timestamp < b.my_timestamp ) {
+                            return 1;
+                        } else if (a.my_timestamp > b.my_timestamp ) {
+                            return -1;
+                        }
+                        return 0;
+                    }
+                }).map(item=>{
+                    return (item.voltage)*(item.electric_current)
+                })
+                
+                this.setState({
+                    ybattery1,
+                    ybattery2,
+                    ybattery3,
+                    ybattery4,
+                    ybattery5,
+                    ybattery6,
+                    DatabaseData,
+                    xTime,
+                    batteryBind:dataVoltage,
+                })
+            })
+            setTimeout(loop,60000);
+        }
+
+        loop();
     }
 
     componentWillUnmount() {
@@ -329,14 +332,14 @@ export default class BatteryPower extends Component {
 
     table(){
         this.props.navigation.navigate('Table',{ 
-            localData:this.state.voltage,
+            localData:this.state.DatabaseData,
             batteryBind:this.state.batteryBind,
             power:true,
         })
     }
 
     static navigationOptions = {
-        headerTitle:(<Text style={{fontSize:20,flex: 1, textAlign: 'center'}}>蓄电池电压数据</Text>), 
+        headerTitle:(<Text style={{fontSize:20,flex: 1, textAlign: 'center'}}>蓄电池功率数据</Text>), 
         headerStyle: {
             height: 40,
         },
@@ -372,35 +375,6 @@ export default class BatteryPower extends Component {
                     dataView : {
                         show: false, 
                         readOnly: true,
-                        // optionToContent: function(opt) {
-                        //     var axisData = opt.xAxis[0].data;
-                        //     var series = opt.series;
-                        //     var table = '<div style="height:350px;overflow:auto"><table style="width:100%;text-align:center;"><tbody><tr>'
-                        //                  + '<td>时间</td>'
-                        //                  + '<td>' + series[0].name + '</td>'
-                        //                  + '<td>' + series[1].name + '</td>'
-                        //                  + '<td>' + series[2].name + '</td>'
-                        //                  + '<td>' + series[3].name + '</td>'
-                        //                  + '<td>' + series[4].name + '</td>'
-                        //                  + '<td>' + series[5].name + '</td>'
-                        //                  + '</tr>';
-                        //     for (var i = 0, l = axisData.length; i < l; i++) {
-                        //         table += '<tr>'
-                        //                  + '<td>' + axisData[i] + '</td>'
-                        //                  + '<td>' + series[0].data[i] + '</td>'
-                        //                  + '<td>' + series[1].data[i] + '</td>'
-                        //                  + '<td>' + series[2].data[i] + '</td>'
-                        //                  + '<td>' + series[3].data[i] + '</td>'
-                        //                  + '<td>' + series[4].data[i] + '</td>'
-                        //                  + '<td>' + series[5].data[i] + '</td>'
-                        //                  + '</tr>';
-                        //     }
-                        //     table += '</tbody></table></div>';
-                        //     return table;
-                        // },
-                        // contentToOption:function(){
-
-                        // }
                     },//show是否显示表格，readOnly是否只读
                     magicType : {
                         //折线图  柱形图    总数统计 分开平铺
@@ -433,7 +407,7 @@ export default class BatteryPower extends Component {
             dataZoom: {
                 type: 'slider',
                 filterMode: 'filter', // 设定为 'filter' 从而 X 的窗口变化会影响 Y 的范围。
-                start: 80,
+                start: 0,
                 end: 100,
                 // realtime:false,
             },

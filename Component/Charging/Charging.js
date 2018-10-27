@@ -44,7 +44,7 @@ export default class Charging extends Component {
                     charging:!this.state.charging
                 });
                 storage.get(CHARGER_BIND_STORAGE_KEY, (error, result) => {
-                    bleBroadcast.start('0132' ,'3826879215020000'+H24Time+result);// 定时充电
+                    bleBroadcast.start('0132' ,'3826879215020000'+H24Time+result,()=>{alert('此手机不支持')});// 定时充电
                 });
             }
         }
@@ -54,7 +54,7 @@ export default class Charging extends Component {
             charging:!this.state.charging
         });
         storage.get(CHARGER_BIND_STORAGE_KEY, (error, result) => {
-            bleBroadcast.start('0130' ,'3826879215020000'+result);// 开启充电
+            bleBroadcast.start('0130' ,'3826879215020000'+result,()=>{alert('此手机不支持')});// 开启充电
         });
     }
     stopRecharge(){
@@ -62,7 +62,7 @@ export default class Charging extends Component {
             charging:!this.state.charging
         });
         storage.get(CHARGER_BIND_STORAGE_KEY, (error, result) => {
-            bleBroadcast.start('0131' ,'3826879215020000'+result);// 关闭充电
+            bleBroadcast.start('0131' ,'3826879215020000'+result,()=>{alert('此手机不支持')});// 关闭充电
         });
     }
 

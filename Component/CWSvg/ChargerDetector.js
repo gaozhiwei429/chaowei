@@ -20,10 +20,6 @@ class VoltageCurrent extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            chargerVoltage:[],
-            chargerElectricCurrent:[],
-            chargerTimeData:[],
-            chargerTime:[],
             ChargerDetector:[],
             xTime:[],
         };
@@ -40,54 +36,52 @@ class VoltageCurrent extends Component {
 
         /** 充电器检测仪*/
 
-        //查询数据库总数据
-        let Database = new Promise(function (resolve,reject){
-            return db.transaction((tx)=>{
-                tx.executeSql("select ChargerDetector_id,my_timestamp,voltage,electric_current from ChargerDetector where ChargerDetector_id order by my_timestamp asc", [],(tx,results)=>{
-                    var len = results.rows.length;
-                    let Database=[];
-                    for(let i=0; i<len; i++){
-                        var u = results.rows.item(i);
-                        Database.push(u);
-                    }
-                    resolve(Database);
+        const loop = ()=>{
+            //查询数据库总数据
+            new Promise(function (resolve,reject){
+                return db.transaction((tx)=>{
+                    tx.executeSql("select ChargerDetector_id,my_timestamp,voltage,electric_current from ChargerDetector where ChargerDetector_id order by my_timestamp asc", [],(tx,results)=>{
+                        var len = results.rows.length;
+                        let DatabaseData=[];
+                        for(let i=0; i<len; i++){
+                            var u = results.rows.item(i);
+                            DatabaseData.push(u);
+                        }
+                        resolve(DatabaseData);
+                    });
+                },(error)=>{
+                    reject(error);
                 });
-            },(error)=>{
-                reject(error);
-            });
-        })
+            }).then((DatabaseData)=>{
+                // 取到时间
+                const repeatTime=DatabaseData.map((item,i) => {
+                    return item.my_timestamp
+                })
 
-        let ChargerDetector = await Promise.all([Database]);
+                //时间去重后排序
+                const xTime = Array.from(new Set(repeatTime)).sort(function(a, b){
+                    return a > b ? 1 : -1; // 这里改为大于号
+                })
 
-        // 取到时间
-        const repeatTime=ChargerDetector[0].map((item,i) => {
-            return item.my_timestamp
-        })
-
-        //时间去重后排序
-        const xTime = Array.from(new Set(repeatTime)).sort(function(a, b){
-            return a > b ? 1 : -1; // 这里改为大于号
-        })
-
-        this.setState({
-            ChargerDetector:commonality.uniqeByKeys(...ChargerDetector,['my_timestamp']),
-            xTime, 
-        })
-
+                this.setState({
+                    ChargerDetector:commonality.uniqeByKeys(DatabaseData,['my_timestamp']),
+                    xTime, 
+                })
+            })
+            this.ChargerDetectorClearTime=setTimeout(loop,60000);
+        }
+        loop();
 
     }
 
     componentWillUnmount() {
-        chargerVoltageData = [];
-        chargerElectricCurrentData=[];
-        chargerTimeData=[];
         this.ChargerDetectorClearTime && clearTimeout(this.ChargerDetectorClearTime);
     }
 
     table(){
         this.props.navigation.navigate('Table',{
             detectorVoltageCurrent:true,
-            localData:[this.state.ChargerDetector],
+            localData:this.state.ChargerDetector,
         })
     }
 
@@ -156,7 +150,7 @@ class VoltageCurrent extends Component {
             dataZoom: {
                 type: 'slider',
                 filterMode: 'filter', // 设定为 'filter' 从而 X 的窗口变化会影响 Y 的范围。
-                start: 70,
+                start: 0,
                 end: 100,
             },
             series: [
@@ -205,10 +199,6 @@ class Temperature extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            BoardTemperature:[],
-            AmbientTemperature:[],
-            TimeData:[],
-
             ChargerDetector:[],
             xTime:[],
         };
@@ -223,52 +213,52 @@ class Temperature extends Component {
         //删除数据
         // sqLite.deleteData();
 
-        //查询数据库总数据
-        let Database = new Promise(function (resolve,reject){
-            return db.transaction((tx)=>{
-                tx.executeSql("select ChargerDetector_id,my_timestamp,BoardTemperature,AmbientTemperature from ChargerDetector where ChargerDetector_id order by my_timestamp asc", [],(tx,results)=>{
-                    var len = results.rows.length;
-                    let Database=[];
-                    for(let i=0; i<len; i++){
-                        var u = results.rows.item(i);
-                        Database.push(u);
-                    }
-                    resolve(Database);
+        const loop = ()=>{
+            //查询数据库总数据
+            new Promise(function (resolve,reject){
+                return db.transaction((tx)=>{
+                    tx.executeSql("select ChargerDetector_id,my_timestamp,BoardTemperature,AmbientTemperature from ChargerDetector where ChargerDetector_id order by my_timestamp asc", [],(tx,results)=>{
+                        var len = results.rows.length;
+                        let Database=[];
+                        for(let i=0; i<len; i++){
+                            var u = results.rows.item(i);
+                            Database.push(u);
+                        }
+                        resolve(Database);
+                    });
+                },(error)=>{
+                    reject(error);
                 });
-            },(error)=>{
-                reject(error);
-            });
-        })
+            }).then((Database)=>{
+                // 取到时间
+                const repeatTime=Database.map((item,i) => {
+                    return item.my_timestamp
+                })
 
-        let ChargerDetector = await Promise.all([Database]);
+                //时间去重后排序
+                const xTime = Array.from(new Set(repeatTime)).sort(function(a, b){
+                    return a > b ? 1 : -1; // 这里改为大于号
+                })
 
-        // 取到时间
-        const repeatTime=ChargerDetector[0].map((item,i) => {
-            return item.my_timestamp
-        })
+                this.setState({
+                    ChargerDetector:commonality.uniqeByKeys(Database,['my_timestamp']),
+                    xTime, 
+                })
+            })
+            this.TemperatureClearTime = setTimeout(loop,6000)
+        }
+        loop();
 
-        //时间去重后排序
-        const xTime = Array.from(new Set(repeatTime)).sort(function(a, b){
-            return a > b ? 1 : -1; // 这里改为大于号
-        })
-
-        this.setState({
-            ChargerDetector:commonality.uniqeByKeys(...ChargerDetector,['my_timestamp']),
-            xTime, 
-        })
     }
 
     componentWillUnmount() {
-        BoardTemperatureData = [];
-        AmbientTemperatureData=[];
-        TimeData=[];
         this.TemperatureClearTime && clearTimeout(this.TemperatureClearTime);
     }
 
     table(){
         this.props.navigation.navigate('Table',{
             detectorTemperature:true,
-            localData:[this.state.ChargerDetector],
+            localData:this.state.ChargerDetector,
         })
     }
 
@@ -386,10 +376,6 @@ class CapacityPower extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            capacityData:[],
-            CapacityPowerData:[],
-            TimeData:[],
-
             ChargerDetector:[],
             xTime:[],
         };
@@ -406,52 +392,52 @@ class CapacityPower extends Component {
 
         /** 充电器检测仪*/
        
-        //查询数据库总数据
-        let Database = new Promise(function (resolve,reject){
-            return db.transaction((tx)=>{
-                tx.executeSql("select ChargerDetector_id,my_timestamp,capacity,voltage,electric_current from ChargerDetector where ChargerDetector_id order by my_timestamp asc", [],(tx,results)=>{
-                    var len = results.rows.length;
-                    let Database=[];
-                    for(let i=0; i<len; i++){
-                        var u = results.rows.item(i);
-                        Database.push(u);
-                    }
-                    resolve(Database);
+        const loop =()=>{
+            //查询数据库总数据
+            new Promise(function (resolve,reject){
+                return db.transaction((tx)=>{
+                    tx.executeSql("select ChargerDetector_id,my_timestamp,capacity,voltage,electric_current from ChargerDetector where ChargerDetector_id order by my_timestamp asc", [],(tx,results)=>{
+                        var len = results.rows.length;
+                        let Database=[];
+                        for(let i=0; i<len; i++){
+                            var u = results.rows.item(i);
+                            Database.push(u);
+                        }
+                        resolve(Database);
+                    });
+                },(error)=>{
+                    reject(error);
                 });
-            },(error)=>{
-                reject(error);
-            });
-        })
+            }).then((Database)=>{
+                // 取到时间
+                const repeatTime=Database.map((item,i) => {
+                    return item.my_timestamp
+                })
 
-        let ChargerDetector = await Promise.all([Database]);
+                //时间去重后排序
+                const xTime = Array.from(new Set(repeatTime)).sort(function(a, b){
+                    return a > b ? 1 : -1; // 这里改为大于号
+                })
 
-        // 取到时间
-        const repeatTime=ChargerDetector[0].map((item,i) => {
-            return item.my_timestamp
-        })
-
-        //时间去重后排序
-        const xTime = Array.from(new Set(repeatTime)).sort(function(a, b){
-            return a > b ? 1 : -1; // 这里改为大于号
-        })
-
-        this.setState({
-            ChargerDetector:commonality.uniqeByKeys(...ChargerDetector,['my_timestamp']),
-            xTime, 
-        })
+                this.setState({
+                    ChargerDetector:commonality.uniqeByKeys(Database,['my_timestamp']),
+                    xTime, 
+                })
+            })
+            this.TemperatureClearTime= setTimeout(loop,60000);
+        }
+        loop();
+    
     }
 
     componentWillUnmount() {
-        capacityData = [];
-        CapacityPowerData=[];
-        TimeData=[];
         this.TemperatureClearTime && clearTimeout(this.TemperatureClearTime);
     }
 
     table(){
         this.props.navigation.navigate('Table',{
             CapacityPower:true,
-            localData:[this.state.ChargerDetector],
+            localData:this.state.ChargerDetector,
         })
     }
 

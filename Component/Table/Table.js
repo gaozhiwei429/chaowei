@@ -30,16 +30,20 @@ export default class Table extends Component {
     this.ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2 });
     const { params } = this.props.navigation.state;
     const { localData } = params;
-    this.state = {
-      ds: this.ds.cloneWithRows(...localData),
-    };
 
+    this.state = {
+      ds: this.ds.cloneWithRows(localData),
+      battery:false,
+    };
     this.renderHeader = this.renderHeader.bind(this);
     this.renderRow = this.renderRow.bind(this);
   }
-
+ 
 
   async componentDidMount(){
+    const { params } = this.props.navigation.state;
+    const { localData,capacity,electric_current,temperature,voltage,power,xTime } = params;
+    
     let promise2=new Promise(function (resolve,reject) {
       return storage.get(BATTERY_BIND_STORAGE_KEY, (error, result) => {
           if (error) {
@@ -52,10 +56,33 @@ export default class Table extends Component {
 
       //蓄电池存储数据
     const batteryBind = await Promise.all([promise2]);
-      
-      this.setState({
-        batteryBind
+
+    if(capacity||electric_current||temperature||voltage||power){
+      let dsData =localData
+      var ds={}
+      var New=new Array();
+      dsData.forEach(v=>{
+        !ds[v.my_timestamp]?(ds[v.my_timestamp]=[v]):ds[v.my_timestamp].push(v);
       })
+      var i=0;
+      for(var o in ds){
+        New[i]={
+          "my_timestamp":o,
+          "oarr":ds[o]
+        }
+        i++;
+      }
+    
+      this.setState({
+        batteryBind,
+        ds: this.ds.cloneWithRows(New)
+      }) 
+    }else{
+      this.setState({
+        batteryBind,
+        ds: this.ds.cloneWithRows(localData),
+      }) 
+    }
 
   }
 
@@ -74,6 +101,7 @@ export default class Table extends Component {
 };
 
   render() {
+    
     return (
       <View style={styles.container}>
         <DataTable
@@ -123,7 +151,7 @@ export default class Table extends Component {
           />:batteryBind[0].length>=1?
           <HeaderCell
             style={styles.headerCell}
-            key="2"
+            key="1"
             text='电池1'
             width={1}
             isAscending={false}
@@ -138,14 +166,14 @@ export default class Table extends Component {
           detectorVoltageCurrent?
           <HeaderCell
             style={styles.headerCell}
-            key="3"
+            key="2"
             text={'电流'}
             width={1}
             isAscending={false}
           />:charger?
           <HeaderCell
             style={styles.headerCell}
-            key="3"
+            key="2"
             // text={charger==0?'电流':localData[0][0].voltage&&localData[0][0].electric_current?'功率':localData[0][0].voltage?'电压':localData[0][0].temperature?'温度':localData[0][0].electric_current?'电流':localData[0][0].capacity?'容量':''}
             text={'电流'}
             width={1}
@@ -153,7 +181,7 @@ export default class Table extends Component {
           />:batteryBind[0].length>=2?
           <HeaderCell
             style={styles.headerCell}
-            key="4"
+            key="2"
             text='电池2'
             width={1}
             isAscending={false}
@@ -166,7 +194,7 @@ export default class Table extends Component {
           detectorTemperature?
           <HeaderCell
           style={styles.headerCell}
-          key="5"
+          key="3"
           text='电路板温度'
           width={1}
         />:
@@ -174,13 +202,13 @@ export default class Table extends Component {
           <HeaderCell width={0}/>:charger?
           <HeaderCell
             style={styles.headerCell}
-            key="5"
+            key="3"
             text='温度'
             width={1}
           />:batteryBind[0].length>=3?
         <HeaderCell
           style={styles.headerCell}
-          key="6"
+          key="3"
           text='电池3'
           width={1}
           isAscending={false}
@@ -191,7 +219,7 @@ export default class Table extends Component {
           CapacityPower?
           <HeaderCell 
             style={styles.headerCell}
-            key="1"
+            key="4"
             text='容量'
             width={1}
             isAscending={false}
@@ -199,20 +227,20 @@ export default class Table extends Component {
           detectorTemperature?
           <HeaderCell
           style={styles.headerCell}
-          key="6"
+          key="4"
           text='环境温度'
           width={1}
         />:detectorVoltageCurrent?
           <HeaderCell width={0}/>:charger?
           <HeaderCell
           style={styles.headerCell}
-          key="7"
+          key="4"
           text='容量'
           width={1}
         />:batteryBind[0].length>=4?
         <HeaderCell
           style={styles.headerCell}
-          key="8"
+          key="4"
           text='电池4'
           width={1}
           isAscending={false}
@@ -223,7 +251,7 @@ export default class Table extends Component {
           CapacityPower?
           <HeaderCell 
             style={styles.headerCell}
-            key="1"
+            key="5"
             text='功率'
             width={1}
             isAscending={false}
@@ -237,7 +265,7 @@ export default class Table extends Component {
           batteryBind[0].length>=5?
           <HeaderCell
             style={styles.headerCell}
-            key="9"
+            key="5"
             text='电池5'
             width={1}
             isAscending={false}
@@ -256,7 +284,7 @@ export default class Table extends Component {
         batteryBind[0].length>=6?
         <HeaderCell
           style={styles.headerCell}
-          key="10"
+          key="6"
           text='电池6'
           width={1}
           isAscending={false}
@@ -271,6 +299,60 @@ export default class Table extends Component {
     let rowStyle = item.id%2 === 0  ? styles.whiteRow : styles.row;
     const { params } = this.props.navigation.state;
     const { charger,batteryBind,capacity,electric_current,temperature,voltage,power,detectorVoltageCurrent,detectorTemperature,CapacityPower } = params;
+    var battery1;
+    item.oarr&&item.oarr.forEach(item=>{
+      (item.battery_id==batteryBind[0][0])&&capacity?battery1=item.capacity:
+      (item.battery_id==batteryBind[0][0])&&electric_current?battery1=item.electric_current:
+      (item.battery_id==batteryBind[0][0])&&temperature?battery1=item.temperature:
+      (item.battery_id==batteryBind[0][0])&&voltage?battery1=item.voltage:
+      (item.battery_id==batteryBind[0][0])&&power?battery1=item.voltage*item.electric_current:null
+    })
+
+    var battery2;
+    item.oarr&&item.oarr.forEach(item=>{
+      (item.battery_id==batteryBind[0][1])&&capacity?battery2=item.capacity:
+      (item.battery_id==batteryBind[0][1])&&electric_current?battery2=item.electric_current:
+      (item.battery_id==batteryBind[0][1])&&temperature?battery2=item.temperature:
+      (item.battery_id==batteryBind[0][1])&&voltage?battery2=item.voltage:
+      (item.battery_id==batteryBind[0][1])&&power?battery2=item.voltage*item.electric_current:null
+    })
+
+    var battery3;
+    item.oarr&&item.oarr.forEach(item=>{
+      (item.battery_id==batteryBind[0][2])&&capacity?battery3=item.capacity:
+      (item.battery_id==batteryBind[0][2])&&electric_current?battery3=item.electric_current:
+      (item.battery_id==batteryBind[0][2])&&temperature?battery3=item.temperature:
+      (item.battery_id==batteryBind[0][2])&&voltage?battery3=item.voltage:
+      (item.battery_id==batteryBind[0][2])&&power?battery3=item.voltage*item.electric_current:null
+    })
+
+    var battery4;
+    item.oarr&&item.oarr.forEach(item=>{
+      (item.battery_id==batteryBind[0][3])&&capacity?battery4=item.capacity:
+      (item.battery_id==batteryBind[0][3])&&electric_current?battery4=item.electric_current:
+      (item.battery_id==batteryBind[0][3])&&temperature?battery4=item.temperature:
+      (item.battery_id==batteryBind[0][3])&&voltage?battery4=item.voltage:
+      (item.battery_id==batteryBind[0][3])&&power?battery4=item.voltage*item.electric_current:null
+    })
+
+    var battery5;
+    item.oarr&&item.oarr.forEach(item=>{
+      (item.battery_id==batteryBind[0][4])&&capacity?battery5=item.capacity:
+      (item.battery_id==batteryBind[0][4])&&electric_current?battery5=item.electric_current:
+      (item.battery_id==batteryBind[0][4])&&temperature?battery5=item.temperature:
+      (item.battery_id==batteryBind[0][4])&&voltage?battery5=item.voltage:
+      (item.battery_id==batteryBind[0][4])&&power?battery5=item.voltage*item.electric_current:null
+    })
+
+    var battery6;
+    item.oarr&&item.oarr.forEach(item=>{
+      (item.battery_id==batteryBind[0][5])&&capacity?battery6=item.capacity:
+      (item.battery_id==batteryBind[0][5])&&electric_current?battery6=item.electric_current:
+      (item.battery_id==batteryBind[0][5])&&temperature?battery6=item.temperature:
+      (item.battery_id==batteryBind[0][5])&&voltage?battery6=item.voltage:
+      (item.battery_id==batteryBind[0][5])&&power?battery6=item.voltage*item.electric_current:null
+    })
+
     return (
       <Row style={rowStyle}>
         {/* 时间 */}
@@ -289,25 +371,25 @@ export default class Table extends Component {
           <Cell style={styles.cell} width={1}>
             {item.voltage}
           </Cell>:
-          capacity&&batteryBind[0].length>=1?
+          capacity&&batteryBind[0].length>=1?//电池1
           <Cell style={styles.cell} width={1}>
-            {batteryBind&&batteryBind[0][0]==item.battery_id?item.capacity:null}
+            {battery1}
           </Cell>:
           electric_current&&batteryBind[0].length>=1?
           <Cell style={styles.cell} width={1}>
-            {batteryBind&&batteryBind[0][0]==item.battery_id?item.electric_current:null}
+            {battery1}
           </Cell>:
           temperature&&batteryBind[0].length>=1?
           <Cell style={styles.cell} width={1}>
-            {batteryBind&&batteryBind[0][0]==item.battery_id?item.temperature:null}
+            {battery1}
           </Cell>:
           voltage&&batteryBind[0].length>=1?
           <Cell style={styles.cell} width={1}>
-            {batteryBind&&batteryBind[0][0]==item.battery_id?item.voltage:null}
+            {battery1}
           </Cell>:
           power&&batteryBind[0].length>=1?
           <Cell style={styles.cell} width={1}>
-            {batteryBind&&batteryBind[0][0]==item.battery_id?item.voltage*item.electric_current:null}
+            {battery1}
           </Cell>:
           <Cell width={0}/>
         }
@@ -325,25 +407,25 @@ export default class Table extends Component {
           <Cell style={styles.cell} width={1}>
             {item.electric_current} 
           </Cell>:
-          capacity&&batteryBind[0].length>=2?
+          capacity&&batteryBind[0].length>=2?//电池2
           <Cell style={styles.cell} width={1}>
-            {batteryBind&&batteryBind[0][1]==item.battery_id?item.capacity:null}
+            {battery2}
           </Cell>:
           electric_current&&batteryBind[0].length>=2?
           <Cell style={styles.cell} width={1}>
-            {batteryBind&&batteryBind[0][1]==item.battery_id?item.electric_current:null}
+            {battery2}
           </Cell>:
           temperature&&batteryBind[0].length>=2?
           <Cell style={styles.cell} width={1}>
-            {batteryBind&&batteryBind[0][1]==item.battery_id?item.temperature:null}
+            {battery2}
           </Cell>:
           voltage&&batteryBind[0].length>=2?
           <Cell style={styles.cell} width={1}>
-            {batteryBind&&batteryBind[0][1]==item.battery_id?item.voltage:null}
+            {battery2}
           </Cell>:
           power&&batteryBind[0].length>=2?
           <Cell style={styles.cell} width={1}>
-            {batteryBind&&batteryBind[0][1]==item.battery_id?item.voltage*item.electric_current:null}
+            {battery2}
           </Cell>:
           <Cell width={0}/>
         }
@@ -360,25 +442,25 @@ export default class Table extends Component {
           <Cell style={styles.cell} width={1}>
             {item.chargerTemperature}
           </Cell>:
-          capacity&&batteryBind[0].length>=3?
+          capacity&&batteryBind[0].length>=3?//电池3
           <Cell style={styles.cell} width={1}>
-            {batteryBind&&batteryBind[0][2]==item.battery_id?item.capacity:null}
+            {battery3}
           </Cell>:
           electric_current&&batteryBind[0].length>=3?
           <Cell style={styles.cell} width={1}>
-            {batteryBind&&batteryBind[0][2]==item.battery_id?item.electric_current:null}
+            {battery3}
           </Cell>:
           temperature&&batteryBind[0].length>=3?
           <Cell style={styles.cell} width={1}>
-            {batteryBind&&batteryBind[0][2]==item.battery_id?item.temperature:null}
+            {battery3}
           </Cell>:
           voltage&&batteryBind[0].length>=3?
           <Cell style={styles.cell} width={1}>
-            {batteryBind&&batteryBind[0][2]==item.battery_id?item.voltage:null}
+            {battery3}
           </Cell>:
           power&&batteryBind[0].length>=3?
           <Cell style={styles.cell} width={1}>
-            {batteryBind&&batteryBind[0][2]==item.battery_id?item.voltage*item.electric_current:null}
+            {battery3}
           </Cell>:
           <Cell width={0}/>
         }
@@ -398,25 +480,25 @@ export default class Table extends Component {
           <Cell style={styles.cell} width={1}>
             {item.capacity}
           </Cell>:
-          capacity&&batteryBind[0].length>=4?
+          capacity&&batteryBind[0].length>=4?//电池4
           <Cell style={styles.cell} width={1}>
-            {batteryBind&&batteryBind[0][3]==item.battery_id?item.capacity:null}
+            {battery4}
           </Cell>:
           electric_current&&batteryBind[0].length>=4?
           <Cell style={styles.cell} width={1}>
-            {batteryBind&&batteryBind[0][3]==item.battery_id?item.electric_current:null}
+            {battery4}
           </Cell>:
           temperature&&batteryBind[0].length>=4?
           <Cell style={styles.cell} width={1}>
-            {batteryBind&&batteryBind[0][3]==item.battery_id?item.temperature:null}
+            {battery4}
           </Cell>:
           voltage&&batteryBind[0].length>=4?
           <Cell style={styles.cell} width={1}>
-            {batteryBind&&batteryBind[0][3]==item.battery_id?item.voltage:null}
+            {battery4}
           </Cell>:
           power&&batteryBind[0].length>=4?
           <Cell style={styles.cell} width={1}>
-            {batteryBind&&batteryBind[0][3]==item.battery_id?item.voltage*item.electric_current:null}
+            {battery4}
           </Cell>:
           <Cell width={0}/>
         }
@@ -430,25 +512,25 @@ export default class Table extends Component {
           <Cell width={0}/>:
           detectorVoltageCurrent?
           <Cell width={0}/>:
-          capacity&&batteryBind[0].length>=5?
+          capacity&&batteryBind[0].length>=5?//电池5
           <Cell style={styles.cell} width={1}>
-            {batteryBind&&batteryBind[0][4]==item.battery_id?item.capacity:null}
+            {battery5}
           </Cell>:
           electric_current&&batteryBind[0].length>=5?
           <Cell style={styles.cell} width={1}>
-            {batteryBind&&batteryBind[0][4]==item.battery_id?item.electric_current:null}
+            {battery5}
           </Cell>:
           temperature&&batteryBind[0].length>=5?
           <Cell style={styles.cell} width={1}>
-            {batteryBind&&batteryBind[0][4]==item.battery_id?item.temperature:null}
+            {battery5}
           </Cell>:
           voltage&&batteryBind[0].length>=5?
           <Cell style={styles.cell} width={1}>
-            {batteryBind&&batteryBind[0][4]==item.battery_id?item.voltage:null}
+            {battery5}
           </Cell>:
           power&&batteryBind[0].length>=5?
           <Cell style={styles.cell} width={1}>
-            {batteryBind&&batteryBind[0][4]==item.battery_id?item.voltage*item.electric_current:null}
+            {battery5}
           </Cell>:
           <Cell width={0}/>
         }
@@ -460,25 +542,25 @@ export default class Table extends Component {
           <Cell width={0}/>:
           detectorVoltageCurrent?
           <Cell width={0}/>:
-          capacity&&batteryBind[0].length>=6?
+          capacity&&batteryBind[0].length>=6?//电池6
           <Cell style={styles.cell} width={1}>
-            {batteryBind&&batteryBind[0][5]==item.battery_id?item.capacity:null}
+            {battery6}
           </Cell>:
           electric_current&&batteryBind[0].length>=6?
           <Cell style={styles.cell} width={1}>
-            {batteryBind&&batteryBind[0][5]==item.battery_id?item.electric_current:null}
+            {battery6}
           </Cell>:
           temperature&&batteryBind[0].length>=6?
           <Cell style={styles.cell} width={1}>
-            {batteryBind&&batteryBind[0][5]==item.battery_id?item.temperature:null}
+            {battery6}
           </Cell>:
           voltage&&batteryBind[0].length>=6?
           <Cell style={styles.cell} width={1}>
-            {batteryBind&&batteryBind[0][5]==item.battery_id?item.voltage:null}
+            {battery6}
           </Cell>:
           power&&batteryBind[0].length>=6?
           <Cell style={styles.cell} width={1}>
-            {batteryBind&&batteryBind[0][5]==item.battery_id?item.voltage*item.electric_current:null}
+            {battery6}
           </Cell>:
           <Cell width={0}/>
         }

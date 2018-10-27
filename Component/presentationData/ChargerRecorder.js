@@ -29,7 +29,6 @@ export default class ChargerRecorder extends Component {
         storage.get(LOGGER_STORAGE_KEY, (error, result) => {
             if (error) {
                 reject(error);
-                return;
             }
             this.setState({
                 ChargerRecorder:result
@@ -42,11 +41,8 @@ export default class ChargerRecorder extends Component {
             if (error) {
                 if(error.errorCode == 102){
                     this.refs.bleScan.open();
-                    this.setState({
-                        BleScanErr:true
-                    })
                 }
-                return;  
+                alert('蓝牙搜索出错')
             }else{
                 this.deviceMap.set(device.id,device); //使用Map类型保存搜索到的蓝牙设备，确保列表不显示重复的设备
                 var BleData=[...this.deviceMap.values()];
@@ -63,7 +59,7 @@ export default class ChargerRecorder extends Component {
                         let BleScanId5 = BleScanArrayId.slice(8, 10);
                         let BleScanId6 = BleScanArrayId.slice(10, 12);
                         var BleScanId = BleScanId6.concat(BleScanId5, BleScanId4, BleScanId3, BleScanId2, BleScanId1).toLowerCase();
-                        if(BleScanId == this.state.ChargerRecorder[0] && Interception==chargerDetectorIdentifier){
+                        if((this.state.ChargerRecorder && this.state.ChargerRecorder[0] == BleScanId) && Interception==chargerDetectorIdentifier){
                             this.setState({
                                 status:paseInt(BleDataArray.slice(32,34),16),
                             })
