@@ -64,6 +64,7 @@ export default class CWScanning extends Component {
     _removeBattery = ()=>{    // 解绑电池
         AsyncStorage.removeItem(BATTERY_BIND_STORAGE_KEY);
         AsyncStorage.removeItem(PHONE_BIND_STORAGE_KEY);
+        DeviceEventEmitter.emit('untied', true)
         DeviceEventEmitter.emit('battery', 0)
         this.refs.batterUnbing.open();
     };
@@ -71,6 +72,7 @@ export default class CWScanning extends Component {
     _removeCharger = ()=>{    // 解绑充电器
         AsyncStorage.removeItem(CHARGER_BIND_STORAGE_KEY);
         AsyncStorage.removeItem(PHONE_BIND_STORAGE_KEY);
+        DeviceEventEmitter.emit('untied', true)
         DeviceEventEmitter.emit('charger', 0)
         this.refs.chargerUnbing.open();
     };
@@ -78,7 +80,7 @@ export default class CWScanning extends Component {
     _removeChargerRecorder=()=>{
         AsyncStorage.removeItem(LOGGER_STORAGE_KEY);
         AsyncStorage.removeItem(PHONE_BIND_STORAGE_KEY);
-        // DeviceEventEmitter.emit('charger', 0)
+        
         this.refs.ChargerRecorder.open(); 
     }
 

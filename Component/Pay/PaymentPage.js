@@ -43,7 +43,6 @@ export default class PaymentPage extends Component {
     async goAlipay () {   
         try {
             await Alipay.pay();
-            // alert('支付成功');
         } catch (e) {
             alert(e.message);
         }

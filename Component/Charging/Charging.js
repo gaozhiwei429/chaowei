@@ -74,7 +74,7 @@ export default class Charging extends Component {
                 height: 40,
             },
             // headerLeft:(
-            //     <View style={{height: 44,width: 55,justifyContent: 'center',paddingRight:15} }/>
+            //     <View />
             // ),
             headerRight: (
                 <TouchableOpacity
@@ -105,12 +105,13 @@ export default class Charging extends Component {
                         <DatePicker
                             style={{width: 120,marginTop:5}}
                             date={this.state.datetime}
-                            mode="datetime"
-                            format="YYYY-MM-DD HH:mm"
+                            mode="time"
+                            format="HH:mm"
                             confirmBtnText="确定"
                             cancelBtnText="取消"
                             hideText={false}
                             showIcon={false}
+                            androidMode='spinner'
                             customStyles={{
                                 dateIcon: {
                                     // position: 'absolute',

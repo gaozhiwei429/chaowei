@@ -1,66 +1,85 @@
-import React, {Component} from "react";
+import React, {Component} from 'react';
 import {
-    ActivityIndicator,
-    FlatList,
     StyleSheet,
-    Text,
     View,
-    ListView,
-    TouchableOpacity,
-    SectionList
-} from "react-native";
+    FlatList,
+    Text,
+    ScrollView,
+} from 'react-native';
 
-export default class Listiew extends Component {
-    constructor(props) {
-        super(props);
-        let ds = new ListView.DataSource({ rowHasChanged: (r1, r2) => r1 !== r2  });
-        this.state = {
-            dataSource: ds.cloneWithRows(data)
-        }
+export default class ListViewText extends Component {
+
+    _renderItem = (item) => {
+        alert(JSON.stringify(item))
+        var txt = '第' + item.index + '个' + ' title=' + item.item.title;
+        var bgColor = item.index % 2 == 0 ? 'red' : 'blue';
+        return <Text onPress={()=>{ alert(item.index) }} style={[{flex:1,height:100,},styles.txt]}>{txt}</Text>
+    }
+
+    // _header = () => {
+    //     return <Text style={[styles.txt,{backgroundColor:'black'}]}>这是头部</Text>;
+    // }//头部组件
+
+    // _footer = () => {
+    //     return <Text style={[styles.txt,{backgroundColor:'black'}]}>这是尾部</Text>;
+    // }//尾部组件
+
+    _separator = () => {
+        return <View style={{backgroundColor:'#fff',paddingLeft:15}}/>;
     }
 
     render() {
-        const overrideRenderItem = ({ item, index, section: { title, data } }) => <Text key={index}>Override{item}</Text>
+        var data = [];
+        for (var i = 0; i < 4; i++) {
+            data.push({key: i+'', title: i + ''});
+        }
+        // alert(JSON.stringify(data))
         return (
-            <View style={styles.container}>
-                <SectionList
-                    renderItem={({ item, index, section }) => <Text key={index}>{item}</Text>}
-                    sections={[
-                        { title: 'Title1', data: ['item1', 'item2'] },
-                        { title: 'Title2', data: ['i em3', 'item4'] },
-                        { title: 'Title3', data: ['item5', 'item6'] },
-                    ]}
-                />
-            </View>
-        )
-    }
+            <ScrollView style={{flex:1}}>
+                {/* <Button title='滚动到指定位置' onPress={()=>{
+                    this._flatList.scrollToEnd();
+                    this._flatList.scrollToIndex({viewPosition:0,index:8});
+                    this._flatList.scrollToOffset({animated: true, offset: 2000});
+                }}/> */}
+                <View style={{flex:1,}}>
+                    <FlatList
+                        ref={(flatList)=>this._flatList = flatList}
+                        // ListHeaderComponent={this._header}//头部组件
+                        // ListFooterComponent={this._footer}//尾部组件
+                        ItemSeparatorComponent={this._separator}
+                        renderItem={this._renderItem}
 
-    _renderRow = (rowData) => {
-        return (
-            <View style={styles.cellContainer} onPress={() => {}}>
-                <Text style={styles.title}>{rowData.title}</Text>
-                <Text style={styles.title}>{rowData.title}</Text>
-            </View>
-        )
+                        //numColumns ={3}
+                        //columnWrapperStyle={{borderWidth:2,borderColor:'black',paddingLeft:20}}
+
+                        horizontal={true}
+
+                        //getItemLayout={(data,index)=>(
+                        //{length: ITEM_HEIGHT, offset: (ITEM_HEIGHT+2) * index, index}
+                        //)}
+
+                        //onEndReachedThreshold={5}
+                        //onEndReached={(info)=>{
+                        //console.warn(info.distanceFromEnd);
+                        //}}
+
+                        //onViewableItemsChanged={(info)=>{
+                        //console.warn(info);
+                        //}}
+                        data={data}>
+                    </FlatList>
+                </View> 
+                
+            </ScrollView>
+        );
     }
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
-    cellContainer: {
-        borderBottomWidth: 1,
-        borderColor: '#dcdcdc',
-        flexDirection:'row',
-        alignItems:'center',
-        padding:15
-    },
-    image: {
-        width: 50,
-        height: 50,
-    },
-    title: {
-        marginLeft: 15,
+    txt: {
+        textAlign: 'center',
+        textAlignVertical: 'center',
+        color: '#000',
+        fontSize: 30,
     }
 });

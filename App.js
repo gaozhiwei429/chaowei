@@ -51,6 +51,8 @@ import Shopping from './Component/Shopping/Shopping';//商城
 import RSSI from './Component/CWBleSearch/RSSI';//RSSI
 import ChargerRecorder from "./Component/presentationData/ChargerRecorder";//充电器检测仪
 import Table from './Component/Table/Table';//数据视图表
+import smart_battery from './Component/data_collection/smart_battery';//智能电池数据
+import smart_battery_map from './Component/data_collection/smart_battery_map';//智能电池数据实时位置
 
 //测试
 import ListView from './Component/ListView/ListView'
@@ -59,6 +61,10 @@ import cha from './Component/SQLite/cha'
 import Alert from './Component/Alert/AlertShow';
 import CWEchart from './Component/CWSvg/CWEchart';
 import ListViewText from './Component/ListView/ListViewText';
+
+
+import { Initializer } from 'react-native-baidumap-sdk';
+Initializer.init();
 
 const RootStack = createStackNavigator({
         CWGLaunchlmage : { screen : CWGLaunchlmage },
@@ -94,6 +100,8 @@ const RootStack = createStackNavigator({
         ChargerDetector : { screen : ChargerDetector } ,
         ChargerRecorder : { screen : ChargerRecorder } ,
         Table : { screen: Table },
+        smart_battery:{ screen : smart_battery},
+        smart_battery_map:{ screen : smart_battery_map},
 
         //测试
         ListView:{screen:ListView},
@@ -104,7 +112,7 @@ const RootStack = createStackNavigator({
         CWEchart:{screen:CWEchart},
     },
     {
-        initialRouteName: 'CWGLaunchlmage',
+        initialRouteName: 'CWGLaunchlmage',//CWGLaunchlmage
     }    
 );
 

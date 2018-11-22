@@ -14,7 +14,7 @@ import {
 
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import * as storage from '../../storage';
-import { BATTERY_BIND_STORAGE_KEY,CHARGER_BIND_STORAGE_KEY,LOGGER_STORAGE_KEY } from '../../config';
+import { BATTERY_BIND_STORAGE_KEY,CHARGER_BIND_STORAGE_KEY,LOGGER_STORAGE_KEY,SMART_BATTERY_STORAGE_KEY } from '../../config';
 import EasyToast, {DURATION} from 'react-native-easy-toast';
 // 引入手电筒模块
 // let FlashLight = NativeModules.FlashLight;
@@ -39,78 +39,115 @@ export default class CWQRCode extends Component {
         }else{
             var value = ScanData.toLowerCase()
         } 
-        // alert(value);  
         if(this.state.phone){
-            if(this.state.JudgeBtn===0){
+            if(this.state.JudgeBtn===0){//扫码存储充电器
                 if(value.slice(10,12)=='00'){
-                    storage.get(CHARGER_BIND_STORAGE_KEY, (error, result) => {//扫码存储充电器
+                    storage.get(CHARGER_BIND_STORAGE_KEY, (error, result) => {
                         const set = new Set(result);
                         if(set.has(value)!==true){
                             result= (result || []).concat(value);
                             if(result.length<2){
                                 storage.save(CHARGER_BIND_STORAGE_KEY, result, () => {
-                                    // console.log(result.length,'charger'); 
                                     DeviceEventEmitter.emit('charger', result.length)
                                 });
-                                this.refs.toast.show('扫码成功!',1200);
+                                this.refs.toast.show('扫码成功~',1200);
                             }else {
-                                this.refs.toast.show('目前只支持扫一个充电器!',1200);
+                                this.refs.toast.show('目前只支持扫一个充电器~',1200);
                             }
                         }else {
-                            this.refs.toast.show('此块充电器已存在!',1200);
+                            this.refs.toast.show('此块充电器已存在~',1200);
                         }
                     });
-                }else if(value.slice(10,12)=='01'){
-                    storage.get(BATTERY_BIND_STORAGE_KEY, (error, result) => {//扫码存储电池
+                }else if(value.slice(10,12)=='01'){//扫码存储电池
+                    storage.get(BATTERY_BIND_STORAGE_KEY, (error, result) => {
                         const set = new Set(result);
                         if(set.has(value) !== true){
                             result = (result || []).concat(value);
                             if(result.length<7){
                                 storage.save(BATTERY_BIND_STORAGE_KEY, result, () => {
-                                    // console.log(result.length,'battery'); 
                                     DeviceEventEmitter.emit('battery', result.length)
                                 });
-                                this.refs.toast.show('扫码成功!',1200);
+                                this.refs.toast.show('扫码成功~',1200);
                             }else{
-                                this.refs.toast.show('目前最多支持绑定6块电池!',1200);
+                                this.refs.toast.show('目前最多支持绑定6块电池~',1200);
                             }
                         }else{
-                            this.refs.toast.show('此块蓄电池已存在!',1200);
+                            this.refs.toast.show('此块蓄电池已存在~',1200);
                         }
                     });
                 }else if(value.slice(10,12)=='66'){
-                    storage.get(LOGGER_STORAGE_KEY, (error, result) => {//扫码存储充电器
+                    storage.get(LOGGER_STORAGE_KEY, (error, result) => {//扫码存储充电器检测仪
                         const set = new Set(result);
                         if(set.has(value)!==true){
                             result= (result || []).concat(value);
                             if(result.length<2){
                                 storage.save(LOGGER_STORAGE_KEY, result, () => {
-                                    DeviceEventEmitter.emit('charger', result.length)
+                                    DeviceEventEmitter.emit('detector', result.length)
                                 });
                                 this.refs.toast.show('扫码成功!',1200);
                             }else {
-                                this.refs.toast.show('主人，目前只支持扫一个记录仪!',1200);
+                                this.refs.toast.show('主人，目前只支持扫一个检测仪~',1200);
                             }
                         }else {
-                            this.refs.toast.show('主人，我已存在!',1200);
+                            this.refs.toast.show('主人，我已存在~',1200);
                         }
                     });
                 }else{
-                    this.refs.toast.show('这不是我们的产品!',1200);
+                    this.refs.toast.show('请检查扫码是否正确~',1200);
                 }
             }
     
             if(this.state.JudgeBtn===1){//扫码充电
                 if(value.slice(10,12)=='aa'){
-                    this.props.navigation.replace('PaymentPage',{AliPay:value})
+                    this.props.navigation.replace('PaymentPage',{device:value})
                 }else {
-                    this.refs.toast.show('您扫的不是我们充电桩二维码!',1200)
+                    this.refs.toast.show('您扫的不是我们充电桩二维码~',1200)
                 }
+            }
+
+            if(this.state.JudgeBtn === 2){//智能电池数据采集器
+                var getUrl = "https://api.heclouds.com/devices";
+                var getOpts = {
+                    method: "GET",
+                    headers:{
+                        "api-key":"PtxuM9Hb1lMXk0Unkr570s2gPas="
+                    },
+                }
+
+                storage.get(SMART_BATTERY_STORAGE_KEY, (error, result) => {//数据采集
+                    var results = result
+                    if(results !== null){
+                        results = results.map( item => {
+                            return item.split(",")[0]
+                        })
+                    }
+                    const set = new Set(results);
+                    if(set.has(value)!==true){
+                        fetch(getUrl, getOpts)
+                            .then((response) => {
+                                return response.json();
+                            }).then(data => {
+                                data.data.devices.map(item => {
+                                    if(value == item.title){
+                                        result= (result || []).concat(value+','+item.id);
+                                        storage.save(SMART_BATTERY_STORAGE_KEY, result, () => {
+                                            this.props.navigation.navigate('smart_battery',{smart_battery:value})
+                                        });
+                                        this.refs.toast.show('扫码成功!',1200);
+                                    } 
+                                })
+                            }).catch(error => {
+                                this.refs.toast.show('请检查您的设备ID是否正确!',1200);
+                            })
+                    }else{
+                        this.refs.toast.show('主人，我已存在~',1200);
+                    }
+                })
             }
         }else{
             Linking
                 .openURL(URL)
-                    .catch(err => console.error('An error occured', err));
+                    .catch(err => {});
         }
     }
 
@@ -126,6 +163,12 @@ export default class CWQRCode extends Component {
         });
     }
 
+    dataAcquisition(){
+        this.setState({
+            JudgeBtn: 2
+        });
+    }
+
     // onSuccess(e) {
     //     Linking
     //         .openURL(e.data)
@@ -133,23 +176,26 @@ export default class CWQRCode extends Component {
     // }
 
     //手电筒模块
-    _switch (){
-        this.setState({
-            switchFlash: !this.state.switchFlash,
-        });
-        let flash =this.state.switchFlash;
-        QRCodeScanner.switchState(flash, () => {
+    // _switch (){
+    //     this.setState({
+    //         switchFlash: !this.state.switchFlash,
+    //     });
+    //     let flash =this.state.switchFlash;
+    //     QRCodeScanner.switchState(flash, () => {
             
-        }, (message) => {
-            console.error(message);
-        })
+    //     }, (message) => {
+    //         console.error(message);
+    //     })
+    // }
+
+    componentWillUnmount() {
+        
     }
 
     static navigationOptions = {
         headerTitle:(<Text style={{fontSize:20,flex: 1,textAlign:'center'}}>扫码</Text>),
         headerStyle: {
             height:0,
-            // backgroundColor: 'rgba(0,0,0,0.5)',
             elevation: null
         },
         headerTitleStyle:{
@@ -190,7 +236,9 @@ export default class CWQRCode extends Component {
                             {this.state.JudgeBtn===0 ?
                                 <Text style={styles.navigationHeadline}>扫码绑定</Text>  :
                                     this.state.JudgeBtn===1?
-                                        <Text style={styles.navigationHeadline}>扫码充电</Text> :''}
+                                        <Text style={styles.navigationHeadline}>扫码充电</Text> :
+                                        this.state.JudgeBtn===2?
+                                            <Text style={styles.navigationHeadline}>数据采集</Text>:''}
                         </View>
                     </View>
 
@@ -254,6 +302,16 @@ export default class CWQRCode extends Component {
                             <TouchableOpacity style={styles.unselected} onPress={()=>this.Recharge()}>
                                 <Image source={require('../../img/recharge.png')} style={{width:30,height:30,}} />
                                 <Text style={styles.unselectedText}>电车充电</Text>
+                            </TouchableOpacity>
+                        }
+                        {this.state.JudgeBtn===2?
+                            <View style={styles.selected}>
+                                <Image source={require('../../img/rechargeOn.png')} style={{width:30,height:30,}} />
+                                <Text style={styles.selectedText}>数据采集</Text>
+                            </View>:
+                            <TouchableOpacity style={styles.unselected} onPress={()=>this.dataAcquisition()}>
+                                <Image source={require('../../img/recharge.png')} style={{width:30,height:30,}} />
+                                <Text style={styles.unselectedText}>数据采集</Text>
                             </TouchableOpacity>
                         }
                     </View>

@@ -320,7 +320,7 @@ export default class BatteryPower extends Component {
                     batteryBind:dataVoltage,
                 })
             })
-            setTimeout(loop,60000);
+            this.battery1TimeVoltage = setTimeout(loop,60000);
         }
 
         loop();
@@ -393,7 +393,7 @@ export default class BatteryPower extends Component {
                 name : '时间',//时间
                 data: this.state.xTime.map(function(item){
                     return commonality.replaceTime(item);  
-                }),       
+                }), 
                 axisLabel:{ 
                     textStyle:{ 
                         fontSize: 9,

@@ -51,6 +51,12 @@ export default class PresentationData extends Component {
                             >
                             <Text>充电器检测仪</Text>
                         </TouchableOpacity>
+                        <TouchableOpacity 
+                            style={styles.PresentationBtn} 
+                            onPress={() => this.props.navigation.navigate('smart_battery')}
+                            >
+                            <Text>智能电池数据</Text>
+                        </TouchableOpacity>
                     </View>
                 </View>
                 <View style={styles.shopping}>

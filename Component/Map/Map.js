@@ -9,7 +9,7 @@ import {
     Dimensions,
     Linking,
 } from 'react-native';
-import { MapView,Location,Marker } from 'react-native-baidumap-sdk';  
+import { MapView,Location,Marker } from 'react-native-baidumap-sdk';
 import geolib from 'geolib';
 import MapLinking from './MapLinking';
 import ActionSheet from 'react-native-actionsheet';
@@ -143,7 +143,7 @@ export default class Map extends Component {
                 });
             })
             .catch((error) =>{
-              console.error(error);
+              
             });
         const Position = await Promise.all([dataIntArr]);
 
@@ -176,12 +176,6 @@ export default class Map extends Component {
         this.setState({
             actionSheetConfig,
         });
-
-        return
-        MapLinking.planRoute(
-            {lat:this.state.location.latitude, lng: this.state.location.longitude, title: '当前位置'}, 
-            {lat:this.state.iconLat, lng: this.state.iconLon, title: '充电桩'},
-        'walk');
     }
 
     handleActionSheetClick = (index) => {
@@ -199,13 +193,13 @@ export default class Map extends Component {
         ];
         return (
             <View style={{ flex: 1,}}> 
-            <ActionSheet
-                ref={o => this.ActionSheet = o}
-                // title={''}
-                options={actionSheetText}
-                cancelButtonIndex={actionSheetText.length - 1}
-                // destructiveButtonIndex={1}
-                onPress={this.handleActionSheetClick}
+                <ActionSheet
+                    ref={o => this.ActionSheet = o}
+                    // title={''}
+                    options={actionSheetText}
+                    cancelButtonIndex={actionSheetText.length - 1}
+                    // destructiveButtonIndex={1}
+                    onPress={this.handleActionSheetClick}
                 />
                 {this.state.distanceIs?
                     <View style={{justifyContent:'center'}}>
@@ -228,7 +222,7 @@ export default class Map extends Component {
                     ref={ref => this.mapView = ref}
                     style={{ flex: 1 }}  
                     location={this.state.location}
-                    locationMode='follow'    
+                    locationMode='follow'
                     zoomLevel={18}//缩放级别，取值范围 [3, 21]
                     locationEnabled //显示定位图层    
                     zoomControlsDisabled//禁用缩放按钮
@@ -252,12 +246,12 @@ export default class Map extends Component {
                             }
                         />
                     )}
-                </MapView>      
+                </MapView> 
 
                 <TouchableOpacity style={styles.locationButton} onPress={this.location}>
                     <Image style={styles.locationIcon}  source={require('../../img/locationButton.png')}/>
                 </TouchableOpacity>
-                
+        
             </View>
         )
     }

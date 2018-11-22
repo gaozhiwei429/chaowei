@@ -10,6 +10,7 @@ import {
     AsyncStorage,
     DeviceEventEmitter,
     StatusBar,
+    TextInput
 } from 'react-native';
 
 import bleBroadcast from '../CWBleBroadcast/CWBleBroadcast';//蓝牙广播模块
@@ -66,32 +67,32 @@ export default class CWHome extends Component {
     constructor(){
         super();
         this.state = {
-            bandingImg:0,
+            bandingImg:true,
             chargerStorage:0,
             batteryStorage:0,
             chargerLen:0,
             BleScanErr:false,
         };
         this.deviceMap = new Map();
-    } 
+    }
 
     componentDidMount() {
-        
-        /** 是否绑定*/
+
+        // 充电器、蓄电池解绑监听者
+        this.listener = DeviceEventEmitter.addListener('untied', (len) => {
+            this.setState({
+                bandingImg:len
+            });
+        })
+
+        /** 判断是否绑定*/
         storage.get(PHONE_BIND_STORAGE_KEY, (error, result) => {
             if(result == '123' ){
                 this.setState({
-                    bandingImg: 1
+                    bandingImg: false
                 });
             }
         });
-
-        // 添加监听者
-        this.listener = DeviceEventEmitter.addListener('charger', (len) => {
-            this.setState({
-                chargerStorage: len
-            });
-        })
 
         /** 充电器*/   
         storage.get(CHARGER_BIND_STORAGE_KEY, (error, result) => {
@@ -106,12 +107,6 @@ export default class CWHome extends Component {
             }
         });
 
-        // 添加监听者
-        this.listener = DeviceEventEmitter.addListener('battery', (len) => {
-            this.setState({
-                batteryStorage: len
-            });  
-        })
         /** 电池*/
         storage.get(BATTERY_BIND_STORAGE_KEY, (error, result) => {
             if(result !== null){
@@ -125,19 +120,21 @@ export default class CWHome extends Component {
             }
         });
 
-        /** 充电器*/
-        let promise1=new Promise(function (resolve, reject) {
+        /** 获取充电器本地存储*/
+        var promise1;
+            promise1=new Promise(function (resolve, reject) {
             return storage.get(CHARGER_BIND_STORAGE_KEY, (error, result) => {
                 if (error) {
                     reject(error);
                     return;
                 }
-                resolve(result);    
+                resolve(result); 
             })}
         );
 
-        /** 电池*/
-        let promise2=new Promise(function (resolve,reject) {
+        /** 获取电池本地存储*/
+            var promise2;
+            promise2=new Promise(function (resolve,reject) {
             return storage.get(BATTERY_BIND_STORAGE_KEY, (error, result) => {
                 if (error) {
                     reject(error);
@@ -147,7 +144,9 @@ export default class CWHome extends Component {
             })}
         );
 
-        let LOGGER=new Promise(function(resolve,reject){//获取充电器记录仪本地存储
+        /** 获取充电器记录仪本地存储 */
+        var LOGGER;
+            LOGGER=new Promise(function(resolve,reject){
             return  storage.get(LOGGER_STORAGE_KEY, (error, result) => {
                 if (error) {
                     reject(error);
@@ -157,26 +156,32 @@ export default class CWHome extends Component {
             })
         })
 
-        
-        
+        // 充电器扫码监听者
+        this.listener = DeviceEventEmitter.addListener('charger', (len) => {
+            this.setState({
+                chargerStorage: len
+            });
+            this.componentDidMount();
+        })
+
+        // 电池扫码监听者
+        this.listener = DeviceEventEmitter.addListener('battery', (len) => {
+            this.setState({
+                batteryStorage: len
+            });
+            this.componentDidMount();
+        })
+
+        // 充电器检测仪扫码监听者
+        this.listener = DeviceEventEmitter.addListener('detector',(len)=>{
+            this.componentDidMount();
+        })
 
         /** 电池、充电器本地存储数据*/
         Promise.all([promise1,promise2,LOGGER]).then((values) => {
             batteryArray=[].concat(values[0],values[1]);//绑定电池与充电器合并后的数组
             detector=values[2];//记录仪
 
-            // this.deviceMap.clear();
-            // BluetoothManager.manager.startDeviceScan(null, null, (error, device) => {                
-            //     if (error) {
-            //         if(error.errorCode == 102){
-            //             this.refs.bleScan.open();
-            //         }
-            //         this.refs.toast.show('主人,蓝牙搜索出错啦~',1500)
-            //     }else{
-            //         this.deviceMap.set(device.id,device); //使用Map类型保存搜索到的蓝牙设备，确保列表不显示重复的设备
-            //         BleScan = [...this.deviceMap.values()];
-            //     }
-            // })
             /**蓝牙扫描绑定*/
             this.deviceMap.clear();
             BluetoothManager.manager.startDeviceScan(null, null, (error, device) => {
@@ -192,19 +197,6 @@ export default class CWHome extends Component {
             }) 
             // 向数据库写数据
             this.writeDatabase();
-        });
-    }
-    
-    /**充电器*/ 
-    chargerStorage(val){
-        this.setState({
-            chargerStorage:val
-        });
-    }
-    /**蓄电池*/ 
-    batteryStorage(val){
-        this.setState({
-            batteryStorage:val
         });
     }
 
@@ -231,7 +223,7 @@ export default class CWHome extends Component {
             const positionData = position.coords;
             /**  经度：positionData.longitude*/
             /** 纬度：positionData.latitude*/
-            const loop = () => {   
+            const loop = () => {
                 var date = new Date();
                 var y = date.getFullYear();
                 var m = date.getMonth()+1;
@@ -398,7 +390,7 @@ export default class CWHome extends Component {
                                                 bleBroadcast.stop();
                                                 this.refs.toast_su.success();
                                                 this.setState({
-                                                    bandingImg: 1
+                                                    bandingImg: false
                                                 });
                                                 return;
                                             }
@@ -423,6 +415,7 @@ export default class CWHome extends Component {
         // BluetoothManager.stopScan();
         BluetoothManager.destroy();  
         clearTimeout(this.storageTime);
+        this.listener.remove();//监听移除
     }
 
     //电池1
@@ -465,7 +458,7 @@ export default class CWHome extends Component {
             } else {
                 alert('error');
             };    
-    })
+        })
     }     
     // 页头
     static navigationOptions = {
@@ -491,7 +484,7 @@ export default class CWHome extends Component {
                 {/*进度条*/}
                 <ProgressDialogAlert ref='pmgressbar' title='提示信息' btnText='确定' msg={10}  progress={0.7} width={200} color='red'/>
                 <AlertS ref='bleScan' title='提示' btnText='确定' msg='请先打开蓝牙开关！' />
-
+                
                 {/*测试*/}
                 {/* <View style={{justifyContent:'space-around',flexDirection:'row'}}>
                     <TouchableOpacity style={{width:35,height:35,backgroundColor:'#0fa'}} onPress={()=>this.banding1()}>
@@ -660,10 +653,14 @@ export default class CWHome extends Component {
                     </View>
                 </View>
                 {/*绑定按钮*/}
-                {this.state.bandingImg===0?
-                    <TouchableOpacity style={{position:'absolute',bottom:20,left:20}} onPress={()=>{this.banding()}}>
-                        <Image style={{width:width/8,height:width/8 }} source={require('../../img/bind.png')}/>
-                    </TouchableOpacity>:<View/>}
+                {this.state.bandingImg === true?
+                    <TouchableOpacity style={ styles.bindBtn } onPress={()=>{this.banding()}}>
+                        <Image style={ styles.bindBtnImg } source={require('../../img/bind/bind.png')}/>
+                    </TouchableOpacity>:
+                    <View style={ styles.bindBtn }>
+                        <Image style={ styles.bindBtnImg } source={require('../../img/bind/success.png')}/>
+                    </View>
+                }
                 <EasyToast
                     ref="toast"
                     style={{backgroundColor:'rgba(0,0,0,0.5)',padding:12}}
@@ -675,6 +672,14 @@ export default class CWHome extends Component {
 };
 
 const styles = StyleSheet.create({
+    bindBtnImg:{
+        width:width/8,
+        height:width/8
+    },
+    bindBtn:{
+        position:'absolute',
+        bottom:20,left:20
+    },
     container:{
         flex:1,
         backgroundColor:'#fff',
@@ -707,7 +712,7 @@ const styles = StyleSheet.create({
         width:40,
         height:70, 
         // flex:1,   
-    }
+    },
 });
 
 // AppRegistry.registerComponent('CWHome', () => CWHome);

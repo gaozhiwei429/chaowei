@@ -86,7 +86,7 @@ export function pad(num, n) {
     return Array(n>num?(n-(''+num).length+1):0).join(0)+num;
 }
 
-
+// 截取时间
 export function replaceTime(txt){
         // var txt='2013-01-31 20:20';
         var re2='.*?((?:(?:[0-1][0-9])|(?:[2][0-3])|(?:[0-9])):(?:[0-5][0-9])?(?:\\s?(?:am|AM|pm|PM))?)';	// HourMinuteSec 1
@@ -126,4 +126,93 @@ export function uniqeByKeys(array,keys){
         }
     }
     return arr ;
+}
+
+// 去重数组对象
+export function del(arr){
+    for( let i=0;i<arr.length;i++) {
+            for(let j=i+1;j<arr.length;j++) {
+                if (arr[i].at==arr[j].at && arr[i].id !== arr[j].id) {
+                    if(arr[i].id == 'Base_Station'){
+                        arr.splice(i,1);
+                        i--;
+                    }else if (arr[j].id == 'Base_Station'){
+                        arr.splice(j,1);
+                        i--;
+                    }
+
+                }
+            }
+        }
+        return arr;
+    }
+// json数组时间正序
+export function timeCompare(p){ //这是比较函数
+    return function(m,n){
+        var a = m[p];
+        var b = n[p];
+        return a > b ? 1 : -1; 
+    }
+}
+
+
+/**
+
+获取本周、本月 的开端日期、停止日期
+*/
+var now = new Date(); //当前日期
+var nowDayOfWeek = now.getDay(); //今天本周的第几天
+var nowDay = now.getDate(); //当前日
+var nowMonth = now.getMonth(); //当前月
+var nowYear = now.getYear(); //当前年
+nowYear += (nowYear < 2000) ? 1900 : 0; //
+//格局化日期：yyyy-MM-dd
+function formatDate(date) {
+    var myyear = date.getFullYear();
+    var mymonth = date.getMonth()+1;
+    var myweekday = date.getDate();
+    
+    if(mymonth < 10){
+        mymonth = "0" + mymonth;
+    }
+    if(myweekday < 10){
+        myweekday = "0" + myweekday;
+    }
+    return (myyear+"-"+mymonth + "-" + myweekday);
+}
+
+//获得某月的天数
+function getMonthDays(nowMonth){
+    var monthStartDate = new Date(nowYear, nowMonth, 1);
+    var monthEndDate = new Date(nowYear, nowMonth + 1, 1);
+    var days = (monthEndDate - monthStartDate)/(1000*60*60 * 24);
+    return days;
+}
+// 当前月份
+export function nowMonth(){
+    return nowMonth+1+'月'
+}
+
+//获得本周的开端日期
+export function getWeekStartDate() {
+    var weekStartDate = new Date(nowYear, nowMonth, nowDay - nowDayOfWeek+1);
+    return formatDate(weekStartDate);
+}
+
+//获得本周的停止日期
+export function getWeekEndDate() {
+    var weekEndDate = new Date(nowYear, nowMonth, nowDay + (6 - nowDayOfWeek)+1);
+    return formatDate(weekEndDate);
+}
+
+//获得本月的开端日期
+export function getMonthStartDate(){
+    var monthStartDate = new Date(nowYear, nowMonth, 1);
+    return formatDate(monthStartDate);
+}
+
+//获得本月的停止日期
+export function getMonthEndDate(){
+    var monthEndDate = new Date(nowYear, nowMonth, getMonthDays(nowMonth));
+    return formatDate(monthEndDate);
 }

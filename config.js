@@ -22,3 +22,6 @@ export const CALIBRATION_BATTERY_ELECTRICITY_VALUE_STORAGE_KEY = 'calibration_ba
 
 //充电器检测仪
 export const LOGGER_STORAGE_KEY = 'loggerValue';
+
+//智能电池
+export const SMART_BATTERY_STORAGE_KEY = 'SMART_BATTERY_STORAGE_KEY'
