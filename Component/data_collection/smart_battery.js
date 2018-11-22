@@ -57,18 +57,6 @@ export default class smart_battery extends Component {
             modalVisible: false,
             locationValue:[],
             DatePickerDisabled:false,
-            voltageTime:[],//电压时间
-            voltageValue:[ ],//电压
-            currentTime:[],//电流时间
-            currentValue:[ ],//电流
-            capTime:[],//容(电)量时间
-            capValue:[ ],//容(电)量
-            Temp_OutTime:[],//外部温度时间
-            Temp_OutValue:[ ],//外部温度
-            Temp_InTime:[],//内部温度时间
-            Temp_InValue:[ ],//内部温度
-            Open_AlarmValue:[],//开盒情况
-            locationValue:[],//GPS与基站 经纬度
         };
         
     }
